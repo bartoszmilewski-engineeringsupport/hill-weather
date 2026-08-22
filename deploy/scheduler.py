@@ -13,6 +13,7 @@ plain python:alpine with no build step and nothing to install.
 Config comes from the environment (see .env.example):
     RUN_TIMES       comma separated HH:MM in UTC, default "05:15,16:15"
     RUN_ON_START    run once at startup if there is no forecast yet
+    HEARTBEAT_URL   optional Uptime Kuma push URL, pinged after each run
     ROOT            project root inside the container
 """
 
@@ -22,6 +23,8 @@ import shutil
 import subprocess
 import sys
 import time
+import urllib.parse
+import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -29,6 +32,7 @@ ROOT = Path(os.environ.get("ROOT", "/app"))
 RUN_TIMES = [t.strip() for t in
              os.environ.get("RUN_TIMES", "05:15,16:15").split(",") if t.strip()]
 RUN_ON_START = os.environ.get("RUN_ON_START", "1") not in ("0", "false", "no")
+HEARTBEAT_URL = os.environ.get("HEARTBEAT_URL", "").strip()
 PYTHON = sys.executable
 
 DATA = ROOT / "web" / "data"
@@ -65,6 +69,31 @@ def write_status(ok, detail):
     }, indent=2), encoding="utf-8")
 
 
+def heartbeat(ok, msg):
+    """Ping an Uptime Kuma push monitor, if one is configured.
+
+    The status file alone is not enough to monitor this properly: if the
+    scheduler dies, the file sits there still saying everything is fine while
+    the forecast quietly goes stale. A push monitor inverts that. Silence is
+    the alert, so a dead container, a hung process or a broken network all get
+    caught by the same check.
+
+    Never allowed to break the pipeline. Monitoring that can take down the
+    thing it monitors is worse than no monitoring.
+    """
+    if not HEARTBEAT_URL:
+        return
+    try:
+        sep = "&" if "?" in HEARTBEAT_URL else "?"
+        url = (f"{HEARTBEAT_URL}{sep}status={'up' if ok else 'down'}"
+               f"&msg={urllib.parse.quote(msg)}")
+        with urllib.request.urlopen(url, timeout=15):
+            pass
+        log("heartbeat sent")
+    except Exception as e:                        # noqa: BLE001
+        log(f"heartbeat failed, ignoring: {e}")
+
+
 def pipeline():
     log("pipeline start")
 
@@ -81,6 +110,7 @@ def pipeline():
     if not run("build.py", "--out", str(STAGING)):
         log("BUILD FAILED, keeping the previous forecast in place")
         write_status(False, "build failed, serving previous forecast")
+        heartbeat(False, "build failed")
         shutil.rmtree(STAGING, ignore_errors=True)
         return False
 
@@ -95,6 +125,7 @@ def pipeline():
 
     log("build ok, swapped into web/data")
     write_status(True, "ok")
+    heartbeat(True, "build ok")
     return True
 
 

@@ -132,13 +132,32 @@ static and cacheable, so the edge absorbs it.
 
 ### Monitoring
 
-Uptime Kuma, HTTP keyword monitor:
+Two monitors in Uptime Kuma, because they catch different things.
 
+**1. Push monitor (the important one).**
+
+- Type: Push
+- Heartbeat Interval: `46800` (13 hours, comfortably more than the 11 hour gap
+  between the 05:15 and 16:15 builds)
+- Retries: 0
+- Copy its push URL into `HEARTBEAT_URL` in `deploy/.env`, then
+  `docker compose up -d` to pick it up.
+
+The scheduler pings this after every run, up on success and down on failure.
+Silence is the alert, so this catches a failed build, a dead container, a hung
+process and a broken network with one check.
+
+**2. Keyword monitor (site availability).**
+
+- Type: HTTP(s) - Keyword
 - URL: `https://hillweather.co.uk/data/_status.json`
 - Keyword: `"ok": true`
+- Heartbeat Interval: 3600
 
-The scheduler writes that file after every run, so this catches a build that
-has silently stopped refreshing, which a plain uptime check would not.
+This one tells you the site is reachable and serving. On its own it is not
+enough: if the scheduler dies, the last forecast keeps being served and this
+monitor stays green while the data quietly goes stale. That is what the push
+monitor is for.
 
 ### Archive backup
 
