@@ -45,15 +45,27 @@ def log(msg):
 
 
 def run(script, *args):
-    """Run one pipeline script, streaming its output into our own log."""
-    cmd = [PYTHON, str(ROOT / "scripts" / script), *args]
-    proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-    for line in (proc.stdout or "").splitlines():
-        log(f"  {line}")
-    if proc.returncode != 0:
-        for line in (proc.stderr or "").strip().splitlines()[-8:]:
-            log(f"  ! {line}")
-    return proc.returncode == 0
+    """Run one pipeline script, streaming its output into our own log.
+
+    Streamed line by line rather than captured and printed at the end. A build
+    can legitimately sit in a rate-limit backoff for twenty minutes, and a job
+    that pauses that long while showing nothing is indistinguishable from a
+    hung one. Anyone watching the log deserves to see the backoff happening.
+    """
+    cmd = [PYTHON, "-u", str(ROOT / "scripts" / script), *args]
+    proc = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True, bufsize=1)
+    tail = []
+    for line in proc.stdout:
+        line = line.rstrip()
+        if line:
+            log(f"  {line}")
+            tail.append(line)
+            del tail[:-8]
+    code = proc.wait()
+    if code != 0 and tail:
+        log(f"  ! exited {code}")
+    return code == 0
 
 
 def write_status(ok, detail):
