@@ -75,8 +75,22 @@ generic map-pin iconography, dark mode.
 
 - **No external map tiles.** Everything is self-hosted static files: no
   Mapbox, no Google, no OpenStreetMap tiles. The relief is pre-rendered at
-  build time from **OS Terrain 50** (free UK elevation open data) and shipped
-  as static assets, so it works with one bar of signal in a car park.
+  build time and shipped as static assets, so it works with one bar of signal
+  in a car park.
+- **The terrain data is confirmed available.** OS Terrain 50 is free for
+  everyone, 50 m post spacing, and ships **10 m interval contours as vectors**
+  (Shapefile, GeoPackage, GML) alongside the elevation grid. The contour lines
+  do not have to be computed: they are supplied. That makes engraved
+  cartography a matter of styling existing linework rather than deriving it,
+  and 50 m spacing is far finer than a national view needs, so it downsamples
+  freely. Attribution to Ordnance Survey is required; confirm the exact wording
+  against the OS OpenData licence before publishing.
+- **The cloud field needs its own data.** The 496 hill points are unevenly
+  distributed and leave large gaps, so a smooth field cannot honestly be
+  interpolated from them alone. A coarse regular grid (roughly 25 km spacing
+  over the Highlands, 10 km over the Lakes, around 150 to 200 points) gives a
+  proper field and is cheap: far fewer variables per point than the hill
+  forecast needs.
 - **Rendering is open.** SVG, canvas, WebGL, pre-rendered raster, or any
   combination. Going elaborate is welcome if it earns its place.
 - **Phones matter**, but design desktop first. One-handed use, and the result
