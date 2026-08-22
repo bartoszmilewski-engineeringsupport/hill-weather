@@ -9,12 +9,14 @@
     --bg: #f6f7f9; --card: #fff; --ink: #16191d; --dim: #666e78;
     --line: #e2e5ea; --accent: #2f6f4f;
     --good: #2f6f4f; --mid: #b07d2b; --bad: #8a3d3d; --inv: #4a5fa8;
+    --cloud: #c9ced6;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #14171a; --card: #1c2024; --ink: #e8eaed; --dim: #9aa3ad;
       --line: #2a2f35; --accent: #7fc6a0;
       --good: #7fc6a0; --mid: #d9ac5f; --bad: #d98b8b; --inv: #93a6e8;
+      --cloud: #3a424c;
     }
   }
   * { box-sizing: border-box; }
@@ -35,21 +37,28 @@
   }
   button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent);
     color: var(--bg); font-weight: 600; }
-  main { max-width: 780px; margin: 0 auto; padding: .3rem 1rem; }
+  main { max-width: 720px; margin: 0 auto; padding: .3rem 1rem; }
   .row {
-    display: grid; grid-template-columns: 3.2rem 1fr auto;
-    gap: .75rem; align-items: center;
-    background: var(--card); border: 1px solid var(--line);
-    border-radius: 10px; padding: .6rem .75rem; margin-bottom: .4rem;
-    cursor: pointer;
+    display: grid; grid-template-columns: 2.9rem 1fr auto;
+    gap: .8rem; align-items: center;
+    border-bottom: 1px solid var(--line);
+    padding: .5rem .35rem; cursor: pointer;
   }
-  .pct { font-size: 1.25rem; font-weight: 650; text-align: right;
-         font-variant-numeric: tabular-nums; }
-  .name { font-weight: 600; }
-  .meta { color: var(--dim); font-size: .78rem; margin-top: .1rem; }
-  .tags { display: flex; gap: .3rem; flex-direction: column; align-items: flex-end; }
-  .tag { font-size: .68rem; padding: .1rem .4rem; border-radius: 4px;
+  .row:hover { background: var(--card); }
+  .pct { font-size: 1.15rem; font-weight: 650; text-align: right;
+         font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .mid { min-width: 0; }
+  .name { font-weight: 600; white-space: nowrap; overflow: hidden;
+          text-overflow: ellipsis; }
+  .ht { color: var(--dim); font-weight: 400; font-size: .85em; }
+  .meta { color: var(--dim); font-size: .74rem; margin-top: .05rem;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .viz { display: flex; align-items: center; gap: .5rem; }
+  .elev { flex: none; display: block; }
+  .tags { display: flex; gap: .25rem; flex-direction: column; align-items: flex-end; }
+  .tag { font-size: .62rem; padding: .05rem .35rem; border-radius: 4px;
          border: 1px solid currentColor; white-space: nowrap; }
+  @media (max-width: 540px) { .elev { display: none; } }
   .t-inv { color: var(--inv); } .t-light { color: var(--mid); }
   .g { color: var(--good); } .m { color: var(--mid); } .b { color: var(--bad); }
   .detail { display: none; padding: .5rem .75rem .7rem; margin: -.3rem 0 .5rem;
@@ -209,24 +218,60 @@ function render() {
   }
 }
 
+// A small elevation diagram: the cloud layer as a band, the summit as a tick.
+//
+// This is the whole idea of the site in one glyph. "CLEAR, cloud 850-1549m" is
+// a sentence you have to parse; a summit sitting below a grey band is a fact
+// you take in at a glance, and it makes rows comparable down the page in a way
+// numbers never are.
+const SCALE_TOP = 1600;   // metres at the right hand edge
+
+function elevationBar(height, base, top, verdict) {
+  const W = 132, H = 16;
+  const x = m => Math.max(0, Math.min(W, (m / SCALE_TOP) * W));
+  const parts = [];
+
+  parts.push(`<rect x="0" y="${H / 2 - 1}" width="${W}" height="2"
+    fill="var(--line)"/>`);
+
+  if (base != null) {
+    const b = x(base);
+    const t = top != null ? x(top) : W;
+    parts.push(`<rect x="${b}" y="0" width="${Math.max(2, t - b)}" height="${H}"
+      fill="var(--cloud)" rx="2"/>`);
+  }
+
+  const sx = x(height);
+  const colour = verdict === 'IN CLOUD' ? 'var(--bad)'
+               : verdict === 'ON THE EDGE' ? 'var(--mid)' : 'var(--good)';
+  parts.push(`<path d="M${sx - 5} ${H} L${sx} ${H - 11} L${sx + 5} ${H} Z"
+    fill="${colour}"/>`);
+
+  return `<svg class="elev" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
+    aria-hidden="true">${parts.join('')}</svg>`;
+}
+
 function renderRows(rows, list) {
   for (const { h, s } of rows) {
-    const cloud = s.cloud_base == null ? ''
+    const cloud = s.cloud_base == null ? 'no low cloud'
       : `cloud ${s.cloud_base}${s.cloud_top ? '-' + s.cloud_top : ''}m`;
 
     const row = document.createElement('div');
     row.className = 'row';
     row.innerHTML = `
       <div class="pct ${cls(s.view_pct)}">${s.view_pct}<span style="font-size:.6em">%</span></div>
-      <div>
-        <div class="name">${h.name} <span style="color:var(--dim);font-weight:400">${h.height}m</span></div>
-        <div class="meta">${s.verdict}${cloud ? ' · ' + cloud : ''}${
+      <div class="mid">
+        <div class="name">${h.name} <span class="ht">${h.height}m</span></div>
+        <div class="meta">${cloud}${
           s.view_best !== s.view_worst
-            ? ` · ${s.view_worst}-${s.view_best}% across the day` : ''}</div>
+            ? ` · ${s.view_worst}-${s.view_best}% through the day` : ''}</div>
       </div>
-      <div class="tags">
-        ${s.inversion > 15 ? `<span class="tag t-inv">inversion ${s.inversion}</span>` : ''}
-        ${s.light_dawn > 25 ? `<span class="tag t-light">dawn light ${s.light_dawn}</span>` : ''}
+      <div class="viz">
+        ${elevationBar(h.height, s.cloud_base, s.cloud_top, s.verdict)}
+        <div class="tags">
+          ${s.inversion > 15 ? `<span class="tag t-inv">inversion</span>` : ''}
+          ${s.light_dawn > 25 ? `<span class="tag t-light">dawn light</span>` : ''}
+        </div>
       </div>`;
 
     const det = document.createElement('div');
