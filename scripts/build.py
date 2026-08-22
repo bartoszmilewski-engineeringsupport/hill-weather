@@ -65,8 +65,30 @@ def from_live(region):
     return meta, [h._asdict() for h in hills], responses
 
 
+def enrich(hill_defs, region):
+    """Fill in static hill facts from the current DoBIH.
+
+    Grid references, county and list membership do not change with the weather,
+    so they are joined at build time rather than frozen into the archive. That
+    also means an archive written before a field existed still rebuilds into a
+    complete page, which matters for backtests.
+    """
+    try:
+        current = {h.name: h._asdict() for h in load_hills(region)}
+    except Exception:                              # noqa: BLE001
+        return hill_defs
+    out = []
+    for hill in hill_defs:
+        ref = current.get(hill["name"])
+        if ref:
+            hill = {**ref, **{k: v for k, v in hill.items() if v is not None}}
+        out.append(hill)
+    return out
+
+
 def build(meta, hill_defs, responses, source):
     levels = meta["levels_hpa"]
+    hill_defs = enrich(hill_defs, meta["region"])
     hills_out = []
 
     for hill, resp in zip(hill_defs, responses):
@@ -94,7 +116,8 @@ def build(meta, hill_defs, responses, source):
         }
         # Optional and read with .get() so archives written before these fields
         # existed still rebuild cleanly.
-        for extra in ("alt", "prominence", "area"):
+        for extra in ("alt", "prominence", "area", "lists", "county",
+                      "country", "grid_ref", "map50", "feature", "url"):
             if hill.get(extra) is not None:
                 entry[extra] = hill[extra]
         hills_out.append(entry)
@@ -268,7 +291,11 @@ def main():
             except (ValueError, KeyError):
                 pass
         existing.update({r["region"]: r for r in built})
-        regions = sorted(existing.values(), key=lambda r: r["region"])
+        # Site order, not alphabetical: Scotland leads. The page then remembers
+        # whichever region the reader last chose.
+        regions = sorted(existing.values(),
+                         key=lambda r: (REGIONS.get(r["region"], {}).get("order", 99),
+                                        r["region"]))
         index_path.write_text(json.dumps({"regions": regions}, indent=2),
                               encoding="utf-8")
         print(f"  {'index':9} -> {index_path.name} "

@@ -26,7 +26,8 @@ import zipfile
 from collections import namedtuple
 from pathlib import Path
 
-Hill = namedtuple("Hill", "name region lat lon height alt prominence area")
+Hill = namedtuple("Hill", "name region lat lon height alt prominence area "
+                          "lists county country grid_ref map50 feature url")
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DOBIH_CSV = DATA_DIR / "DoBIH_v18_5.csv"
@@ -48,15 +49,20 @@ DOBIH_VERSION = "v18.5"
 # `area_column` is the geographic grouping. DoBIH fills different columns for
 # the two lists: Munros carry SMC section names in Region, Wainwrights carry
 # Wainwright's own fell groups in Area.
+# `order` sets which region leads on the site. Scotland first because it is
+# where most of the hills are and where the forecast matters most; the site
+# then remembers whichever the reader last chose.
 REGIONS = {
     "scotland": {
         "label": "Scottish Highlands", "column": "M", "list_name": "Munros",
+        "order": 1,
         "area_column": "Region",
         "bands": [(1200, "Over 1200m"), (1100, "1100 to 1200m"),
                   (1000, "1000 to 1100m"), (0, "Under 1000m")],
     },
     "lakes": {
         "label": "Lake District", "column": "W", "list_name": "Wainwrights",
+        "order": 2,
         "area_column": "Area",
         "bands": [(800, "Over 800m"), (600, "600 to 800m"),
                   (400, "400 to 600m"), (0, "Under 400m")],
@@ -102,6 +108,24 @@ VALIDATION_NAMES = {
 }
 
 _BRACKETS = re.compile(r"\s*[\[\(].*?[\]\)]\s*")
+
+# DoBIH records list membership as comma-separated codes. Only the lists people
+# actually bag are worth showing; the rest are cartographic bookkeeping.
+LIST_NAMES = {
+    "M": "Munro", "MT": "Munro Top", "C": "Corbett", "CT": "Corbett Top",
+    "G": "Graham", "D": "Donald", "DT": "Donald Top", "Hew": "Hewitt",
+    "N": "Nuttall", "W": "Wainwright", "B": "Birkett", "Ma": "Marilyn",
+    "Fel": "Fellranger",
+}
+COUNTRIES = {"S": "Scotland", "E": "England", "W": "Wales", "I": "Ireland"}
+
+
+def _lists(value):
+    out = [LIST_NAMES[c.strip()] for c in (value or "").split(",")
+           if c.strip() in LIST_NAMES]
+    # Order them the way a bagger would rank them, biggest list first.
+    rank = list(LIST_NAMES.values())
+    return sorted(set(out), key=rank.index)
 
 
 def _clean(name):
@@ -170,6 +194,15 @@ def load_hills(region=None, validation=False):
             alt=alt,
             prominence=prominence,
             area=_area(row, REGIONS[region]["area_column"]),
+            lists=_lists(row.get("Classification")),
+            county=row.get("County") or None,
+            country=COUNTRIES.get(row.get("Country"), None),
+            grid_ref=row.get("Grid ref") or None,
+            # "51 52" means the summit falls on two Landranger sheets.
+            map50=(row.get("Map 1:50k") or "").replace(" ", ", ") or None,
+            # What actually marks the top: a trig point, a cairn, a shelter.
+            feature=row.get("Feature") or None,
+            url=row.get("Hill-bagging") or None,
         ))
     hills.sort(key=lambda h: -h.height)
 

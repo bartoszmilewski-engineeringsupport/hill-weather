@@ -28,6 +28,7 @@
     <div class="navgroup" id="regions"></div>
     <div class="navgroup" id="days"></div>
     <div class="navgroup">
+      <button id="locate" type="button" style="letter-spacing:.13em">Nearest to me</button>
       <a href="how-to-read.html">How to read this</a>
       <button id="share" type="button" style="letter-spacing:.13em">Share</button>
     </div>
@@ -71,7 +72,31 @@
 </footer>
 
 <script>
-const state = { region: null, day: null, data: {}, open: null };
+const state = { region: null, day: null, data: {}, open: null, here: null };
+
+// Which region leads is a remembered preference, not a guess.
+//
+// Deliberately no geolocation prompt on arrival: asking before someone knows
+// what the site is gets declined by a lot of people, and location is not
+// intent anyway - somebody in Manchester planning a Scotland trip does not
+// want the Lakes forced on them. What they last chose tracks intent far
+// better, and costs no permission. "Nearest to me" is there for the people
+// who actively want it.
+const REMEMBERED = 'hw.region';
+function rememberedRegion() {
+  try { return localStorage.getItem(REMEMBERED); } catch (e) { return null; }
+}
+function rememberRegion(r) {
+  try { localStorage.setItem(REMEMBERED, r); } catch (e) { /* private mode */ }
+}
+
+function haversine(a, b, c, d) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (c - a) * rad, dLon = (d - b) * rad;
+  const h = Math.sin(dLat / 2) ** 2 +
+    Math.cos(a * rad) * Math.cos(c * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
 const DATA = 'data/';
 const detailCache = {};
 
@@ -185,7 +210,8 @@ function render() {
       { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   chips('regions', Object.entries(state.data).map(([k, v]) => [k, v.meta.label]),
-        () => state.region, v => { state.region = v; state.day = null; state.open = null; render(); });
+        () => state.region,
+        v => { state.region = v; rememberRegion(v); state.day = null; state.open = null; render(); });
   chips('days', days.map(x => [x, new Date(x + 'T12:00')
         .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })]),
         () => state.day, v => { state.day = v; state.open = null; render(); });
@@ -269,6 +295,29 @@ function render() {
   }
 }
 
+function facts(h) {
+  const rows = [];
+  if (h.lists && h.lists.length) rows.push(['Lists', h.lists.join(', ')]);
+  rows.push(['Height', `${h.height} m` + (h.prominence != null
+    ? ` <small style="color:var(--faint)">(${h.prominence} m of drop)</small>` : '')]);
+  if (h.area) rows.push(['Area', h.area]);
+  if (h.county) rows.push(['County', h.county + (h.country ? ', ' + h.country : '')]);
+  if (h.grid_ref) rows.push(['Grid ref', h.grid_ref]);
+  if (h.map50) rows.push(['OS Landranger', h.map50]);
+  // What actually marks the top. A small thing, and exactly the sort of detail
+  // that tells a walker this was made by someone who has stood on these hills.
+  if (h.feature) rows.push(['Summit', h.feature]);
+  if (state.here) {
+    const km = haversine(state.here.lat, state.here.lon, h.lat, h.lon);
+    rows.push(['From you', `${Math.round(km)} km`]);
+  }
+  return rows.map(([k, v]) =>
+    `<div style="display:flex;justify-content:space-between;gap:16px;
+      border-bottom:1px dotted var(--rule);padding:6px 0">
+      <dt style="color:#4A423A;flex:none">${k}</dt>
+      <dd style="margin:0;text-align:right">${v}</dd></div>`).join('');
+}
+
 function detailHTML(h) {
   const sun = h.sun[state.day] || {};
   const hrs = h.hours.filter(x => x.t.startsWith(state.day) &&
@@ -276,8 +325,14 @@ function detailHTML(h) {
   return `<div class="detail-inner">
     <div>
       <h4>${h.name}</h4>
-      <div class="hill-sub">${h.height} m${h.area ? ' &middot; ' + h.area : ''}</div>
-      <dl style="margin:16px 0 0;display:flex;flex-direction:column;gap:9px;font-size:15px">
+      <div class="hill-sub">${h.alt ? h.alt : (h.country || '')}</div>
+      <dl style="margin:14px 0 0;font-size:15px">${facts(h)}</dl>
+      <div style="margin-top:14px;font-size:14px;display:flex;gap:16px;flex-wrap:wrap">
+        <a href="https://www.openstreetmap.org/?mlat=${h.lat}&amp;mlon=${h.lon}#map=14/${h.lat}/${h.lon}"
+           target="_blank" rel="noopener">Map</a>
+        ${h.url ? `<a href="${h.url}" target="_blank" rel="noopener">Hill-bagging</a>` : ''}
+      </div>
+      <dl style="margin:18px 0 0;display:flex;flex-direction:column;gap:9px;font-size:15px">
         <div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted var(--rule);padding-bottom:7px">
           <dt style="color:#4A423A">Sunrise</dt><dd style="margin:0">${hhmm(sun.sunrise)} <small style="color:var(--faint)">${compass(sun.sunrise_azimuth)}</small></dd></div>
         <div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted var(--rule);padding-bottom:7px">
@@ -292,7 +347,8 @@ function detailHTML(h) {
         ${hrs.map(x => `<tr>
           <td>${x.t.slice(11, 16)}</td>
           <td class="${band(x.view_pct)}">${x.view_pct}%</td>
-          <td>${x.cloud_base ?? '-'}${x.cloud_top ? '&ndash;' + x.cloud_top : ''} m${x.uncertain ? ' ?' : ''}</td>
+          <td>${x.cloud_base == null ? 'none'
+             : `${x.cloud_base}${x.cloud_top ? '&ndash;' + x.cloud_top : ''} m`}${x.uncertain ? ' ?' : ''}</td>
           <td>${x.temp ?? '-'}&deg;</td>
           <td>${x.wind ?? '-'} ${compass(x.wind_dir)}</td>
         </tr>`).join('')}
@@ -301,11 +357,52 @@ function detailHTML(h) {
   </div>`;
 }
 
+// Opt-in only, and it never blocks the page. Picks the region whose hills are
+// nearest, then keeps the fix so hill detail can show a distance.
+async function locate() {
+  const btn = document.getElementById('locate');
+  if (!navigator.geolocation) { btn.textContent = 'Location unavailable'; return; }
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Finding you…';
+  try {
+    const pos = await new Promise((res, rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej,
+        { timeout: 10000, maximumAge: 600000 }));
+    state.here = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+
+    let best = null;
+    for (const [key, d] of Object.entries(state.data)) {
+      const nearest = Math.min(...d.hills.map(h =>
+        haversine(state.here.lat, state.here.lon, h.lat, h.lon)));
+      if (!best || nearest < best.km) best = { key, km: nearest };
+    }
+    if (best) {
+      state.region = best.key;
+      rememberRegion(best.key);
+      state.day = null;
+      state.open = null;
+      render();
+      btn.textContent = `${Math.round(best.km)} km away`;
+      return;
+    }
+  } catch (e) {
+    // Declined, timed out, or blocked. Say so quietly and carry on.
+    btn.textContent = e && e.code === 1 ? 'Location declined' : 'Could not locate you';
+    setTimeout(() => { btn.textContent = original; }, 4000);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById('locate').addEventListener('click', locate);
+
 async function boot() {
   const index = await (await fetch(DATA + 'index.json')).json();
   for (const r of index.regions)
     state.data[r.region] = await (await fetch(DATA + r.summary)).json();
-  state.region = index.regions[0].region;
+  const saved = rememberedRegion();
+  state.region = state.data[saved] ? saved : index.regions[0].region;
   render();
 }
 
