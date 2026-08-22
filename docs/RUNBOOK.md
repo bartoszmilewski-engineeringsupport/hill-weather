@@ -86,21 +86,30 @@ risk of divergence.
 
 ### DNS
 
+Both domains are registered and served by Cloudflare, so there is no
+nameserver change to make. Add four A records, all pointing at the host:
+
 ```
-A    hillweather.uk       <host-ip>
-A    www.hillweather.uk   <host-ip>
-A    hillweather.co.uk    <host-ip>
+A    hillweather.co.uk        <host-ip>     DNS only
+A    www.hillweather.co.uk    <host-ip>     DNS only
+A    hillweather.uk           <host-ip>     DNS only
+A    www.hillweather.uk       <host-ip>     DNS only
 ```
+
+**Create them unproxied (grey cloud).** With the orange cloud on, Cloudflare
+answers with its own addresses, so a certificate failure gives you no way to
+tell whether the problem is the host, the proxy host, or Cloudflare. Get it
+working end to end first, then turn the proxy on.
 
 Must resolve before requesting a certificate.
 
 ### Nginx Proxy Manager
 
-- Proxy host: `hillweather.uk`, `www.hillweather.uk` to `http://<host-ip>:<WEB_PORT>`.
-  Request a Let's Encrypt certificate. Enable Block Common Exploits and
-  Websockets off.
-- Second entry: `hillweather.co.uk` as a **301 redirect** to
-  `https://hillweather.uk`, with its own certificate.
+- Proxy host: `hillweather.co.uk`, `www.hillweather.co.uk` to
+  `http://<host-ip>:<WEB_PORT>`. Request a Let's Encrypt certificate. Enable
+  Block Common Exploits; leave Websockets off.
+- Second entry: `hillweather.uk` and `www.hillweather.uk` as a **301 redirect**
+  to `https://hillweather.co.uk`, with its own certificate.
 
 Known trap: NPM has a latent trailing-space bug on the forward hostname field.
 If you get 502s straight after editing a proxy host in the UI, check for a
@@ -125,7 +134,7 @@ static and cacheable, so the edge absorbs it.
 
 Uptime Kuma, HTTP keyword monitor:
 
-- URL: `https://hillweather.uk/data/_status.json`
+- URL: `https://hillweather.co.uk/data/_status.json`
 - Keyword: `"ok": true`
 
 The scheduler writes that file after every run, so this catches a build that

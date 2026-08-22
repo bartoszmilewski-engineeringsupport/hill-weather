@@ -37,8 +37,8 @@ Wainwrights, rebuilding twice daily.
       runs with no download step.
 - [x] Repo created at `C:\dev\hill-weather`, **not** in Google Drive, which
       corrupts `.git`.
-- [x] Name and domains: **hillweather.uk** canonical, hillweather.co.uk
-      registered and redirected.
+- [x] Name and domains: **hillweather.co.uk** canonical, hillweather.uk
+      registered and redirected to it. Both bought through Cloudflare.
 - [ ] Email Open-Meteo about the request pattern. Their terms already confirm a
       free ad-free app is non-commercial, so this is about sizing, not
       permission. Draft is written.
