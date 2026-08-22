@@ -43,7 +43,12 @@ CACHE = ROOT / "data" / "sources.json"
 UA = ("HillWeather/0.1 (https://hillweather.co.uk; free hobby hill forecast; "
       "contact@hillweather.co.uk)")
 PAUSE = 0.4                     # be a polite visitor to both sites
-GEO_RADIUS = 600                # metres
+# Wikipedia's coordinates for a hill often mark the massif rather than the
+# exact summit, so a tight radius misses real articles: Lochnagar sits 686 m
+# from the DoBIH summit and Beinn a' Ghlo nearly 3 km. A wide radius is safe
+# here only because the NAME must match too - that check is what stops a
+# neighbour's article being served for a hill that has none.
+GEO_RADIUS = 3000               # metres
 NAME_RATIO = 0.88
 
 WH_BASE = "https://www.walkhighlands.co.uk"
@@ -193,6 +198,8 @@ def status(cache):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--refresh", action="store_true", help="redo every hill")
+    ap.add_argument("--retry-missing", action="store_true",
+                    help="retry only hills with no description yet")
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--limit", type=int, default=0, help="stop after N lookups")
     args = ap.parse_args()
@@ -202,20 +209,27 @@ def main():
         return status(cache)
 
     hills = load_hills()
-    todo = [h for h in hills if args.refresh or key(h) not in cache["hills"]]
+    if args.retry_missing:
+        todo = [h for h in hills
+                if not (cache["hills"].get(key(h)) or {}).get("wikipedia")]
+    else:
+        todo = [h for h in hills if args.refresh or key(h) not in cache["hills"]]
     print(f"{len(todo)} hills to look up (of {len(hills)})")
 
     for i, h in enumerate(todo, 1):
         if args.limit and i > args.limit:
             break
-        entry = {}
+        entry = dict(cache["hills"].get(key(h)) or {}) if args.retry_missing else {}
         w = wikipedia(h)
         if w:
             entry["wikipedia"] = w
-        time.sleep(PAUSE)
-        link = walkhighlands(h)
-        if link:
-            entry["walkhighlands"] = link
+        if args.retry_missing and entry.get("walkhighlands"):
+            link = entry["walkhighlands"]          # already verified, leave it
+        else:
+            time.sleep(PAUSE)
+            link = walkhighlands(h)
+            if link:
+                entry["walkhighlands"] = link
         cache["hills"][key(h)] = entry
 
         marks = ("W" if w else "-") + ("H" if link else "-")
