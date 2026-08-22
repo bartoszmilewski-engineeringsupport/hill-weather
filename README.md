@@ -3,8 +3,8 @@
 Cloud base and inversion forecasts for British hills. The one question no
 mainstream weather app answers: **will I be in the cloud, above it, or clear?**
 
-Free, non-commercial, no ads, no accounts. Covers all 282 Munros and 214
-Wainwrights.
+Live at **[hillweather.co.uk](https://hillweather.co.uk)**. Free,
+non-commercial, no ads, no accounts. Covers all 282 Munros and 214 Wainwrights.
 
 **Status: unvalidated.** The physics is defensible but has not yet been checked
 against observations. See [Validation](#validation).
@@ -42,11 +42,22 @@ Open-Meteo (UK Met Office 2 km, pressure levels)
                  |
                  +--> physics.py   cloud base, inversion, light scores
                  +--> solar.py     sunrise/sunset, golden hour, sun azimuth
+                 +--> hills.py     DoBIH: heights, grid refs, lists, areas
+                 +--> sources.json Wikipedia extracts, Walkhighlands links
                  |
                  v
             web/data/<region>/summary.json   ranked list, ~30 kB gzipped
-            web/data/<region>/hills/*.json   hourly detail, fetched on tap
+            web/data/<region>/hills/*.json   full detail, fetched on tap
 ```
+
+The site itself is three static pages plus one small service:
+
+| | |
+|---|---|
+| `web/index.html` | The forecast. A lede written from the numbers, then hills grouped by height band. |
+| `web/how-to-read.html` | What cloud base is, and why the number is a chance rather than a promise. |
+| `web/contact.html` | Contact form. |
+| `scripts/contact_server.py` | The only running service. A static site cannot send email. |
 
 Two independent cloud-base estimates, cross-checked:
 
@@ -145,8 +156,9 @@ The constants to tune live at the top of `scripts/physics.py`: `RH_MOIST`,
 
 ## Rules this project holds to
 
-1. **Never scrape MWIS.** Their forecast text is copyrighted and the hill
-   community depends on the service. Link to them; do not compete.
+1. **Never scrape MWIS or Walkhighlands.** Their words are their own editorial
+   work, and both are communities this project depends on. Link to them, never
+   copy them. Wikipedia is the licensed source for prose, with attribution.
 2. **Phones never call the weather API.** One build fetches, everyone reads the
    same static files. That is what keeps this inside the free tier at any scale.
 3. **Not a general outdoors app.** No routes, no gear lists, no step counting;
@@ -159,6 +171,8 @@ The constants to tune live at the top of `scripts/physics.py`: `RH_MOIST`,
   deterministic model. CC-BY 4.0.
 - Hills: [Database of British and Irish Hills](https://www.hill-bagging.co.uk/dobih)
   v18.5. CC-BY 4.0.
+- Descriptions: [Wikipedia](https://en.wikipedia.org). CC BY-SA 4.0.
+- Routes: [Walkhighlands](https://www.walkhighlands.co.uk), linked only.
 
 Planning aid only, not a substitute for [MWIS](https://www.mwis.org.uk) or,
 in winter, [SAIS](https://www.sais.gov.uk).

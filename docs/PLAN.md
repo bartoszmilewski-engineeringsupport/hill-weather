@@ -9,7 +9,7 @@ no mainstream weather app answers: will I be in the cloud, above it, or clear?
 **Price:** free, no ads, no accounts. Static hosting keeps running costs near
 zero, and free is what carries it through a tight community by word of mouth.
 
-Last updated 2026-08-22.
+Last updated 2026-08-22 (evening).
 
 ---
 
@@ -20,13 +20,15 @@ Last updated 2026-08-22.
 | 0. Housekeeping | Done |
 | 1. Data pipeline | Done |
 | 2. Validation harness | **Collecting. This is the open question.** |
-| 3. Web app | Working, unpolished |
+| 3. Web app | Designed and built |
 | 4. Soft launch | Not started |
 | 5. Alerts | Not started |
 | 6. Android, then iOS | Not started |
 
-Live on the IONOS VPS at `/opt/hillweather`, serving 282 Munros and 214
-Wainwrights, rebuilding twice daily.
+Live at **hillweather.co.uk** on the IONOS VPS at `/opt/hillweather`, serving
+282 Munros and 214 Wainwrights, rebuilding twice daily behind Cloudflare.
+
+Three pages: the forecast, **How to read this**, and **Contact**.
 
 ---
 
@@ -83,20 +85,39 @@ Everything else is polish until this is answered.
 not, no amount of app polish saves this. Better to know in week four than in
 month six.
 
-## Phase 3: Web app (working, needs work before launch)
+## Phase 3: Web app (designed and built)
 
-- [x] Ranked list, region and day tabs, sortable by view, inversion or light.
-- [x] Per-hill hourly detail fetched on tap and cached.
-- [x] Disclaimer and attribution in the footer.
-- [x] Deployed behind Nginx Proxy Manager with Let's Encrypt.
-- [ ] **Ranking needs rethinking.** With all 496 hills in, the top of the list
-      is small fells that are simply below cloud base. Correct, but nobody
-      drives to the Lakes for Bleaberry Fell. Weight by height or prominence so
-      it answers "which decent hill is clear".
-- [ ] Share card image. This is the marketing and matters more than it looks.
+Designed as a **newspaper**: cream paper (#FBF7F0), near-black ink (#2A2521),
+Newsreader serif throughout, hairline rules, ochre accent (#A8763F). Desktop
+first, collapsing to two columns then one. The direction was chosen from three
+candidates; the other two are in `design/`.
+
+- [x] Ranked list, grouped by **height band**. A single ranking put the
+      smallest fells on top because they sit below the cloud: correct, and
+      useless. Band headers say how many are clear, which turns the list into
+      the answer people want.
+- [x] **A lede written from the numbers.** Without it the page is 214
+      percentages and the reader has to work out what kind of day it is
+      themselves. Cases for an inversion, a clear day, a hopeless day and the
+      usual in-between.
+- [x] An elevation glyph per hill: the cloud layer as a band, the summit in
+      section. The idea of the site in one drawing.
+- [x] Per-hill detail: bagging lists, prominence, county, grid reference, OS
+      Landranger sheet, what marks the summit, sun times with azimuth, hourly
+      table.
+- [x] **Descriptions from Wikipedia** (465 of 496, CC BY-SA 4.0, attributed)
+      and **route links to Walkhighlands** (432 of 496, verified, never
+      copied).
+- [x] Share card as a front page, drawn on a canvas so it carries the date and
+      the source wherever it is pasted.
+- [x] Scotland leads; the region is then a remembered preference rather than a
+      geolocation guess. Opt-in "nearest to me" for those who want it.
+- [x] **How to read this**, the explainer for a first-time visitor.
+- [x] **Contact form**, the one running service in the project.
 - [ ] Offline caching, so it works in a car park with no signal.
 
-No map in v1. The ranked list is the product.
+No map in v1. The ranked list is the product. See `design/MAP-BRIEF.md` for
+where a map might go, and why it waits for validation.
 
 ## Phase 4: Soft launch
 
@@ -104,6 +125,9 @@ No map in v1. The ranked list is the product.
       observation network and it feeds Phase 2.
 - [ ] Post to Walkhighlands and two or three hillwalking Facebook groups. Ask
       for feedback, not installs.
+- [ ] **Approach Walkhighlands about a volunteer collaboration.** Worth going
+      in able to say the site already links to ~87% of their hill pages, sends
+      them traffic, has never copied a word, and credits them in every footer.
 - [ ] Approach SAIS about an avalanche feed once there is something to show.
 
 ## Phase 5: Alerts
@@ -145,8 +169,9 @@ SAIS avalanche data is Scotland only and does not extend.
 
 ## Rules to hold
 
-1. **Never scrape MWIS.** Their forecast text is copyrighted and the community
-   depends on the service. Link to them; do not compete.
+1. **Never scrape MWIS or Walkhighlands.** Their words are their own editorial
+   work and both are communities this project depends on. Link to them; never
+   copy them. Wikipedia is the licensed source for prose, with attribution.
 2. **Do not become a general outdoors app.** The moment it grows routes, gear
    lists and step counts, it is competing with OS Maps and Komoot and the
    reason anyone chose it disappears.

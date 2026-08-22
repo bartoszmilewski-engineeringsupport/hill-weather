@@ -165,6 +165,23 @@ enough: if the scheduler dies, the last forecast keeps being served and this
 monitor stays green while the data quietly goes stale. That is what the push
 monitor is for.
 
+### Descriptions and route links
+
+`data/sources.json` holds a Wikipedia extract and a Walkhighlands link per
+hill, committed so the twice-daily build never touches either site. Refresh it
+only when the hill list changes:
+
+```bash
+python3 scripts/sources.py            # fill in anything missing
+python3 scripts/sources.py --status   # coverage
+```
+
+Two rules the script exists to enforce. Wikipedia is matched by proximity AND
+name, never proximity alone, because nearest-article-wins silently returns
+Walla Crag for Bleaberry Fell and a description of the wrong mountain is worse
+than none. Walkhighlands is linked only, never copied, and every slug is
+verified with a HEAD request so a broken link is never published.
+
 ### Contact form
 
 The one part of the site that is a running service rather than a file, because
@@ -231,11 +248,39 @@ On the homelab this is unnecessary: set `ARCHIVE_DIR` to the NAS path directly.
 
 ## Routine operations
 
-Rebuild now, without waiting for a slot:
+Rebuild now, without waiting for a slot. Run it DETACHED: a build can sit in a
+rate-limit backoff for twenty minutes or more, and `exec` without `-d` dies if
+the SSH session drops.
 
 ```bash
-docker compose exec scheduler python3 /app/deploy/scheduler.py --once
+cd /opt/hillweather/deploy && docker compose exec -d scheduler sh -c 'python3 /app/deploy/scheduler.py --once > /app/web/.once.log 2>&1'
 ```
+
+```bash
+tail -f /opt/hillweather/web/.once.log
+```
+
+**Then purge the Cloudflare cache**, or the site keeps serving the old
+forecast for up to thirty minutes and it looks like the build failed:
+
+Cloudflare, hillweather.co.uk, Caching, Configuration, Purge Everything.
+
+Only needed after a MANUAL rebuild. The scheduled 05:15 and 16:15 runs are far
+enough apart that the cache expires on its own.
+
+Confirm a build is genuinely working rather than hung:
+
+```bash
+cd /opt/hillweather/deploy && docker compose exec scheduler ps -o pid,etime,args
+```
+
+A child process running `archive.py` or `build.py` means it is fetching or
+waiting out a backoff. Leave it: the backoff is deliberate, and failing would
+leave the site stale until the next slot.
+
+**Do not stack manual builds.** Three inside twenty minutes exhausted the
+hourly API budget and every build after that failed for an hour. If a rebuild
+is fighting the limit, the 05:15 run will do it with a fresh budget.
 
 Update after a `git push` from the laptop or desktop:
 
