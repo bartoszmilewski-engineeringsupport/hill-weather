@@ -37,7 +37,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&display=swap">
-<link rel="stylesheet" href="style.css?v=e6379469">
+<link rel="stylesheet" href="style.css?v=1b97c4d8">
 </head>
 <body>
 
@@ -56,11 +56,6 @@ try {
   <div class="nav-inner">
     <div class="navgroup" id="regions"></div>
     <div class="navgroup" id="days"></div>
-    <div class="search">
-      <label for="q" class="visually-hidden" style="position:absolute;left:-9999px">Search hills</label>
-      <input id="q" type="search" autocomplete="off" placeholder="Search 496 hills&hellip;">
-      <div class="results" id="results" role="listbox"></div>
-    </div>
     <div class="navgroup">
       <button id="locate" type="button" style="letter-spacing:.13em">Nearest to me</button>
       <a href="how-to-read.html">How to read this</a>
@@ -78,6 +73,21 @@ try {
     </div>
   </div>
 </nav>
+
+<div class="searchbar wrap">
+  <div class="search">
+    <label for="q">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 21 21" stroke-linecap="round"/>
+      </svg>
+      <span class="sr">Search hills</span>
+    </label>
+    <input id="q" type="search" autocomplete="off"
+           placeholder="Find a hill by name&hellip;">
+    <div class="results" id="results" role="listbox"></div>
+  </div>
+  <div class="searchbar-note" id="searchnote"></div>
+</div>
 
 <main class="wrap">
   <section class="lede">
@@ -605,7 +615,8 @@ async function boot() {
   wireSearch();
 
   const total = Object.values(state.data).reduce((n, d) => n + d.hills.length, 0);
-  document.getElementById('q').placeholder = `Search ${total} hills…`;
+  const note = document.getElementById('searchnote');
+  if (note) note.textContent = `all ${total} hills, both regions`;
 }
 
 boot().catch(e => {

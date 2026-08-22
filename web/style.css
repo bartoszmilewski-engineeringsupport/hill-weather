@@ -221,16 +221,26 @@
      With 496 hills and nine shown per band, somebody who already knows they
      are going up Blencathra could not find Blencathra. Searching across both
      regions at once matters: people think in hill names, not in regions. */
-  .search { position: relative; flex: 1 1 240px; max-width: 340px; }
+  .sr { position: absolute; left: -9999px; }
+  .searchbar { display: flex; align-items: baseline; gap: 20px;
+               border-bottom: 1px solid var(--ink); padding: 0; }
+  .searchbar-note { color: var(--faint); font-size: .8rem; font-style: italic;
+                    white-space: nowrap; padding-bottom: 12px; }
+  .search { position: relative; flex: 1 1 auto; display: flex;
+            align-items: center; gap: 10px; }
+  .search label { display: flex; align-items: center; color: var(--faint); flex: none; }
+  .search label svg { width: 19px; height: 19px; }
+  .search:focus-within label { color: var(--ochre); }
   .search input {
-    width: 100%; font: inherit; font-size: 15px; color: var(--ink);
-    background: transparent; border: 0; border-bottom: 1px solid var(--rule);
-    padding: 7px 2px; min-height: 44px;
+    width: 100%; font: inherit; font-size: clamp(16px, 1.5vw, 19px);
+    color: var(--ink); background: transparent; border: 0;
+    padding: 14px 2px; min-height: 52px;
   }
   .search input::placeholder { color: var(--faint); font-style: italic; }
-  .search input:focus { outline: 0; border-bottom-color: var(--ochre); }
+  .search input:focus { outline: 0; }
+  .searchbar:focus-within { border-bottom-color: var(--ochre); }
   .results {
-    position: absolute; z-index: 20; left: 0; right: 0; top: 100%;
+    position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 1px);
     background: var(--paper); border: 1px solid var(--rule); border-top: 0;
     max-height: 62vh; overflow-y: auto; display: none;
     box-shadow: 0 14px 34px rgba(42, 37, 33, .14);
@@ -247,3 +257,9 @@
   .results .none { padding: 12px; color: var(--muted); font-style: italic; }
   .hill.flash { animation: flash 1.6s ease-out; }
   @keyframes flash { from { background: var(--hair); } to { background: transparent; } }
+
+  /* On a narrow screen the note would squeeze the field it is describing, and
+     the placeholder already says the same thing. */
+  @media (max-width: 620px) {
+    .searchbar-note { display: none; }
+  }
