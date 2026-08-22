@@ -92,8 +92,11 @@ def build(meta, hill_defs, responses, source):
             "sun": sun,
             "hours": hours,
         }
-        if hill.get("alt"):
-            entry["alt"] = hill["alt"]
+        # Optional and read with .get() so archives written before these fields
+        # existed still rebuild cleanly.
+        for extra in ("alt", "prominence", "area"):
+            if hill.get(extra) is not None:
+                entry[extra] = hill[extra]
         hills_out.append(entry)
 
     # Per-day summary so the front page can rank without walking every hour.
@@ -157,6 +160,9 @@ def build(meta, hill_defs, responses, source):
             "attribution": meta.get("attribution", omfetch.ATTRIBUTION),
             "disclaimer": ("Planning aid only. Not a substitute for MWIS "
                            "(mwis.org.uk) or, in winter, SAIS (sais.gov.uk)."),
+            # Height bands for display, defined per region in hills.py. Sent
+            # with the data so the page does not need its own copy to drift.
+            "bands": REGIONS.get(meta["region"], {}).get("bands", []),
         },
         "hills": hills_out,
     }
@@ -199,6 +205,8 @@ def write_region(out, out_dir):
         summary_hills.append({
             "slug": slug, "name": h["name"], "height": h["height"],
             "lat": h["lat"], "lon": h["lon"],
+            "prominence": h.get("prominence"),
+            "area": h.get("area"),
             "daily": h["daily"],
             "sunrise": {d: s["sunrise"] for d, s in h["sun"].items()},
         })

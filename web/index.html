@@ -66,6 +66,14 @@
   .warn { background: var(--card); border: 1px solid var(--line);
           border-left: 3px solid var(--mid); padding: .5rem .7rem;
           border-radius: 6px; font-size: .78rem; margin-bottom: .7rem; }
+  .band { display: flex; justify-content: space-between; align-items: baseline;
+          gap: .5rem; margin: 1.1rem .2rem .35rem; padding-bottom: .25rem;
+          border-bottom: 1px solid var(--line);
+          font-size: .78rem; font-weight: 650; letter-spacing: .02em;
+          text-transform: uppercase; }
+  .band:first-child { margin-top: .2rem; }
+  .band-note { font-weight: 400; text-transform: none; letter-spacing: 0;
+               color: var(--dim); }
 </style>
 </head>
 <body>
@@ -167,6 +175,32 @@ function render() {
 
   const list = document.getElementById('list');
   list.innerHTML = '';
+
+  // Grouped by height band rather than one flat ranking. Sorting the whole
+  // region by chance of a view puts the smallest fells on top, because they
+  // sit below the cloud. That is arithmetically right and practically useless:
+  // nobody drives to the Lakes for a 335m fell. Banding tells the real story,
+  // which is usually "the tops are in cloud but the low fells are clear".
+  const bands = (d.meta.bands || [[0, 'All hills']]);
+  for (const [floor, label] of bands) {
+    const inBand = rows.filter(r => r.h.height >= floor &&
+      !bands.some(([f]) => f > floor && r.h.height >= f));
+    if (!inBand.length) continue;
+
+    const clear = inBand.filter(r => r.s.view_pct >= 70).length;
+    const best = Math.max(...inBand.map(r => r.s.view_pct));
+    const head = document.createElement('div');
+    head.className = 'band';
+    head.innerHTML = `<span>${label}</span><span class="band-note">${
+      clear ? `${clear} of ${inBand.length} clear`
+            : `none clear, best ${best}%`}</span>`;
+    list.appendChild(head);
+
+    renderRows(inBand, list);
+  }
+}
+
+function renderRows(rows, list) {
   for (const { h, s } of rows) {
     const cloud = s.cloud_base == null ? ''
       : `cloud ${s.cloud_base}${s.cloud_top ? '-' + s.cloud_top : ''}m`;

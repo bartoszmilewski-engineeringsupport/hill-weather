@@ -26,7 +26,7 @@ import zipfile
 from collections import namedtuple
 from pathlib import Path
 
-Hill = namedtuple("Hill", "name region lat lon height alt")
+Hill = namedtuple("Hill", "name region lat lon height alt prominence area")
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DOBIH_CSV = DATA_DIR / "DoBIH_v18_5.csv"
@@ -34,12 +34,50 @@ DOBIH_ZIP = DATA_DIR / "hillcsv.zip"
 DOBIH_VERSION = "v18.5"
 
 # DoBIH marks list membership with a 1 in a single-letter column.
+#
+# `bands` groups hills by height for display. Without this the ranked list is
+# topped by whichever fells are small enough to sit below the cloud, which is
+# arithmetically correct and useless: nobody drives to the Lakes for a 335m
+# fell. Banding tells the real story instead, which is usually "the tops are
+# in cloud but the low fells are clear".
+#
+# Thresholds differ by region because the lists do. Every Munro is above 914m,
+# so Scotland bands the big hills against each other; Wainwrights run from
+# 290m to 978m, which is where the problem actually shows up.
+#
+# `area_column` is the geographic grouping. DoBIH fills different columns for
+# the two lists: Munros carry SMC section names in Region, Wainwrights carry
+# Wainwright's own fell groups in Area.
 REGIONS = {
-    "scotland": {"label": "Scottish Highlands", "column": "M",
-                 "list_name": "Munros"},
-    "lakes":    {"label": "Lake District",      "column": "W",
-                 "list_name": "Wainwrights"},
+    "scotland": {
+        "label": "Scottish Highlands", "column": "M", "list_name": "Munros",
+        "area_column": "Region",
+        "bands": [(1200, "Over 1200m"), (1100, "1100 to 1200m"),
+                  (1000, "1000 to 1100m"), (0, "Under 1000m")],
+    },
+    "lakes": {
+        "label": "Lake District", "column": "W", "list_name": "Wainwrights",
+        "area_column": "Area",
+        "bands": [(800, "Over 800m"), (600, "600 to 800m"),
+                  (400, "400 to 600m"), (0, "Under 400m")],
+    },
 }
+
+
+def _area(row, column):
+    """Tidy the geographic grouping into something readable.
+
+    Munros arrive as '04A: Fort William to Loch Treig & Loch Leven' and
+    Wainwrights as 'Lake District - Northern Fells'.
+    """
+    v = (row.get(column) or "").strip()
+    if not v:
+        return None
+    if ":" in v:
+        v = v.split(":", 1)[1].strip()          # drop the SMC section code
+    if " - " in v:
+        v = v.split(" - ", 1)[1].strip()        # drop the 'Lake District' prefix
+    return v or None
 
 # Chosen for ground truth, not popularity. Names must match DoBIH exactly
 # after bracket-stripping - load_validation() asserts that they all resolve.
@@ -117,12 +155,21 @@ def load_hills(region=None, validation=False):
         if row.get(col) != "1":
             continue
         name, alt = _clean(row["Name"])
+        try:
+            # Prominence. A better measure of "worth climbing" than raw height:
+            # a 600m hill with 500m of drop is a proper day out, a 900m bump on
+            # a ridge is not.
+            prominence = round(float(row.get("Drop") or 0))
+        except ValueError:
+            prominence = None
         hills.append(Hill(
             name=name, region=region,
             lat=round(float(row["Latitude"]), 5),
             lon=round(float(row["Longitude"]), 5),
             height=round(float(row["Metres"])),
             alt=alt,
+            prominence=prominence,
+            area=_area(row, REGIONS[region]["area_column"]),
         ))
     hills.sort(key=lambda h: -h.height)
 
