@@ -257,6 +257,9 @@ def write_region(out, out_dir):
         # Only what the list renders: name, height, and the day summaries.
         summary_hills.append({
             "slug": slug, "name": h["name"], "height": h["height"],
+            # Carried so search can find a hill by its Gaelic name:
+            # "Beinn Nibheis" should return Ben Nevis.
+            "alt": h.get("alt"),
             "lat": h["lat"], "lon": h["lon"],
             "prominence": h.get("prominence"),
             "area": h.get("area"),

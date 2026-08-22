@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The site in one glyph: a summit standing clear above the cloud layer.
+       Warm paper and ink so it belongs to the rest of the design. -->
+  <rect width="64" height="64" rx="9" fill="#FBF7F0"/>
+  <path d="M6 52 L24 24 L34 36 L46 16 L58 52 Z" fill="#EDE5D7" stroke="#C9BCA3" stroke-width="1.5"/>
+  <rect x="4" y="38" width="56" height="11" fill="#B9AE99" opacity="0.55"/>
+  <path d="M4 38 H60" stroke="#8C8175" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <path d="M6 52 H58" stroke="#2A2521" stroke-width="2.5"/>
+</svg>

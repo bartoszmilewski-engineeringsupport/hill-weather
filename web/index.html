@@ -5,6 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hill Weather: cloud base and inversions for British hills</title>
 <meta name="description" content="Will the summit be in cloud, above it, or clear? A free cloud base and inversion forecast for every Munro and Wainwright.">
+<script>
+// Applied before first paint so the page never flashes the wrong theme.
+try {
+  var m = localStorage.getItem('hw.theme');
+  if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+} catch (e) {}
+</script>
+<link rel="canonical" href="https://hillweather.co.uk/">
+<meta name="theme-color" content="#FBF7F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16140F" media="(prefers-color-scheme: dark)">
+
+<!-- Link previews. The growth model is somebody pasting this into a walking
+     group, so what appears in that message matters as much as the page. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hill Weather">
+<meta property="og:title" content="Hill Weather: will the summit be in cloud, above it, or clear?">
+<meta property="og:description" content="A free cloud base and inversion forecast for every Munro and Wainwright. The one question no mainstream weather app answers.">
+<meta property="og:url" content="https://hillweather.co.uk/">
+<meta property="og:image" content="https://hillweather.co.uk/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Hill Weather: cloud base and inversions for British hills">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hill Weather: will the summit be in cloud, above it, or clear?">
+<meta name="twitter:description" content="A free cloud base and inversion forecast for every Munro and Wainwright. The one question no mainstream weather app answers.">
+<meta name="twitter:image" content="https://hillweather.co.uk/og.png">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&display=swap">
@@ -27,9 +56,24 @@
   <div class="nav-inner">
     <div class="navgroup" id="regions"></div>
     <div class="navgroup" id="days"></div>
+    <div class="search">
+      <label for="q" class="visually-hidden" style="position:absolute;left:-9999px">Search hills</label>
+      <input id="q" type="search" autocomplete="off" placeholder="Search 496 hills&hellip;">
+      <div class="results" id="results" role="listbox"></div>
+    </div>
     <div class="navgroup">
       <button id="locate" type="button" style="letter-spacing:.13em">Nearest to me</button>
       <a href="how-to-read.html">How to read this</a>
+      <button id="theme" class="theme" type="button" aria-pressed="false" title="Switch theme">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" stroke-linecap="round"/>
+        </svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z" stroke-linejoin="round"/>
+        </svg>
+        <span>Theme</span>
+      </button>
       <button id="share" type="button" style="letter-spacing:.13em">Share</button>
     </div>
   </div>
@@ -65,7 +109,17 @@
     <div>
       <h5>How it is made</h5>
       Pressure-level data interpolated to true summit height, rebuilt twice a day.
-      <a href="how-to-read.html">How to read this</a>.
+      <a href="how-to-read.html">How to read this</a>
+      <button id="theme" class="theme" type="button" aria-pressed="false" title="Switch theme">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"/>
+          <path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" stroke-linecap="round"/>
+        </svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z" stroke-linejoin="round"/>
+        </svg>
+        <span>Theme</span>
+      </button>.
     </div>
     <div>
       <h5>Sources</h5>
@@ -80,7 +134,7 @@
 </footer>
 
 <script>
-const state = { region: null, day: null, data: {}, open: null, here: null };
+const state = { region: null, day: null, data: {}, open: null, here: null, pinned: null };
 
 // Which region leads is a remembered preference, not a guess.
 //
@@ -256,7 +310,15 @@ function render() {
       <div class="hills"></div>`;
     const grid = section.querySelector('.hills');
 
-    const shown = inBand.slice(0, 9);
+    // Only nine per band are shown, so a hill chosen from search can easily
+    // fall outside the list and picking it would appear to do nothing. Pin it
+    // in, keeping it in rank order rather than dumping it at the top.
+    let shown = inBand.slice(0, 9);
+    if (state.pinned && !shown.some(r => r.h.slug === state.pinned)) {
+      const pinned = inBand.find(r => r.h.slug === state.pinned);
+      if (pinned) shown = [...shown, pinned].sort(
+        (a, b) => b.s.view_pct - a.s.view_pct || b.h.height - a.h.height);
+    }
     for (const { h, s } of shown) {
       const gap = s.cloud_base == null ? null : s.cloud_base - h.height;
       const sub = s.cloud_base == null ? 'no low cloud about'
@@ -414,6 +476,125 @@ async function locate() {
 
 document.getElementById('locate').addEventListener('click', locate);
 
+// ---------------------------------------------------------------------------
+// Search.
+//
+// Across BOTH regions, because people think in hill names rather than in
+// regions: somebody typing "scafell" should not first have to know it is in
+// the Lakes. Picking a result switches region if it has to, opens the day
+// currently selected, and scrolls the hill into view.
+//
+// Gaelic names are searched too. "Beinn Nibheis" should find Ben Nevis.
+// ---------------------------------------------------------------------------
+const fold = s => (s || '').toLowerCase()
+  .normalize('NFKD').replace(/[̀-ͯ]/g, '')
+  .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+
+let searchIndex = null;
+function buildIndex() {
+  if (searchIndex) return searchIndex;
+  searchIndex = [];
+  for (const [region, d] of Object.entries(state.data)) {
+    for (const h of d.hills) {
+      searchIndex.push({
+        region, label: d.meta.label, hill: h,
+        hay: fold(h.name) + ' ' + fold(h.alt || ''),
+      });
+    }
+  }
+  return searchIndex;
+}
+
+function search(term) {
+  const q = fold(term);
+  if (q.length < 2) return [];
+  const starts = [], contains = [];
+  for (const row of buildIndex()) {
+    const at = row.hay.indexOf(q);
+    if (at === 0 || row.hay.includes(' ' + q)) starts.push(row);
+    else if (at > 0) contains.push(row);
+  }
+  // Whole-word matches first, then the tallest, so "ben" leads with Ben Nevis.
+  const rank = (a, b) => b.hill.height - a.hill.height;
+  return [...starts.sort(rank), ...contains.sort(rank)].slice(0, 12);
+}
+
+function showResults(rows) {
+  const box = document.getElementById('results');
+  if (!rows.length) {
+    box.innerHTML = '<div class="none">No hill by that name.</div>';
+    box.classList.add('open');
+    return;
+  }
+  box.innerHTML = rows.map((r, i) => {
+    const s = r.hill.daily[state.day] || Object.values(r.hill.daily)[0] || {};
+    return `<button type="button" role="option" data-i="${i}" aria-selected="false">
+      <span class="r-name">${r.hill.name}</span>
+      <span class="r-meta">${r.hill.height} m &middot; ${r.label}</span>
+      <span class="r-pct ${s.view_pct != null ? band(s.view_pct) : ''}">${
+        s.view_pct != null ? s.view_pct + '%' : ''}</span>
+    </button>`;
+  }).join('');
+  box.classList.add('open');
+  box.querySelectorAll('button').forEach(b =>
+    b.addEventListener('click', () => pick(rows[+b.dataset.i])));
+}
+
+function pick(row) {
+  document.getElementById('results').classList.remove('open');
+  document.getElementById('q').value = '';
+  if (state.region !== row.region) {
+    state.region = row.region;
+    rememberRegion(row.region);
+    state.day = null;
+  }
+  state.pinned = row.hill.slug;
+  state.open = null;
+  render();
+  // render() is synchronous, so the row already exists: no need to wait for a
+  // frame, and requestAnimationFrame is throttled in background tabs anyway.
+  const el = [...document.querySelectorAll('.hill')]
+    .find(b => b.querySelector('.hill-name').textContent === row.hill.name);
+  if (el) {
+    el.classList.add('flash');
+    el.click();
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+}
+
+function wireSearch() {
+  const input = document.getElementById('q');
+  const box = document.getElementById('results');
+  let rows = [];
+  let cursor = -1;
+
+  input.addEventListener('input', () => {
+    rows = search(input.value);
+    cursor = -1;
+    if (input.value.trim().length < 2) box.classList.remove('open');
+    else showResults(rows);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const opts = [...box.querySelectorAll('button')];
+    if (e.key === 'Escape') { box.classList.remove('open'); input.blur(); return; }
+    if (!opts.length) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      cursor = (cursor + (e.key === 'ArrowDown' ? 1 : -1) + opts.length) % opts.length;
+      opts.forEach((o, i) => o.setAttribute('aria-selected', String(i === cursor)));
+      opts[cursor].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      pick(rows[cursor >= 0 ? cursor : 0]);
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search')) box.classList.remove('open');
+  });
+}
+
 async function boot() {
   const index = await (await fetch(DATA + 'index.json')).json();
   for (const r of index.regions)
@@ -421,6 +602,10 @@ async function boot() {
   const saved = rememberedRegion();
   state.region = state.data[saved] ? saved : index.regions[0].region;
   render();
+  wireSearch();
+
+  const total = Object.values(state.data).reduce((n, d) => n + d.hills.length, 0);
+  document.getElementById('q').placeholder = `Search ${total} hills…`;
 }
 
 boot().catch(e => {
@@ -429,5 +614,6 @@ boot().catch(e => {
 });
 </script>
 <script src="share.js"></script>
+<script src="theme.js"></script>
 </body>
 </html>

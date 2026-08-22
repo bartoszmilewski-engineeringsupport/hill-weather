@@ -1,5 +1,9 @@
   /* A newspaper, not a dashboard. Warm paper, one serif, hairline rules,
      hierarchy from size and weight rather than boxes and colour. */
+  /* Dark is a warm inversion, not a switch to slate. Newsprint in low light
+     is still paper: near-black brown rather than blue-grey, warm off-white
+     rather than pure white, and the ochre and verdict colours lifted so they
+     hold their contrast without going neon. */
   :root {
     --paper: #FBF7F0;
     --ink: #2A2521;
@@ -14,7 +18,48 @@
     --relief: #EDE5D7;
     --relief-line: #C9BCA3;
     --cloud: #B9AE99;
+    --body: #4A423A;
     --measure: 1280px;
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #16140F;
+    --ink: #EFE8DB;
+    --muted: #A79C8B;
+    --faint: #877D6E;
+    --rule: #3A342A;
+    --hair: #26221A;
+    --ochre: #CC9A5B;
+    --clear: #86C495;
+    --edge: #DBB165;
+    --incloud: #DE8F79;
+    --relief: #2B2519;
+    --relief-line: #4E4534;
+    --cloud: #4A4234;
+    --body: #D5CCBC;
+    color-scheme: dark;
+  }
+
+  /* Follow the machine unless the reader has said otherwise. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #16140F;
+      --ink: #EFE8DB;
+      --muted: #A79C8B;
+      --faint: #877D6E;
+      --rule: #3A342A;
+      --hair: #26221A;
+      --ochre: #CC9A5B;
+      --clear: #86C495;
+      --edge: #DBB165;
+      --incloud: #DE8F79;
+      --relief: #2B2519;
+      --relief-line: #4E4534;
+      --cloud: #4A4234;
+      --body: #D5CCBC;
+      color-scheme: dark;
+    }
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
@@ -68,13 +113,13 @@
   .lede h2 { margin: 0; font-weight: 400; letter-spacing: -.01em;
              font-size: clamp(26px, 3.4vw, 40px); line-height: 1.16; text-wrap: pretty; }
   .standfirst { font-size: clamp(15px, 1.4vw, 17px); line-height: 1.65;
-                color: #4A423A; margin-top: 16px; max-width: 62ch; text-wrap: pretty; }
+                color: var(--body); margin-top: 16px; max-width: 62ch; text-wrap: pretty; }
   .glance { border-left: 1px solid var(--rule); padding-left: 28px; }
   .glance dl { margin: 14px 0 0; display: flex; flex-direction: column; gap: 12px; }
   .glance div { display: flex; justify-content: space-between; align-items: baseline;
                 gap: 12px; border-bottom: 1px dotted var(--rule); padding-bottom: 9px; }
   .glance div:last-child { border-bottom: 0; padding-bottom: 0; }
-  .glance dt { font-size: 15px; color: #4A423A; }
+  .glance dt { font-size: 15px; color: var(--body); }
   .glance dd { margin: 0; font-size: 20px; font-variant-numeric: tabular-nums; }
   .glance dd small { font-size: 13px; color: var(--faint); }
 
@@ -160,3 +205,45 @@
   @media (pointer: coarse) and (max-width: 620px) {
     .navgroup { width: 100%; justify-content: space-between; }
   }
+
+  /* Theme switch */
+  .theme { display: inline-flex; align-items: center; gap: .4rem; }
+  .theme svg { width: 15px; height: 15px; flex: none; }
+  .theme .moon { display: none; }
+  :root[data-theme="dark"] .theme .sun { display: none; }
+  :root[data-theme="dark"] .theme .moon { display: inline; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme .sun { display: none; }
+    :root:not([data-theme="light"]) .theme .moon { display: inline; }
+  }
+
+  /* Search.
+     With 496 hills and nine shown per band, somebody who already knows they
+     are going up Blencathra could not find Blencathra. Searching across both
+     regions at once matters: people think in hill names, not in regions. */
+  .search { position: relative; flex: 1 1 240px; max-width: 340px; }
+  .search input {
+    width: 100%; font: inherit; font-size: 15px; color: var(--ink);
+    background: transparent; border: 0; border-bottom: 1px solid var(--rule);
+    padding: 7px 2px; min-height: 44px;
+  }
+  .search input::placeholder { color: var(--faint); font-style: italic; }
+  .search input:focus { outline: 0; border-bottom-color: var(--ochre); }
+  .results {
+    position: absolute; z-index: 20; left: 0; right: 0; top: 100%;
+    background: var(--paper); border: 1px solid var(--rule); border-top: 0;
+    max-height: 62vh; overflow-y: auto; display: none;
+    box-shadow: 0 14px 34px rgba(42, 37, 33, .14);
+  }
+  .results.open { display: block; }
+  .results button {
+    display: flex; width: 100%; text-align: left; gap: 10px; align-items: baseline;
+    padding: 10px 12px; border-bottom: 1px solid var(--hair); min-height: 44px;
+  }
+  .results button:hover, .results button[aria-selected="true"] { background: var(--hair); }
+  .results .r-name { flex-grow: 1; }
+  .results .r-meta { color: var(--faint); font-size: .78rem; white-space: nowrap; }
+  .results .r-pct { font-variant-numeric: tabular-nums; }
+  .results .none { padding: 12px; color: var(--muted); font-style: italic; }
+  .hill.flash { animation: flash 1.6s ease-out; }
+  @keyframes flash { from { background: var(--hair); } to { background: transparent; } }
