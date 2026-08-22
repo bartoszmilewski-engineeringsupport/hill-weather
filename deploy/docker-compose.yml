@@ -1,34 +1,55 @@
-# Hill Weather - static site container.
+# Hill Weather. The whole system in one stack, so it moves between hosts
+# without anything being left behind.
 #
-# Follows the same pattern as the other static sites on the IONOS VPS
-# (PPM Website :5001, GaugeApp :5002). Nginx Proxy Manager terminates SSL and
-# routes hillweather.uk here; this container only ever serves files.
+# Two containers, both stock images, no build step:
+#   web         nginx:alpine serving static files
+#   scheduler   python:alpine running deploy/scheduler.py
 #
-#   /opt/hillweather/
-#     web/            <- docroot, contains data/ written by the build
-#     scripts/        <- pipeline (runs on the host via cron, not in here)
-#     archive/        <- raw forecast history
-#     deploy/         <- this file
+# Everything host-specific lives in .env. Nothing is hardcoded to a particular
+# VPS, path or port, so moving to a different provider or onto the homelab is
+# a config change rather than a code change.
 #
-# NPM proxy host:  hillweather.uk -> http://<vps-ip>:5003   (Let's Encrypt on)
+# Migration is: clone the repo, copy .env, restore archive/, compose up.
+
+name: hillweather
 
 services:
-  hillweather:
+  web:
     image: nginx:alpine
-    container_name: hillweather
+    container_name: hillweather-web
     restart: unless-stopped
     ports:
-      - "5003:80"
+      - "${WEB_PORT:-5003}:80"
     volumes:
-      - ../web:/usr/share/nginx/html:ro
+      - ${PROJECT_ROOT:-..}/web:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/data/index.json"]
+      test: ["CMD", "wget", "-qO-", "http://localhost/data/_status.json"]
       interval: 60s
       timeout: 5s
       retries: 3
-    logging:
+      start_period: 120s
+    logging: &logging
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
+
+  scheduler:
+    image: python:3.12-alpine
+    container_name: hillweather-scheduler
+    restart: unless-stopped
+    working_dir: /app
+    command: ["python3", "/app/deploy/scheduler.py"]
+    environment:
+      ROOT: /app
+      RUN_TIMES: "${RUN_TIMES:-05:15,16:15}"
+      RUN_ON_START: "${RUN_ON_START:-1}"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      # The repo itself, writable because the scheduler writes web/data.
+      - ${PROJECT_ROOT:-..}:/app
+      # Archive is mounted separately so it can live somewhere else entirely,
+      # for example straight onto the NAS when running on the homelab.
+      - ${ARCHIVE_DIR:-../archive}:/app/archive
+    logging: *logging

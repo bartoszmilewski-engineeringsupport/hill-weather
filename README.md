@@ -84,21 +84,48 @@ python scripts/build.py --file archive/lakes/2026-08-22T08Z.json.gz
 
 ## Deployment
 
-Static site on the IONOS VPS, same pattern as the other sites there
-(`nginx:alpine` in `/opt/<name>`, Nginx Proxy Manager terminating SSL).
+Two stock containers, no build step: `nginx:alpine` serving the files, and
+`python:3.12-alpine` running the scheduler. The host needs Docker and nothing
+else, not even Python.
+
+```bash
+git clone https://github.com/bartoszmilewski-engineeringsupport/hill-weather.git /opt/hillweather
+```
+
+```bash
+cd /opt/hillweather/deploy && cp .env.example .env
+```
 
 ```bash
 cd /opt/hillweather/deploy && docker compose up -d
 ```
 
-NPM proxy host: `hillweather.uk` → `http://<vps-ip>:5003`, Let's Encrypt on.
+The scheduler builds immediately when no forecast is present, so a fresh host
+is live within about ten minutes.
 
-Cron, twice daily. Open-Meteo weights API calls by variable and location
-count, so four builds a day would exceed the free tier:
+**Everything host-specific lives in `deploy/.env`**: paths, port, build times.
+The schedule runs inside the stack rather than in host cron, so moving to a
+different VPS or onto the homelab carries the schedule with it instead of
+leaving it behind.
 
+Builds run twice daily. Open-Meteo weights API calls by variable and location
+count, so four builds a day would exceed the free tier.
+
+Moving hosts:
+
+```bash
+cd deploy && ./migrate.sh export        # old host
 ```
-15 5,16 * * *  /opt/hillweather/deploy/run-pipeline.sh >> /var/log/hillweather.log 2>&1
+
+```bash
+cd deploy && ./migrate.sh import <file> && docker compose up -d && ./migrate.sh verify
 ```
+
+The archive is the only irreplaceable state. Everything else is either in git
+or rebuilds itself.
+
+See [docs/RUNBOOK.md](docs/RUNBOOK.md) for DNS, proxy host, Cloudflare,
+monitoring and routine operations.
 
 ## Validation
 
