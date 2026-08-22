@@ -137,6 +137,9 @@ def build(meta, hill_defs, responses, source):
                 "verdict": midday["verdict"],
                 "cloud_base": midday["cloud_base"],
                 "cloud_top": midday["cloud_top"],
+                # Carried in the summary so the front page can write its own
+                # opening paragraph without pulling any hill's hourly file.
+                "freezing_level": midday["freezing_level"],
                 "inversion": max((hr["inversion"] for hr in daylight), default=0),
                 "inversion_dawn": dawn["inversion"] if dawn else None,
                 "light_dawn": dawn["light"] if dawn else None,

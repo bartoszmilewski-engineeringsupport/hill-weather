@@ -3,136 +3,84 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hill Weather: cloud base and inversions</title>
-<style>
-  :root {
-    --bg: #f6f7f9; --card: #fff; --ink: #16191d; --dim: #666e78;
-    --line: #e2e5ea; --accent: #2f6f4f;
-    --good: #2f6f4f; --mid: #b07d2b; --bad: #8a3d3d; --inv: #4a5fa8;
-    --cloud: #c9ced6;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #14171a; --card: #1c2024; --ink: #e8eaed; --dim: #9aa3ad;
-      --line: #2a2f35; --accent: #7fc6a0;
-      --good: #7fc6a0; --mid: #d9ac5f; --bad: #d98b8b; --inv: #93a6e8;
-      --cloud: #3a424c;
-    }
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
-    padding: 0 0 3rem;
-  }
-  header { padding: 1.1rem 1rem .6rem; max-width: 780px; margin: 0 auto; }
-  h1 { font-size: 1.15rem; margin: 0 0 .15rem; letter-spacing: -.01em; }
-  .sub { color: var(--dim); font-size: .8rem; }
-  .bar { display: flex; gap: .4rem; flex-wrap: wrap; padding: .5rem 1rem;
-         max-width: 780px; margin: 0 auto; }
-  button {
-    font: inherit; font-size: .82rem; padding: .32rem .7rem; cursor: pointer;
-    background: var(--card); color: var(--ink);
-    border: 1px solid var(--line); border-radius: 999px;
-  }
-  button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent);
-    color: var(--bg); font-weight: 600; }
-  main { max-width: 720px; margin: 0 auto; padding: .3rem 1rem; }
-  .row {
-    display: grid; grid-template-columns: 2.9rem 1fr auto;
-    gap: .8rem; align-items: center;
-    border-bottom: 1px solid var(--line);
-    padding: .5rem .35rem; cursor: pointer;
-  }
-  .row:hover { background: var(--card); }
-  .pct { font-size: 1.15rem; font-weight: 650; text-align: right;
-         font-variant-numeric: tabular-nums; line-height: 1.1; }
-  .mid { min-width: 0; }
-  .name { font-weight: 600; white-space: nowrap; overflow: hidden;
-          text-overflow: ellipsis; }
-  .ht { color: var(--dim); font-weight: 400; font-size: .85em; }
-  .meta { color: var(--dim); font-size: .74rem; margin-top: .05rem;
-          white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .viz { display: flex; align-items: center; gap: .5rem; }
-  .elev { flex: none; display: block; }
-  .tags { display: flex; gap: .25rem; flex-direction: column; align-items: flex-end; }
-  .tag { font-size: .62rem; padding: .05rem .35rem; border-radius: 4px;
-         border: 1px solid currentColor; white-space: nowrap; }
-  @media (max-width: 540px) { .elev { display: none; } }
-  .t-inv { color: var(--inv); } .t-light { color: var(--mid); }
-  .g { color: var(--good); } .m { color: var(--mid); } .b { color: var(--bad); }
-  .detail { display: none; padding: .5rem .75rem .7rem; margin: -.3rem 0 .5rem;
-    background: var(--card); border: 1px solid var(--line); border-top: 0;
-    border-radius: 0 0 10px 10px; font-size: .8rem; }
-  .detail.open { display: block; }
-  .detail table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  .detail th { text-align: left; color: var(--dim); font-weight: 500; font-size: .72rem; }
-  .detail td, .detail th { padding: .14rem .3rem; border-bottom: 1px solid var(--line); }
-  .sun { color: var(--dim); margin-bottom: .4rem; }
-  footer { max-width: 780px; margin: 1.5rem auto 0; padding: 0 1rem;
-           color: var(--dim); font-size: .72rem; }
-  footer a { color: var(--dim); }
-  .warn { background: var(--card); border: 1px solid var(--line);
-          border-left: 3px solid var(--mid); padding: .5rem .7rem;
-          border-radius: 6px; font-size: .78rem; margin-bottom: .7rem; }
-  .band { display: flex; justify-content: space-between; align-items: baseline;
-          gap: .5rem; margin: 1.1rem .2rem .35rem; padding-bottom: .25rem;
-          border-bottom: 1px solid var(--line);
-          font-size: .78rem; font-weight: 650; letter-spacing: .02em;
-          text-transform: uppercase; }
-  .band:first-child { margin-top: .2rem; }
-  .band-note { font-weight: 400; text-transform: none; letter-spacing: 0;
-               color: var(--dim); }
-  .head-row { display: flex; justify-content: space-between; align-items: flex-start;
-              gap: 1rem; }
-  .share { flex: none; padding: .4rem .9rem; font-weight: 600; }
-  .share:disabled { opacity: .5; cursor: default; }
-</style>
+<title>Hill Weather: cloud base and inversions for British hills</title>
+<meta name="description" content="Will the summit be in cloud, above it, or clear? A free cloud base and inversion forecast for every Munro and Wainwright.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&display=swap">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <div class="head-row">
-    <div>
-      <h1>Hill Weather</h1>
-      <div class="sub" id="stamp">loading…</div>
-    </div>
-    <button id="share" class="share" title="Save a picture of today's forecast">Share</button>
+
+<header class="masthead wrap">
+  <div class="masthead-top kicker">
+    <span id="dateline">&nbsp;</span>
+    <span>Free &middot; No accounts &middot; No advertising</span>
+  </div>
+  <div class="masthead-main">
+    <h1>Hill Weather</h1>
+    <div class="tagline">Cloud base &amp; inversions for British hills</div>
   </div>
 </header>
 
-<div class="bar" id="regions"></div>
-<div class="bar" id="days"></div>
-<div class="bar" id="sorts"></div>
-
-<main>
-  <div class="warn">
-    Internal viewer. Forecast is <strong>unvalidated</strong>. The cloud-base
-    method has not yet been checked against observations.
+<nav class="wrap">
+  <div class="nav-inner">
+    <div class="navgroup" id="regions"></div>
+    <div class="navgroup" id="days"></div>
+    <div class="navgroup">
+      <a href="how-to-read.html">How to read this</a>
+      <button id="share" type="button" style="letter-spacing:.13em">Share</button>
+    </div>
   </div>
-  <div id="list"></div>
+</nav>
+
+<main class="wrap">
+  <section class="lede">
+    <div>
+      <h2 id="headline">Loading the forecast&hellip;</h2>
+      <p class="standfirst" id="standfirst"></p>
+    </div>
+    <aside class="glance">
+      <div class="kicker">At a glance</div>
+      <dl id="glance"></dl>
+    </aside>
+  </section>
+  <div id="bands"></div>
 </main>
 
-<footer>
-  Planning aid only, not a substitute for
-  <a href="https://www.mwis.org.uk">MWIS</a> or, in winter,
-  <a href="https://www.sais.gov.uk">SAIS</a>.<br>
-  Weather: <a href="https://open-meteo.com">Open-Meteo</a>, UK Met Office 2km model.
-  Hills: <a href="https://www.hill-bagging.co.uk/dobih">DoBIH</a> v18.5, CC-BY-4.0.
+<footer class="wrap">
+  <div class="footer-inner">
+    <div>
+      <h5>Before you go</h5>
+      A planning aid, not a forecast service. Always read
+      <a href="https://www.mwis.org.uk">MWIS</a>, and in winter
+      <a href="https://www.sais.gov.uk">SAIS</a> for avalanche risk.
+    </div>
+    <div>
+      <h5>How it is made</h5>
+      Pressure-level data interpolated to true summit height, rebuilt twice a day.
+      <a href="how-to-read.html">How to read this</a>.
+    </div>
+    <div>
+      <h5>Sources</h5>
+      Weather from <a href="https://open-meteo.com">Open-Meteo</a>, UK Met Office 2&nbsp;km model.
+      Hill data from the <a href="https://www.hill-bagging.co.uk/dobih">Database of British
+      and Irish Hills</a> v18.5, CC&nbsp;BY&nbsp;4.0.
+    </div>
+  </div>
 </footer>
 
 <script>
-const state = { region: null, day: null, sort: 'view_pct', data: {}, open: null };
-
-const cls = v => v >= 70 ? 'g' : v >= 35 ? 'm' : 'b';
-const hhmm = iso => iso ? iso.slice(11, 16) : '-';
-const compass = d => d == null ? '' :
-  ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16];
-
+const state = { region: null, day: null, data: {}, open: null };
 const DATA = 'data/';
 const detailCache = {};
 
-// Hourly detail is fetched only when a hill is tapped, and cached. The summary
-// alone is enough to render the whole ranked list.
+const band = v => v >= 70 ? 'c-clear' : v >= 35 ? 'c-edge' : 'c-cloud';
+const hhmm = iso => iso ? iso.slice(11, 16) : '-';
+const compass = d => d == null ? '' :
+  ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d / 22.5) % 16];
+const metres = m => m == null ? '-' : m.toLocaleString('en-GB') + ' m';
+
 async function loadDetail(region, slug) {
   const key = region + '/' + slug;
   if (!detailCache[key])
@@ -140,23 +88,78 @@ async function loadDetail(region, slug) {
   return detailCache[key];
 }
 
-async function boot() {
-  const index = await (await fetch(DATA + 'index.json')).json();
-  for (const r of index.regions)
-    state.data[r.region] = await (await fetch(DATA + r.summary)).json();
+// A hill drawn in section, with the cloud layer laid across it. The whole
+// point of the site in one glyph: a summit under a grey band, or standing
+// clear of it, is a fact you take in without reading anything.
+const SCALE = 1600;
+function relief(height, base, top, verdict) {
+  const W = 56, H = 42, GROUND = 40;
+  const y = m => Math.max(0, Math.min(H, H - (m / SCALE) * (H - 4)));
+  const peak = y(height);
+  const shape = `M2 ${GROUND} L${W * 0.36} ${peak + 14} L${W * 0.57} ${peak + 22}
+                 L${W * 0.79} ${peak} L${W - 2} ${GROUND} Z`;
+  let cloud = '';
+  if (base != null) {
+    const b = y(base), t = top != null ? y(top) : 0;
+    cloud = `<rect x="0" y="${t}" width="${W}" height="${Math.max(3, b - t)}"
+             fill="var(--cloud)" opacity=".42"></rect>
+             <line x1="0" y1="${b}" x2="${W}" y2="${b}" stroke="#8C8175"
+             stroke-width="1" stroke-dasharray="3 3"></line>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">
+    <path d="${shape}" fill="var(--relief)" stroke="var(--relief-line)" stroke-width="1"></path>
+    ${cloud}</svg>`;
+}
 
-  state.region = index.regions[0].region;
-  const first = state.data[state.region];
-  document.getElementById('stamp').textContent =
-    'forecast ' + first.meta.forecast_fetched_utc.replace('T', ' ').slice(0, 16) +
-    ' UTC · ' + first.meta.model;
+// The opening paragraph, written from the numbers. Without it the page is a
+// table of 214 percentages and the reader has to work out what kind of day it
+// is for themselves.
+function writeLede(hills, day, label) {
+  const rows = hills.map(h => ({ h, s: h.daily[day] })).filter(r => r.s);
+  const clear = rows.filter(r => r.s.view_pct >= 70);
+  const bases = rows.map(r => r.s.cloud_base).filter(v => v != null).sort((a, b) => a - b);
+  const mid = bases.length ? bases[Math.floor(bases.length / 2)] : null;
+  const lo = bases.length ? bases[0] : null;
+  const hi = bases.length ? bases[bases.length - 1] : null;
+  const inv = rows.filter(r => (r.s.inversion || 0) >= 25)
+                  .sort((a, b) => b.s.inversion - a.s.inversion);
+  const frac = rows.length ? clear.length / rows.length : 0;
 
-  chips('regions', index.regions.map(r => [r.region, r.label]),
-        () => state.region, v => { state.region = v; state.day = null; render(); });
-  chips('sorts', [['view_pct', 'Chance of a view'], ['inversion', 'Inversion'],
-                  ['light_dawn', 'Sunrise light']],
-        () => state.sort, v => { state.sort = v; render(); });
-  render();
+  let headline, standfirst;
+  if (inv.length) {
+    headline = `A cloud inversion is possible, with tops standing clear above the deck.`;
+    standfirst = `Cloud tops sit around ${metres(inv[0].s.cloud_top)}, and ${inv.length}
+      ${inv.length === 1 ? 'summit rises' : 'summits rise'} above it, ${inv[0].h.name} the
+      most convincingly. Inversions are the best mornings of the year and the hardest to
+      forecast, so treat this as worth setting an alarm for rather than a promise.`;
+  } else if (!bases.length || frac >= 0.9) {
+    headline = `Clear on almost every top.`;
+    standfirst = `Little low cloud anywhere in the ${label} today. Days like this are the
+      exception rather than the rule, so the question is less where to go than how early
+      you can get out.`;
+  } else if (frac <= 0.05) {
+    headline = `In cloud everywhere. A day for the valleys.`;
+    standfirst = `Cloud base is down around ${metres(lo)}, below all but the lowest ground.
+      Nothing on this list will give you a view, and no amount of driving will change that.`;
+  } else {
+    const highestClear = clear.reduce((a, r) => r.h.height > (a?.h.height || 0) ? r : a, null);
+    headline = `The tops are in cloud. Everything below about ${metres(mid)} is clear.`;
+    standfirst = `Cloud base runs from ${metres(lo)} to ${metres(hi)} across the ${label}.
+      ${clear.length} of ${rows.length} tops should stay out of it, the highest of them
+      ${highestClear ? `${highestClear.h.name} at ${metres(highestClear.h.height)}` : 'well down the list'}.
+      Go low today and you will still get your view.`;
+  }
+  document.getElementById('headline').textContent = headline;
+  document.getElementById('standfirst').textContent = standfirst.replace(/\s+/g, ' ').trim();
+
+  const first = rows[0].s;
+  const sunrise = rows[0].h.sunrise ? rows[0].h.sunrise[day] : null;
+  document.getElementById('glance').innerHTML = [
+    ['Cloud base', bases.length ? `${lo.toLocaleString('en-GB')}&ndash;${hi.toLocaleString('en-GB')} m` : 'none'],
+    ['Freezing level', metres(first.freezing_level)],
+    ['Sunrise', sunrise ? `${hhmm(sunrise)}` : '-'],
+    ['Tops clear', `${clear.length} <small>of ${rows.length}</small>`],
+  ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
 }
 
 function chips(id, items, get, set) {
@@ -164,9 +167,10 @@ function chips(id, items, get, set) {
   el.innerHTML = '';
   for (const [val, label] of items) {
     const b = document.createElement('button');
+    b.type = 'button';
     b.textContent = label;
-    b.setAttribute('aria-pressed', get() === val);
-    b.onclick = () => { set(val); };
+    b.setAttribute('aria-pressed', String(get() === val));
+    b.onclick = () => set(val);
     el.appendChild(b);
   }
 }
@@ -176,325 +180,140 @@ function render() {
   const days = Object.keys(d.hills[0].daily).sort();
   if (!state.day || !days.includes(state.day)) state.day = days[0];
 
+  document.getElementById('dateline').textContent =
+    new Date(state.day + 'T12:00').toLocaleDateString('en-GB',
+      { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
   chips('regions', Object.entries(state.data).map(([k, v]) => [k, v.meta.label]),
-        () => state.region, v => { state.region = v; state.day = null; render(); });
+        () => state.region, v => { state.region = v; state.day = null; state.open = null; render(); });
   chips('days', days.map(x => [x, new Date(x + 'T12:00')
         .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })]),
-        () => state.day, v => { state.day = v; render(); });
-  chips('sorts', [['view_pct', 'Chance of a view'], ['inversion', 'Inversion'],
-                  ['light_dawn', 'Sunrise light']],
-        () => state.sort, v => { state.sort = v; render(); });
+        () => state.day, v => { state.day = v; state.open = null; render(); });
 
-  const rows = d.hills
-    .map(h => ({ h, s: h.daily[state.day] || {} }))
-    .filter(r => r.s.view_pct != null)
-    .sort((a, b) => (b.s[state.sort] || 0) - (a.s[state.sort] || 0)
-                 || b.h.height - a.h.height);
+  writeLede(d.hills, state.day, d.meta.label);
 
-  const list = document.getElementById('list');
-  list.innerHTML = '';
-
-  // Grouped by height band rather than one flat ranking. Sorting the whole
-  // region by chance of a view puts the smallest fells on top, because they
-  // sit below the cloud. That is arithmetically right and practically useless:
-  // nobody drives to the Lakes for a 335m fell. Banding tells the real story,
-  // which is usually "the tops are in cloud but the low fells are clear".
-  const bands = (d.meta.bands || [[0, 'All hills']]);
-  for (const [floor, label] of bands) {
-    const inBand = rows.filter(r => r.h.height >= floor &&
-      !bands.some(([f]) => f > floor && r.h.height >= f));
-    if (!inBand.length) continue;
-
-    const clear = inBand.filter(r => r.s.view_pct >= 70).length;
-    const best = Math.max(...inBand.map(r => r.s.view_pct));
-    const head = document.createElement('div');
-    head.className = 'band';
-    head.innerHTML = `<span>${label}</span><span class="band-note">${
-      clear ? `${clear} of ${inBand.length} clear`
-            : `none clear, best ${best}%`}</span>`;
-    list.appendChild(head);
-
-    renderRows(inBand, list);
-  }
-}
-
-// A small elevation diagram: the cloud layer as a band, the summit as a tick.
-//
-// This is the whole idea of the site in one glyph. "CLEAR, cloud 850-1549m" is
-// a sentence you have to parse; a summit sitting below a grey band is a fact
-// you take in at a glance, and it makes rows comparable down the page in a way
-// numbers never are.
-const SCALE_TOP = 1600;   // metres at the right hand edge
-
-function elevationBar(height, base, top, verdict) {
-  const W = 132, H = 16;
-  const x = m => Math.max(0, Math.min(W, (m / SCALE_TOP) * W));
-  const parts = [];
-
-  parts.push(`<rect x="0" y="${H / 2 - 1}" width="${W}" height="2"
-    fill="var(--line)"/>`);
-
-  if (base != null) {
-    const b = x(base);
-    const t = top != null ? x(top) : W;
-    parts.push(`<rect x="${b}" y="0" width="${Math.max(2, t - b)}" height="${H}"
-      fill="var(--cloud)" rx="2"/>`);
-  }
-
-  const sx = x(height);
-  const colour = verdict === 'IN CLOUD' ? 'var(--bad)'
-               : verdict === 'ON THE EDGE' ? 'var(--mid)' : 'var(--good)';
-  parts.push(`<path d="M${sx - 5} ${H} L${sx} ${H - 11} L${sx + 5} ${H} Z"
-    fill="${colour}"/>`);
-
-  return `<svg class="elev" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"
-    aria-hidden="true">${parts.join('')}</svg>`;
-}
-
-function renderRows(rows, list) {
-  for (const { h, s } of rows) {
-    const cloud = s.cloud_base == null ? 'no low cloud'
-      : `cloud ${s.cloud_base}${s.cloud_top ? '-' + s.cloud_top : ''}m`;
-
-    const row = document.createElement('div');
-    row.className = 'row';
-    row.innerHTML = `
-      <div class="pct ${cls(s.view_pct)}">${s.view_pct}<span style="font-size:.6em">%</span></div>
-      <div class="mid">
-        <div class="name">${h.name} <span class="ht">${h.height}m</span></div>
-        <div class="meta">${cloud}${
-          s.view_best !== s.view_worst
-            ? ` · ${s.view_worst}-${s.view_best}% through the day` : ''}</div>
-      </div>
-      <div class="viz">
-        ${elevationBar(h.height, s.cloud_base, s.cloud_top, s.verdict)}
-        <div class="tags">
-          ${s.inversion > 15 ? `<span class="tag t-inv">inversion</span>` : ''}
-          ${s.light_dawn > 25 ? `<span class="tag t-light">dawn light</span>` : ''}
-        </div>
-      </div>`;
-
-    const det = document.createElement('div');
-    det.className = 'detail';
-    det.textContent = 'loading…';
-
-    row.onclick = async () => {
-      const isOpen = det.classList.toggle('open');
-      if (!isOpen) return;
-      const full = await loadDetail(state.region, h.slug);
-      det.innerHTML = detailHTML(full, full.sun[state.day] || {});
-    };
-    list.append(row, det);
-  }
-}
-
-function detailHTML(h, sun) {
-  const hrs = h.hours.filter(x => x.t.startsWith(state.day)
-    && +x.t.slice(11, 13) >= 5 && +x.t.slice(11, 13) <= 21);
-  return `
-    <div class="sun">
-      sunrise ${hhmm(sun.sunrise)} (${compass(sun.sunrise_azimuth)} ${sun.sunrise_azimuth ?? ''}°)
-      · sunset ${hhmm(sun.sunset)} (${compass(sun.sunset_azimuth)})
-      · ${sun.daylight_hours ?? '-'} h daylight
-    </div>
-    <table>
-      <tr><th>h</th><th>view</th><th>cloud</th><th>temp</th><th>wind</th><th>inv</th><th>light</th></tr>
-      ${hrs.map(x => `<tr>
-        <td>${x.t.slice(11, 16)}</td>
-        <td class="${cls(x.view_pct)}">${x.view_pct}%</td>
-        <td>${x.cloud_base ?? '-'}${x.cloud_top ? '-' + x.cloud_top : ''}m${x.uncertain ? ' ?' : ''}</td>
-        <td>${x.temp ?? '-'}°</td>
-        <td>${x.wind ?? '-'} ${compass(x.wind_dir)}</td>
-        <td>${x.inversion || ''}</td>
-        <td>${x.light || ''}</td>
-      </tr>`).join('')}
-    </table>`;
-}
-
-// ---------------------------------------------------------------------------
-// Share card.
-//
-// The growth model for this site is somebody pasting a picture into a walking
-// group on a Friday night, so the card IS the marketing. It is drawn on a
-// canvas rather than screenshotted so it always says where it came from and
-// which day it is for, and so it reads the same in a chat thread whatever
-// theme the sender happens to be using.
-// ---------------------------------------------------------------------------
-
-const CARD = {
-  // Portrait rather than square. Four height bands with a few hills each does
-  // not fit in 1080 square, and the alternative was silently dropping bands,
-  // which could hide the only band that is actually clear.
-  w: 1080, h: 1350,
-  bg: '#14171a', card: '#1c2024', ink: '#e8eaed', dim: '#9aa3ad',
-  line: '#2a2f35', good: '#7fc6a0', mid: '#d9ac5f', bad: '#d98b8b',
-  inv: '#93a6e8',
-  font: '-apple-system, "Segoe UI", system-ui, sans-serif',
-};
-
-function cardColour(v) {
-  return v >= 70 ? CARD.good : v >= 35 ? CARD.mid : CARD.bad;
-}
-
-function drawCard() {
-  const d = state.data[state.region];
-  const c = document.createElement('canvas');
-  c.width = CARD.w; c.height = CARD.h;
-  const x = c.getContext('2d');
-
-  x.fillStyle = CARD.bg;
-  x.fillRect(0, 0, CARD.w, CARD.h);
-
-  const pad = 72;
-  let y = 108;
-
-  x.fillStyle = CARD.ink;
-  x.font = `700 58px ${CARD.font}`;
-  x.fillText('Hill Weather', pad, y);
-
-  x.fillStyle = CARD.dim;
-  x.font = `400 30px ${CARD.font}`;
-  y += 46;
-  const day = new Date(state.day + 'T12:00').toLocaleDateString('en-GB',
-    { weekday: 'long', day: 'numeric', month: 'long' });
-  x.fillText(`${d.meta.label} · ${day}`, pad, y);
-
-  // Rows, grouped exactly as the page groups them, so the card tells the same
-  // story the site does rather than a flattened version of it.
-  const rows = d.hills
-    .map(h => ({ h, s: h.daily[state.day] || {} }))
-    .filter(r => r.s.view_pct != null)
+  const rows = d.hills.map(h => ({ h, s: h.daily[state.day] }))
+    .filter(r => r.s)
     .sort((a, b) => b.s.view_pct - a.s.view_pct || b.h.height - a.h.height);
 
-  const bands = d.meta.bands || [[0, 'All hills']];
-  y += 74;
-
-  // Work out how many hills each band can show BEFORE drawing anything, so
-  // every band that has hills always appears. Dropping bands when space runs
-  // out would be the worst possible failure here: on a bad day the low band is
-  // the only one with anything clear in it, and that is the whole message.
-  const populated = bands.filter(([floor]) => rows.some(r =>
-    r.h.height >= floor && !bands.some(([f]) => f > floor && r.h.height >= f)));
-  const FOOTER_Y = CARD.h - 200;
-  const BAND_CHROME = 90;          // header, rule and trailing gap
-  const ROW_H = 50;
-  const perBand = (FOOTER_Y - y) / Math.max(1, populated.length);
-  const rowsPerBand = Math.max(1, Math.min(3,
-    Math.floor((perBand - BAND_CHROME) / ROW_H)));
+  // Grouped by height band. A single ranking puts the smallest fells on top,
+  // because they sit below the cloud: correct, and useless.
+  const bands = d.meta.bands && d.meta.bands.length ? d.meta.bands : [[0, 'All hills']];
+  const out = document.getElementById('bands');
+  out.innerHTML = '';
 
   for (const [floor, label] of bands) {
     const inBand = rows.filter(r => r.h.height >= floor &&
       !bands.some(([f]) => f > floor && r.h.height >= f));
     if (!inBand.length) continue;
 
-    const clear = inBand.filter(r => r.s.view_pct >= 70).length;
-    x.fillStyle = CARD.dim;
-    x.font = `600 26px ${CARD.font}`;
-    x.fillText(label.toUpperCase(), pad, y);
-    x.textAlign = 'right';
-    x.fillText(clear ? `${clear} of ${inBand.length} clear` : 'none clear',
-               CARD.w - pad, y);
-    x.textAlign = 'left';
+    const clear = inBand.filter(r => r.s.view_pct >= 70);
+    const best = inBand[0];
+    const section = document.createElement('section');
+    section.className = 'band';
+    section.innerHTML = `
+      <div class="band-head">
+        <h3>${label}</h3>
+        <div class="band-note ${clear.length ? 'c-clear' : 'c-cloud'}">${
+          clear.length
+            ? `${clear.length} of ${inBand.length} clear of the cloud`
+            : `None clear &middot; best chance ${best.s.view_pct}% on ${best.h.name}`}</div>
+      </div>
+      <div class="hills"></div>`;
+    const grid = section.querySelector('.hills');
 
-    y += 14;
-    x.strokeStyle = CARD.line; x.lineWidth = 2;
-    x.beginPath(); x.moveTo(pad, y); x.lineTo(CARD.w - pad, y); x.stroke();
-    y += 46;
+    const shown = inBand.slice(0, 9);
+    for (const { h, s } of shown) {
+      const gap = s.cloud_base == null ? null : s.cloud_base - h.height;
+      const sub = s.cloud_base == null ? 'no low cloud about'
+        : gap > 60 ? `${h.height} m &middot; ${Math.round(gap)} m below cloud`
+        : gap < -60 ? `${h.height} m &middot; well inside`
+        : `${h.height} m &middot; in and out`;
 
-    for (const { h, s } of inBand.slice(0, rowsPerBand)) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'hill';
+      btn.innerHTML = `
+        ${relief(h.height, s.cloud_base, s.cloud_top, s.verdict)}
+        <span class="hill-body">
+          <span class="hill-name">${h.name}</span>
+          <span class="hill-sub" style="display:block">${sub}</span>
+        </span>
+        <span class="hill-pct ${band(s.view_pct)}">${s.view_pct}%</span>`;
 
-      // Right hand side first, so we know how much room the name has left.
-      const pct = `${s.view_pct}%`;
-      x.font = `700 38px ${CARD.font}`;
-      const pctW = x.measureText(pct).width;
-      x.fillStyle = cardColour(s.view_pct);
-      x.textAlign = 'right';
-      x.fillText(pct, CARD.w - pad, y);
-      x.textAlign = 'left';
+      const holder = document.createElement('div');
+      holder.className = 'detail';
+      holder.hidden = true;
 
-      const height = `${h.height}m`;
-      x.font = `400 26px ${CARD.font}`;
-      const heightW = x.measureText(height).width;
-
-      // Truncate the name to whatever is genuinely left rather than guessing a
-      // character count: "An Teallach - Bidein a' Ghlas Thuill" is real.
-      const room = CARD.w - pad * 2 - pctW - heightW - 60;
-      x.font = `500 34px ${CARD.font}`;
-      let name = h.name;
-      while (x.measureText(name).width > room && name.length > 4) {
-        name = name.slice(0, -2);
-      }
-      if (name !== h.name) name = name.trimEnd() + '…';
-      x.fillStyle = CARD.ink;
-      x.fillText(name, pad, y);
-      const nameW = x.measureText(name).width;
-
-      x.fillStyle = CARD.dim;
-      x.font = `400 26px ${CARD.font}`;
-      x.fillText(height, pad + nameW + 18, y);
-
-      y += ROW_H;
+      btn.onclick = async () => {
+        const opening = state.open !== h.slug;
+        grid.querySelectorAll('.detail').forEach(x => { x.hidden = true; });
+        state.open = opening ? h.slug : null;
+        if (!opening) return;
+        holder.hidden = false;
+        holder.innerHTML = '<div class="detail-inner"><em>Loading&hellip;</em></div>';
+        holder.innerHTML = detailHTML(await loadDetail(state.region, h.slug));
+      };
+      grid.append(btn, holder);
     }
-    y += 30;
-  }
 
-  // Inversions are the reason anyone forwards this, so they get called out.
-  const best = rows.reduce((a, r) =>
-    (r.s.inversion || 0) > (a?.s.inversion || 0) ? r : a, null);
-  if (best && best.s.inversion >= 25) {
-    x.fillStyle = CARD.inv;
-    x.font = `600 30px ${CARD.font}`;
-    x.fillText(`Possible inversion: ${best.h.name}`, pad, CARD.h - 190);
-  }
-
-  x.strokeStyle = CARD.line;
-  x.beginPath(); x.moveTo(pad, CARD.h - 150); x.lineTo(CARD.w - pad, CARD.h - 150);
-  x.stroke();
-
-  x.fillStyle = CARD.ink;
-  x.font = `600 32px ${CARD.font}`;
-  x.fillText('hillweather.co.uk', pad, CARD.h - 96);
-  x.fillStyle = CARD.dim;
-  x.font = `400 24px ${CARD.font}`;
-  x.fillText('Chance of a view from the summit. Planning aid, not a forecast service.',
-             pad, CARD.h - 58);
-
-  return c;
-}
-
-async function share() {
-  const btn = document.getElementById('share');
-  btn.disabled = true;
-  btn.textContent = '…';
-  try {
-    const canvas = drawCard();
-    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-    const name = `hillweather-${state.region}-${state.day}.png`;
-    const file = new File([blob], name, { type: 'image/png' });
-
-    // Phones get the real share sheet, which is where this actually gets used.
-    // Everything else falls back to a download.
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file] });
-    } else {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = name;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    if (inBand.length > shown.length) {
+      const note = document.createElement('div');
+      note.className = 'more';
+      const rest = inBand.length - shown.length;
+      const restClear = inBand.slice(shown.length).filter(r => r.s.view_pct >= 70).length;
+      note.textContent = `${rest} more in this band, ${restClear ? `${restClear} of them clear` : 'all in cloud'}`;
+      section.appendChild(note);
     }
-  } catch (e) {
-    if (e.name !== 'AbortError') console.error('share failed', e);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Share';
+    out.appendChild(section);
   }
 }
 
-document.getElementById('share').onclick = share;
+function detailHTML(h) {
+  const sun = h.sun[state.day] || {};
+  const hrs = h.hours.filter(x => x.t.startsWith(state.day) &&
+    +x.t.slice(11, 13) >= 6 && +x.t.slice(11, 13) <= 20 && +x.t.slice(11, 13) % 2 === 0);
+  return `<div class="detail-inner">
+    <div>
+      <h4>${h.name}</h4>
+      <div class="hill-sub">${h.height} m${h.area ? ' &middot; ' + h.area : ''}</div>
+      <dl style="margin:16px 0 0;display:flex;flex-direction:column;gap:9px;font-size:15px">
+        <div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted var(--rule);padding-bottom:7px">
+          <dt style="color:#4A423A">Sunrise</dt><dd style="margin:0">${hhmm(sun.sunrise)} <small style="color:var(--faint)">${compass(sun.sunrise_azimuth)}</small></dd></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted var(--rule);padding-bottom:7px">
+          <dt style="color:#4A423A">Sunset</dt><dd style="margin:0">${hhmm(sun.sunset)} <small style="color:var(--faint)">${compass(sun.sunset_azimuth)}</small></dd></div>
+        <div style="display:flex;justify-content:space-between;gap:12px">
+          <dt style="color:#4A423A">Daylight</dt><dd style="margin:0">${sun.daylight_hours ?? '-'} hours</dd></div>
+      </dl>
+    </div>
+    <div>
+      <table>
+        <tr><th>Hour</th><th>View</th><th>Cloud</th><th>Temp</th><th>Wind</th></tr>
+        ${hrs.map(x => `<tr>
+          <td>${x.t.slice(11, 16)}</td>
+          <td class="${band(x.view_pct)}">${x.view_pct}%</td>
+          <td>${x.cloud_base ?? '-'}${x.cloud_top ? '&ndash;' + x.cloud_top : ''} m${x.uncertain ? ' ?' : ''}</td>
+          <td>${x.temp ?? '-'}&deg;</td>
+          <td>${x.wind ?? '-'} ${compass(x.wind_dir)}</td>
+        </tr>`).join('')}
+      </table>
+    </div>
+  </div>`;
+}
 
-boot().catch(e => document.getElementById('list').textContent =
-  'Failed to load: ' + e + ': serve over http, not file://');
+async function boot() {
+  const index = await (await fetch(DATA + 'index.json')).json();
+  for (const r of index.regions)
+    state.data[r.region] = await (await fetch(DATA + r.summary)).json();
+  state.region = index.regions[0].region;
+  render();
+}
+
+boot().catch(e => {
+  document.getElementById('headline').textContent = 'The forecast could not be loaded.';
+  document.getElementById('standfirst').textContent = String(e);
+});
 </script>
+<script src="share.js"></script>
 </body>
 </html>
