@@ -9,7 +9,7 @@ no mainstream weather app answers: will I be in the cloud, above it, or clear?
 **Price:** free, no ads, no accounts. Static hosting keeps running costs near
 zero, and free is what carries it through a tight community by word of mouth.
 
-Last updated 2026-08-22 (evening).
+Last updated 2026-08-22 (end of day).
 
 ---
 
@@ -114,7 +114,17 @@ candidates; the other two are in `design/`.
       geolocation guess. Opt-in "nearest to me" for those who want it.
 - [x] **How to read this**, the explainer for a first-time visitor.
 - [x] **Contact form**, the one running service in the project.
+- [x] **Search across both regions**, including Gaelic names, given as its own
+      band. Nine hills show per band, so search is the only route to the other
+      487 and nothing on the page had said so.
+- [x] **Dark theme** as a warm inversion rather than a switch to slate. Three
+      states: follow the device, force light, force dark.
+- [x] **Link previews**, favicon and touch icon. Pasting the site into a
+      walking group is the growth model, and it showed a bare URL.
+- [x] **Usable on a phone.** 44px targets keyed on pointer rather than width,
+      since a tablet is as much a finger as a phone is.
 - [ ] Offline caching, so it works in a car park with no signal.
+- [ ] A one-tap "what was it like up there?" report, which feeds Phase 2.
 
 No map in v1. The ranked list is the product. See `design/MAP-BRIEF.md` for
 where a map might go, and why it waits for validation.
@@ -181,6 +191,27 @@ SAIS avalanche data is Scotland only and does not extend.
    the thing every other weather app refuses to say.
 
 ---
+
+## Traps worth remembering
+
+Each of these cost real time and each looks like something it is not.
+
+1. **`nginx.conf` needs the container recreated.** Editing it does nothing, and
+   `docker compose up -d` will not do it either: compose sees an unchanged
+   service definition and leaves the container running.
+2. **Stale assets look exactly like code bugs.** A four-hour CDN cache on the
+   stylesheet, served against new markup, produced giant icons and a collapsed
+   layout while the origin was entirely correct. Fixed for good with
+   content-hashed URLs (`scripts/version_assets.py`).
+3. **Purge Cloudflare after a manual rebuild**, or the old forecast serves for
+   half an hour and looks like a failed build.
+4. **Do not stack manual builds.** Three inside twenty minutes exhausted the
+   hourly API budget and everything failed for an hour after.
+5. **A silent build is usually a backoff, not a hang.** Check with
+   `docker compose exec scheduler ps` before assuming the worst.
+
+When something looks wrong in the browser, check what is actually being served
+before trusting local rendering. One curl settles it.
 
 ## Open questions
 
