@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hill Weather — cloud base and inversions</title>
+<title>Hill Weather: cloud base and inversions</title>
 <style>
   :root {
     --bg: #f6f7f9; --card: #fff; --ink: #16191d; --dim: #666e78;
@@ -80,14 +80,14 @@
 
 <main>
   <div class="warn">
-    Internal viewer. Forecast is <strong>unvalidated</strong> — the cloud-base
+    Internal viewer. Forecast is <strong>unvalidated</strong>. The cloud-base
     method has not yet been checked against observations.
   </div>
   <div id="list"></div>
 </main>
 
 <footer>
-  Planning aid only — not a substitute for
+  Planning aid only, not a substitute for
   <a href="https://www.mwis.org.uk">MWIS</a> or, in winter,
   <a href="https://www.sais.gov.uk">SAIS</a>.<br>
   Weather: <a href="https://open-meteo.com">Open-Meteo</a>, UK Met Office 2km model.
@@ -98,7 +98,7 @@
 const state = { region: null, day: null, sort: 'view_pct', data: {}, open: null };
 
 const cls = v => v >= 70 ? 'g' : v >= 35 ? 'm' : 'b';
-const hhmm = iso => iso ? iso.slice(11, 16) : '–';
+const hhmm = iso => iso ? iso.slice(11, 16) : '-';
 const compass = d => d == null ? '' :
   ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16];
 
@@ -169,7 +169,7 @@ function render() {
   list.innerHTML = '';
   for (const { h, s } of rows) {
     const cloud = s.cloud_base == null ? ''
-      : `cloud ${s.cloud_base}${s.cloud_top ? '–' + s.cloud_top : ''}m`;
+      : `cloud ${s.cloud_base}${s.cloud_top ? '-' + s.cloud_top : ''}m`;
 
     const row = document.createElement('div');
     row.className = 'row';
@@ -179,7 +179,7 @@ function render() {
         <div class="name">${h.name} <span style="color:var(--dim);font-weight:400">${h.height}m</span></div>
         <div class="meta">${s.verdict}${cloud ? ' · ' + cloud : ''}${
           s.view_best !== s.view_worst
-            ? ` · ${s.view_worst}–${s.view_best}% across the day` : ''}</div>
+            ? ` · ${s.view_worst}-${s.view_best}% across the day` : ''}</div>
       </div>
       <div class="tags">
         ${s.inversion > 15 ? `<span class="tag t-inv">inversion ${s.inversion}</span>` : ''}
@@ -207,16 +207,16 @@ function detailHTML(h, sun) {
     <div class="sun">
       sunrise ${hhmm(sun.sunrise)} (${compass(sun.sunrise_azimuth)} ${sun.sunrise_azimuth ?? ''}°)
       · sunset ${hhmm(sun.sunset)} (${compass(sun.sunset_azimuth)})
-      · ${sun.daylight_hours ?? '–'} h daylight
+      · ${sun.daylight_hours ?? '-'} h daylight
     </div>
     <table>
       <tr><th>h</th><th>view</th><th>cloud</th><th>temp</th><th>wind</th><th>inv</th><th>light</th></tr>
       ${hrs.map(x => `<tr>
         <td>${x.t.slice(11, 16)}</td>
         <td class="${cls(x.view_pct)}">${x.view_pct}%</td>
-        <td>${x.cloud_base ?? '–'}${x.cloud_top ? '–' + x.cloud_top : ''}m${x.uncertain ? ' ?' : ''}</td>
-        <td>${x.temp ?? '–'}°</td>
-        <td>${x.wind ?? '–'} ${compass(x.wind_dir)}</td>
+        <td>${x.cloud_base ?? '-'}${x.cloud_top ? '-' + x.cloud_top : ''}m${x.uncertain ? ' ?' : ''}</td>
+        <td>${x.temp ?? '-'}°</td>
+        <td>${x.wind ?? '-'} ${compass(x.wind_dir)}</td>
         <td>${x.inversion || ''}</td>
         <td>${x.light || ''}</td>
       </tr>`).join('')}
@@ -224,7 +224,7 @@ function detailHTML(h, sun) {
 }
 
 boot().catch(e => document.getElementById('list').textContent =
-  'Failed to load: ' + e + ' — serve over http, not file://');
+  'Failed to load: ' + e + ': serve over http, not file://');
 </script>
 </body>
 </html>

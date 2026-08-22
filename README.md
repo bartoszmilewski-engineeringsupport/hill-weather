@@ -1,6 +1,6 @@
 # Hill Weather
 
-Cloud base and inversion forecasts for British hills — the one question no
+Cloud base and inversion forecasts for British hills. The one question no
 mainstream weather app answers: **will I be in the cloud, above it, or clear?**
 
 Free, non-commercial, no ads, no accounts. Covers all 282 Munros and 214
@@ -18,13 +18,13 @@ a global 25 km model flattens the Highlands into a gentle bump. So when a
 weather app shows "Ben Nevis, 8°C, light wind", it is describing a mountain
 that does not exist.
 
-This project takes the **pressure-level profile** — temperature, humidity, wind
-and geopotential height at each level up through the atmosphere — and
+This project takes the **pressure-level profile**: temperature, humidity, wind
+and geopotential height at each level up through the atmosphere, and
 interpolates it to the **true summit height**. From that, cloud base falls out,
 and with it the three answers that matter:
 
-- summit **in** cloud — save your petrol
-- summit **above** cloud — an inversion, the best day of the year
+- summit **in** cloud, so save your petrol
+- summit **above** cloud, an inversion, the best day of the year
 - **clear**
 
 Nothing else publishes which hills are likely to be poking above a cloud sea
@@ -52,8 +52,8 @@ Two independent cloud-base estimates, cross-checked:
 
 | Method | Good for | Limitation |
 |---|---|---|
-| **LCL** — lift a glen-level parcel, `125 × (T − Td)` | Orographic hill fog, which is most of what Scotland produces | Says where cloud *would* form, not that it exists — so it is gated on actual low-cloud cover |
-| **RH profile** — lowest level crossing a moist threshold | Layer cloud, and finding the cloud *top* (which is what reveals inversions) | Model levels are 215–466 m apart; Munro summits sit in the widest gap |
+| **LCL**, lift a glen-level parcel, `125 x (T - Td)` | Orographic hill fog, which is most of what Scotland produces | Says where cloud *would* form, not that it exists, so it is gated on actual low-cloud cover |
+| **RH profile**, lowest level crossing a moist threshold | Layer cloud, and finding the cloud *top* (which is what reveals inversions) | Model levels are 215-466 m apart; Munro summits sit in the widest gap |
 
 Output is deliberately **probabilistic**. Broken cloud means the summit is in
 and out of it, and saying so is more useful than a confident icon that is wrong.
@@ -75,7 +75,7 @@ Serve locally:
 python -m http.server 8000 --directory web
 ```
 
-Rebuild from an archived day instead of fetching — this is the backtest path,
+Rebuild from an archived day instead of fetching. This is the backtest path,
 and the reason the archive stores raw responses rather than derived answers:
 
 ```bash
@@ -93,7 +93,7 @@ cd /opt/hillweather/deploy && docker compose up -d
 
 NPM proxy host: `hillweather.uk` → `http://<vps-ip>:5003`, Let's Encrypt on.
 
-Cron, twice daily — Open-Meteo weights API calls by variable and location
+Cron, twice daily. Open-Meteo weights API calls by variable and location
 count, so four builds a day would exceed the free tier:
 
 ```
@@ -106,7 +106,7 @@ The honest state of the project. The maths is sound; whether it matches
 reality is untested.
 
 The plan: score archived forecasts against the Nevis Range, Cairngorm and
-Glencoe webcams, and against the Lake District Fell Top Assessor reports —
+Glencoe webcams, and against the Lake District Fell Top Assessor reports,
 a professional human observation from Helvellyn most winter days, which is far
 better ground truth than a webcam.
 
@@ -122,7 +122,7 @@ The constants to tune live at the top of `scripts/physics.py`: `RH_MOIST`,
    community depends on the service. Link to them; do not compete.
 2. **Phones never call the weather API.** One build fetches, everyone reads the
    same static files. That is what keeps this inside the free tier at any scale.
-3. **Not a general outdoors app.** No routes, no gear lists, no step counting —
+3. **Not a general outdoors app.** No routes, no gear lists, no step counting;
    that road ends with a worse OS Maps.
 4. **Be honest about uncertainty.** "Could go either way" is a feature.
 
@@ -133,5 +133,5 @@ The constants to tune live at the top of `scripts/physics.py`: `RH_MOIST`,
 - Hills: [Database of British and Irish Hills](https://www.hill-bagging.co.uk/dobih)
   v18.5. CC-BY 4.0.
 
-Planning aid only — not a substitute for [MWIS](https://www.mwis.org.uk) or,
+Planning aid only, not a substitute for [MWIS](https://www.mwis.org.uk) or,
 in winter, [SAIS](https://www.sais.gov.uk).
