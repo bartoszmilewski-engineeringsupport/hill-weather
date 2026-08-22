@@ -127,6 +127,37 @@ Artboards for:
 5. **The transition.** How zoom moves between these states, and how the map and
    the list relate to each other.
 
+## What the data actually says (measured, 2026-08-22, one 3-day sample)
+
+Before designing against assumptions, the real forecast was aggregated by area
+across all 496 hills and three days. Three findings that should shape the
+design:
+
+**1. The dominant axis of variation is TIME, not space.** Across the three
+days the median area swung 72 percentage points, and the whole of the western
+Highlands went from 0% of tops clear on Saturday to 100% on Monday. Weather
+systems sweep the entire country, so on most days the map is close to uniform
+and the interesting question is *which day*, not *which glen*. The day control
+is therefore not a secondary garnish; it may be the primary control, and a
+scrubber or a small-multiple of three days deserves serious design attention.
+
+**2. Spatial differentiation is real but episodic.** On 22 August the Lake
+District fell groups ranged from 28% to 76% of tops clear, a genuine 48-point
+spread worth showing. On the same day every one of the 28 Scottish areas read
+0%. So the map has plenty to say on some days and nothing at all on others, and
+it must be honest on the flat days rather than manufacturing contrast with a
+stretched colour scale.
+
+**3. On poor days the pattern is largely height, not weather.** With the cloud
+base low, summits above 900 m averaged 14% clear against 80% for hills under
+700 m. An area map coloured by outcome therefore partly re-encodes where the
+tall hills are, which is constant and tells a returning visitor nothing new.
+Worth designing an opinion about: show the raw outcome, or show it relative to
+what is normal for that area, so the map highlights genuine anomalies?
+
+Caveat: this is one sample from one weather pattern. The archive is
+accumulating and will answer it properly over a season.
+
 ## Open questions worth designing an opinion about
 
 - Is the cloud drawn from above (plan view, as cloud cover) or is the
