@@ -72,6 +72,9 @@
       Weather from <a href="https://open-meteo.com">Open-Meteo</a>, UK Met Office 2&nbsp;km model.
       Hill data from the <a href="https://www.hill-bagging.co.uk/dobih">Database of British
       and Irish Hills</a> v18.5, CC&nbsp;BY&nbsp;4.0.
+      Descriptions from <a href="https://en.wikipedia.org">Wikipedia</a>,
+      CC&nbsp;BY-SA&nbsp;4.0. Routes linked to
+      <a href="https://www.walkhighlands.co.uk">Walkhighlands</a>, never copied.
     </div>
   </div>
 </footer>
@@ -335,6 +338,7 @@ function detailHTML(h) {
       <div style="margin-top:14px;font-size:14px;display:flex;gap:16px;flex-wrap:wrap">
         <a href="https://www.openstreetmap.org/?mlat=${h.lat}&amp;mlon=${h.lon}#map=14/${h.lat}/${h.lon}"
            target="_blank" rel="noopener">Map</a>
+        ${h.walkhighlands ? `<a href="${h.walkhighlands}" target="_blank" rel="noopener">Routes on Walkhighlands</a>` : ''}
         ${h.url ? `<a href="${h.url}" target="_blank" rel="noopener">Hill-bagging</a>` : ''}
       </div>
       <dl style="margin:18px 0 0;display:flex;flex-direction:column;gap:9px;font-size:15px">
@@ -347,6 +351,14 @@ function detailHTML(h) {
       </dl>
     </div>
     <div>
+      ${h.wikipedia ? `
+      <div style="margin-bottom:20px">
+        <p style="font-size:16px;line-height:1.68;color:#3A342D;margin:0;text-wrap:pretty">${h.wikipedia.extract}</p>
+        <div style="font-size:12px;color:var(--faint);margin-top:8px">
+          From <a href="${h.wikipedia.url}" target="_blank" rel="noopener">Wikipedia</a>,
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
+        </div>
+      </div>` : ''}
       <table>
         <tr><th>Hour</th><th>View</th><th>Cloud</th><th>Temp</th><th>Wind</th></tr>
         ${hrs.map(x => `<tr>

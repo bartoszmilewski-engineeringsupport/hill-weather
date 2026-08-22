@@ -33,6 +33,7 @@ from physics import summit_conditions           # noqa: E402
 from hills import REGIONS, DOBIH_VERSION, load_hills   # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
+SOURCES = ROOT / "data" / "sources.json"
 # Output lives inside the web root so the path is identical in dev and
 # production: the site always fetches "data/...", never "../data/...".
 DATA = ROOT / "web" / "data"
@@ -65,6 +66,20 @@ def from_live(region):
     return meta, [h._asdict() for h in hills], responses
 
 
+def load_sources():
+    """Wikipedia extracts and Walkhighlands links, cached by scripts/sources.py.
+
+    Read from disk rather than fetched: mountains do not change, and the
+    twice-daily build has no business hitting either site.
+    """
+    if not SOURCES.exists():
+        return {}
+    try:
+        return json.loads(SOURCES.read_text(encoding="utf-8")).get("hills", {})
+    except ValueError:
+        return {}
+
+
 def enrich(hill_defs, region):
     """Fill in static hill facts from the current DoBIH.
 
@@ -89,6 +104,7 @@ def enrich(hill_defs, region):
 def build(meta, hill_defs, responses, source):
     levels = meta["levels_hpa"]
     hill_defs = enrich(hill_defs, meta["region"])
+    sources = load_sources()
     hills_out = []
 
     for hill, resp in zip(hill_defs, responses):
@@ -120,6 +136,12 @@ def build(meta, hill_defs, responses, source):
                       "country", "grid_ref", "map50", "feature", "url"):
             if hill.get(extra) is not None:
                 entry[extra] = hill[extra]
+
+        src = sources.get(f"{meta['region']}/{hill['name']}") or {}
+        if src.get("wikipedia"):
+            entry["wikipedia"] = src["wikipedia"]
+        if src.get("walkhighlands"):
+            entry["walkhighlands"] = src["walkhighlands"]
         hills_out.append(entry)
 
     # Per-day summary so the front page can rank without walking every hour.
@@ -183,7 +205,12 @@ def build(meta, hill_defs, responses, source):
             "model": meta["model"],
             "algorithm_version": ALGORITHM_VERSION,
             "source": source,
-            "attribution": meta.get("attribution", omfetch.ATTRIBUTION),
+            "attribution": {
+                **meta.get("attribution", omfetch.ATTRIBUTION),
+                "descriptions": ("Wikipedia, CC BY-SA 4.0"),
+                "routes": ("Walkhighlands, linked only "
+                           "- https://www.walkhighlands.co.uk"),
+            },
             "disclaimer": ("Planning aid only. Not a substitute for MWIS "
                            "(mwis.org.uk) or, in winter, SAIS (sais.gov.uk)."),
             # Height bands for display, defined per region in hills.py. Sent
