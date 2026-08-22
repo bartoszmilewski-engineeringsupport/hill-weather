@@ -1,0 +1,23 @@
+# The repo is edited on Windows and runs on Linux, so line endings are forced
+# here rather than left to each machine's git config.
+#
+# Without this, shell scripts committed from Windows arrive on the VPS with
+# CRLF endings and fail with "bad interpreter: /usr/bin/env bash^M", which is
+# a confusing way to discover a line-ending problem.
+
+* text=auto eol=lf
+
+*.sh    text eol=lf
+*.py    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.conf  text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.html  text eol=lf
+
+# Binary, never touch.
+*.zip   binary
+*.gz    binary
+*.png   binary
+*.jpg   binary
