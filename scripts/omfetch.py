@@ -62,7 +62,7 @@ def all_variables(minimal=False):
     return v
 
 
-def _fetch_chunk(hills, variables, forecast_days, retries=4):
+def _fetch_chunk(hills, variables, forecast_days, retries=6):
     lats = ",".join(str(h.lat) for h in hills)
     lons = ",".join(str(h.lon) for h in hills)
     url = ("https://api.open-meteo.com/v1/forecast"
@@ -80,8 +80,13 @@ def _fetch_chunk(hills, variables, forecast_days, retries=4):
             last = e
             if e.code != 429 or attempt == retries - 1:
                 raise RuntimeError(f"fetch failed: HTTP {e.code} {e.reason}")
-            # Rate limited. Back off hard rather than hammering a free service.
-            wait = 30 * (attempt + 1)
+            # Rate limited. The free tier caps calls per minute AND per hour,
+            # and one build of both regions already sits close to the hourly
+            # limit, so short backoffs are not enough: exhausting the hour
+            # means waiting a good part of it out. Nothing here is urgent, and
+            # a build that takes twenty minutes beats one that fails and leaves
+            # the site stale until the next slot.
+            wait = min(600, 60 * (2 ** attempt))
             print(f"    rate limited, waiting {wait}s")
             time.sleep(wait)
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as e:
