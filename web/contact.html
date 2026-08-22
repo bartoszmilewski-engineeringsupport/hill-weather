@@ -36,6 +36,23 @@
   .aside p { font-size: 16px; line-height: 1.68; color: #3A342D; margin: 0 0 14px; }
   .aside .box { border: 1px solid var(--rule); padding: 22px 24px; margin-top: 24px; }
   @media (max-width: 900px) { .contact { grid-template-columns: 1fr; } }
+
+  /* Confirmation. A line of text under the button is too easy to miss, and
+     not being sure whether a message went is a horrible way to leave someone. */
+  dialog#sent {
+    border: 1px solid var(--ink); border-radius: 2px; padding: 0;
+    background: var(--paper); color: var(--ink); max-width: 460px; width: calc(100% - 32px);
+    box-shadow: 0 18px 50px rgba(42, 37, 33, .22);
+  }
+  dialog#sent::backdrop { background: rgba(42, 37, 33, .42); }
+  .sent-inner { padding: 34px 36px 30px; text-align: center; }
+  .sent-inner h2 { font-weight: 400; font-size: 30px; margin: 14px 0 0; }
+  .sent-inner p { font-size: 16px; line-height: 1.62; color: #3A342D; margin: 12px 0 0; }
+  .sent-rule { height: 1px; background: var(--rule); margin: 22px 0 0; }
+  .sent-close { margin-top: 22px; background: var(--ink); color: var(--paper);
+                border: 0; border-radius: 2px; padding: 12px 34px; font-size: 16px;
+                letter-spacing: .06em; min-height: 44px; }
+  .sent-close:hover { background: #443C34; }
 </style>
 </head>
 <body>
@@ -105,6 +122,24 @@
   </div>
 </main>
 
+<dialog id="sent" aria-labelledby="sent-title">
+  <div class="sent-inner">
+    <svg viewBox="0 0 64 48" width="64" height="48" aria-hidden="true">
+      <path d="M2 46 L24 12 L38 24 L52 6 L62 46 Z" fill="var(--relief)"
+            stroke="var(--relief-line)" stroke-width="1"></path>
+      <rect x="0" y="26" width="64" height="12" fill="var(--cloud)" opacity=".42"></rect>
+      <line x1="0" y1="26" x2="64" y2="26" stroke="#8C8175" stroke-width="1"
+            stroke-dasharray="3 3"></line>
+    </svg>
+    <h2 id="sent-title">Message sent</h2>
+    <p>Thank you. It has gone straight to my inbox, and your address is on it so I can
+      reply directly.</p>
+    <p>I read everything, though an answer can take a few days.</p>
+    <div class="sent-rule"></div>
+    <button class="sent-close" id="sent-close" type="button" autofocus>Close</button>
+  </div>
+</dialog>
+
 <footer class="wrap">
   <div class="footer-inner">
     <div>
@@ -141,6 +176,14 @@ fetch('/api/contact/token')
   .then(r => r.json())
   .then(d => { token = d.token; })
   .catch(() => { /* handled on submit */ });
+
+const sentDialog = document.getElementById('sent');
+document.getElementById('sent-close').addEventListener('click', () => sentDialog.close());
+// Clicking the backdrop closes it too: the dialog fills its own box, so any
+// click landing on the element itself was outside the content.
+sentDialog.addEventListener('click', (e) => {
+  if (e.target === sentDialog) sentDialog.close();
+});
 
 const form = document.getElementById('form');
 const note = document.getElementById('note');
@@ -179,7 +222,14 @@ form.addEventListener('submit', async (e) => {
     const out = await res.json().catch(() => ({}));
     if (res.ok && out.ok) {
       form.querySelectorAll('input, textarea').forEach(el => { el.value = ''; });
-      say('Thank you, that has been sent. I read everything, though replies can take a few days.', 'good');
+      say('');
+      // Errors stay inline, where the form is still on screen to correct.
+      // Success gets the dialog, because that is the one people miss.
+      if (typeof sentDialog.showModal === 'function') {
+        sentDialog.showModal();
+      } else {
+        say('Thank you, that has been sent. I read everything, though replies can take a few days.', 'good');
+      }
     } else {
       say(out.error || 'Something went wrong. Please email contact@hillweather.co.uk instead.', 'bad');
     }
