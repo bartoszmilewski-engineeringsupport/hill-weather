@@ -84,10 +84,20 @@ def heartbeat(ok, msg):
     if not HEARTBEAT_URL:
         return
     try:
-        sep = "&" if "?" in HEARTBEAT_URL else "?"
-        url = (f"{HEARTBEAT_URL}{sep}status={'up' if ok else 'down'}"
-               f"&msg={urllib.parse.quote(msg)}")
-        with urllib.request.urlopen(url, timeout=15):
+        # Two conventions, because the sensible host for this depends on where
+        # the stack is running. Uptime Kuma takes query parameters, but it has
+        # to be reachable inbound. healthchecks.io wants a bare GET for success
+        # and /fail for failure, and needs no inbound access at all, which is
+        # what you want when the monitoring lives on a LAN behind the VPS.
+        if "hc-ping.com" in HEARTBEAT_URL or "healthchecks" in HEARTBEAT_URL:
+            url = HEARTBEAT_URL if ok else HEARTBEAT_URL.rstrip("/") + "/fail"
+            data = msg.encode()[:10000]           # shows up in the ping log
+        else:
+            sep = "&" if "?" in HEARTBEAT_URL else "?"
+            url = (f"{HEARTBEAT_URL}{sep}status={'up' if ok else 'down'}"
+                   f"&msg={urllib.parse.quote(msg)}")
+            data = None
+        with urllib.request.urlopen(url, data=data, timeout=15):
             pass
         log("heartbeat sent")
     except Exception as e:                        # noqa: BLE001

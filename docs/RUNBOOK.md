@@ -134,18 +134,24 @@ static and cacheable, so the edge absorbs it.
 
 Two monitors in Uptime Kuma, because they catch different things.
 
-**1. Push monitor (the important one).**
+**1. Dead man's switch (the important one).**
 
-- Type: Push
-- Heartbeat Interval: `46800` (13 hours, comfortably more than the 11 hour gap
-  between the 05:15 and 16:15 builds)
-- Retries: 0
-- Copy its push URL into `HEARTBEAT_URL` in `deploy/.env`, then
-  `docker compose up -d` to pick it up.
+The scheduler pings a URL after every run, up on success and down on failure.
+Silence is the alert, so one check catches a failed build, a dead container, a
+hung process and a broken network.
 
-The scheduler pings this after every run, up on success and down on failure.
-Silence is the alert, so this catches a failed build, a dead container, a hung
-process and a broken network with one check.
+Use **healthchecks.io** rather than Uptime Kuma for this. Kuma lives on the
+homelab and is deliberately LAN only, so a push monitor would mean exposing the
+dashboard that lists the entire homelab to the internet in order to receive one
+heartbeat. healthchecks.io is free and the VPS only makes an outbound call, so
+nothing gets exposed.
+
+- Create a check: period `12 hours`, grace `2 hours`.
+- Put its ping URL in `HEARTBEAT_URL` in `deploy/.env`.
+- `docker compose up -d` to pick it up.
+
+If the stack ever moves onto the homelab, where Kuma is reachable, a Kuma push
+monitor works too and the scheduler detects which style to use from the URL.
 
 **2. Keyword monitor (site availability).**
 
