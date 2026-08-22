@@ -243,8 +243,24 @@ Update after a `git push` from the laptop or desktop:
 cd /opt/hillweather && git pull && docker compose -f deploy/docker-compose.yml restart scheduler
 ```
 
-The web container serves files straight off disk, so it only needs restarting
-if `nginx.conf` changed.
+The web container serves files straight off disk, so HTML, CSS and data changes
+need no restart at all.
+
+**`nginx.conf` is the exception.** nginx reads its config once at startup, so
+editing the file changes nothing until the container is recreated. `up -d`
+alone will NOT do it: compose sees an unchanged service definition and leaves
+the container running.
+
+```bash
+cd /opt/hillweather/deploy && docker compose up -d --force-recreate web
+```
+
+Then check it actually came back, because nginx resolves upstream hostnames at
+startup and will refuse to start if one is missing:
+
+```bash
+cd /opt/hillweather/deploy && docker compose ps web && docker compose logs --tail 15 web
+```
 
 How much history exists:
 
