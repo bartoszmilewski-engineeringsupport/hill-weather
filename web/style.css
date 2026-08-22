@@ -116,7 +116,7 @@
   /* Footer */
   footer { padding-top: clamp(30px, 4vw, 48px); }
   .footer-inner { border-top: 3px solid var(--ink); padding-top: 18px;
-                  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+                  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
                   gap: clamp(20px, 3vw, 44px); font-size: 13.5px; line-height: 1.7;
                   color: var(--muted); }
   .footer-inner h5 { margin: 0 0 7px; font-weight: 400; font-size: 12px;
@@ -126,11 +126,13 @@
     .lede { grid-template-columns: 1fr; }
     .glance { border-left: 0; border-top: 1px solid var(--rule); padding: 18px 0 0; }
     .hills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .detail-inner, .footer-inner { grid-template-columns: 1fr; }
+    .detail-inner { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 620px) {
     body { font-size: 16px; }
     .hills { grid-template-columns: 1fr; }
     .hill { padding: 13px 0; min-height: 44px; }
     .masthead-top { font-size: 11px; }
+    .footer-inner { grid-template-columns: 1fr; }
   }

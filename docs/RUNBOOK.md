@@ -165,6 +165,57 @@ enough: if the scheduler dies, the last forecast keeps being served and this
 monitor stays green while the data quietly goes stale. That is what the push
 monitor is for.
 
+### Contact form
+
+The one part of the site that is a running service rather than a file, because
+a static page cannot send email. It lives in the same compose stack, is reached
+through nginx at `/api/`, and can only ever send to one fixed address, so it
+cannot be turned into an open relay.
+
+**1. Create the address.** Cloudflare Email Routing (free, on the domain
+already there): add `contact@hillweather.co.uk` and forward it to a real
+mailbox.
+
+**2. Relay through an account with a sending reputation.** A VPS IP has none,
+so mail sent straight from the box goes to spam. Gmail needs an app password,
+not the account password.
+
+**3. Configure it** in `deploy/.env`:
+
+```
+CONTACT_TO=you@example.com
+CONTACT_FROM=you@gmail.com
+SMTP_USER=you@gmail.com
+SMTP_PASS=your-16-character-app-password
+FORM_SECRET=<python3 -c "import secrets;print(secrets.token_hex(32))">
+```
+
+With `CONTACT_TO` unset the form refuses to send and says so, rather than
+failing confusingly.
+
+```bash
+cd /opt/hillweather/deploy && docker compose up -d
+```
+
+```bash
+curl -s https://hillweather.co.uk/api/contact/health
+```
+
+`{"ok": true, "to": true}` means it is configured and running.
+
+**Spam handling**, in layers, because a public form on an indexed site gets
+found within weeks:
+
+| Layer | What it stops |
+|---|---|
+| Signed token the page must fetch first | Bots that POST blind. Does most of the work. |
+| Three second minimum age on that token | Scripts that fill and submit instantly |
+| Honeypot field | Form-fillers. Accepted and discarded, so the bot learns nothing. |
+| 3 messages per IP per hour | Floods |
+| Header sanitising and a strict address check | Header injection, which is how contact forms become spam relays |
+
+If it is ever overwhelmed, Cloudflare Turnstile is the next layer and is free.
+
 ### Archive backup
 
 On the VPS, a weekly pull from the NAS side keeps the archive inside the

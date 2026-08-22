@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact: Hill Weather</title>
+<meta name="description" content="Get in touch about Hill Weather: corrections, collaboration, or data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .contact { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+             gap: clamp(28px, 4.4vw, 64px); padding-top: clamp(26px, 3.4vw, 38px);
+             align-items: start; }
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 12px; letter-spacing: .16em;
+                 text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .field input, .field textarea {
+    width: 100%; font: inherit; font-size: 17px; color: var(--ink);
+    background: #FFFDF9; border: 1px solid var(--rule); border-radius: 2px;
+    padding: 11px 12px; min-height: 44px;
+  }
+  .field textarea { min-height: 180px; resize: vertical; line-height: 1.55; }
+  .field input:focus, .field textarea:focus {
+    outline: 2px solid var(--ochre); outline-offset: -1px; border-color: var(--ochre); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .submit { background: var(--ink); color: var(--paper); border: 0; border-radius: 2px;
+            padding: 13px 30px; font-size: 16px; letter-spacing: .06em; min-height: 44px; }
+  .submit:hover { background: #443C34; }
+  .submit:disabled { opacity: .55; cursor: default; }
+  .note { margin-top: 14px; font-size: 15px; line-height: 1.6; }
+  .note.bad { color: var(--incloud); }
+  .note.good { color: var(--clear); }
+  .aside h2 { font-weight: 400; font-size: clamp(19px, 2vw, 23px); margin: 0 0 10px; }
+  .aside p { font-size: 16px; line-height: 1.68; color: #3A342D; margin: 0 0 14px; }
+  .aside .box { border: 1px solid var(--rule); padding: 22px 24px; margin-top: 24px; }
+  @media (max-width: 900px) { .contact { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="masthead wrap">
+  <div class="masthead-top kicker" style="border-bottom:1px solid var(--ink);padding-bottom:14px;align-items:baseline">
+    <span style="font-size:clamp(22px,3vw,30px);letter-spacing:normal;text-transform:none">Hill Weather</span>
+    <a href="index.html" style="text-decoration:none">&larr; Back to the forecast</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="guide-head" style="padding-top:clamp(28px,4vw,46px);text-align:center">
+    <div class="kicker" style="color:var(--ochre)">Get in touch</div>
+    <h1 style="margin:14px 0 0;font-weight:400;letter-spacing:-.015em;line-height:1.06;font-size:clamp(32px,5vw,54px)">Contact</h1>
+  </div>
+
+  <div class="contact">
+    <form id="form" novalidate>
+      <div class="field">
+        <label for="name">Your name</label>
+        <input id="name" name="name" type="text" autocomplete="name" maxlength="120" required>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" maxlength="200" required>
+      </div>
+      <div class="field">
+        <label for="subject">Subject</label>
+        <input id="subject" name="subject" type="text" maxlength="200">
+      </div>
+      <div class="field">
+        <label for="message">Message</label>
+        <textarea id="message" name="message" maxlength="5000" required></textarea>
+      </div>
+
+      <!-- Hidden from people, irresistible to form-filling bots. -->
+      <div class="hp" aria-hidden="true">
+        <label for="website">Leave this blank</label>
+        <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+      <button class="submit" id="send" type="submit">Send message</button>
+      <div class="note" id="note" role="status" aria-live="polite"></div>
+    </form>
+
+    <div class="aside">
+      <h2>What this is for</h2>
+      <p>Hill Weather is a free hobby project, built and run by one person. There is no
+        company behind it and nothing is for sale.</p>
+      <p>Worth writing about: <strong>corrections</strong>, especially if the forecast said
+        one thing and the hill said another; <strong>collaboration</strong>, if you run
+        something the project could work with; and anything involving <strong>observations
+        or data</strong>, which is what the site needs most.</p>
+      <p>If you would rather use your own mail client, the address is
+        <a href="mailto:contact@hillweather.co.uk">contact@hillweather.co.uk</a>.</p>
+
+      <div class="box">
+        <div class="kicker" style="color:var(--ochre)">Please do not write about</div>
+        <p style="margin-top:10px">Whether it is safe to go up a particular hill on a
+          particular day. Nobody should be making that call from a website, and certainly
+          not from one that has not yet been checked against real observations. Read
+          <a href="https://www.mwis.org.uk">MWIS</a>, and in winter
+          <a href="https://www.sais.gov.uk">SAIS</a>.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="wrap">
+  <div class="footer-inner">
+    <div>
+      <h5>Get in touch</h5>
+      Corrections, collaboration and observations all welcome.
+      <a href="contact.html">Contact</a>.
+    </div>
+    <div>
+      <h5>Before you go</h5>
+      A planning aid, not a forecast service. Always read
+      <a href="https://www.mwis.org.uk">MWIS</a>, and in winter
+      <a href="https://www.sais.gov.uk">SAIS</a> for avalanche risk.
+    </div>
+    <div>
+      <h5>How it is made</h5>
+      Pressure-level data interpolated to true summit height, rebuilt twice a day.
+      <a href="how-to-read.html">How to read this</a>.
+    </div>
+    <div>
+      <h5>Sources</h5>
+      Weather from <a href="https://open-meteo.com">Open-Meteo</a>, UK Met Office 2&nbsp;km model.
+      Hill data from the <a href="https://www.hill-bagging.co.uk/dobih">Database of British
+      and Irish Hills</a> v18.5, CC&nbsp;BY&nbsp;4.0.
+    </div>
+  </div>
+</footer>
+
+<script>
+// The token is fetched on load, and the handler refuses anything submitted
+// within three seconds of it being issued. A person cannot read the page and
+// write a message that fast; a script does it instantly.
+let token = null;
+fetch('/api/contact/token')
+  .then(r => r.json())
+  .then(d => { token = d.token; })
+  .catch(() => { /* handled on submit */ });
+
+const form = document.getElementById('form');
+const note = document.getElementById('note');
+const send = document.getElementById('send');
+
+function say(text, kind) {
+  note.textContent = text;
+  note.className = 'note' + (kind ? ' ' + kind : '');
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const body = {
+    name: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    subject: document.getElementById('subject').value,
+    message: document.getElementById('message').value,
+    website: document.getElementById('website').value,
+    token,
+  };
+  if (!body.name.trim() || !body.message.trim()) {
+    return say('Please fill in your name and a message.', 'bad');
+  }
+  if (!/^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$/.test(body.email.trim())) {
+    return say('That email address does not look right.', 'bad');
+  }
+
+  send.disabled = true;
+  say('Sending…');
+  try {
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const out = await res.json().catch(() => ({}));
+    if (res.ok && out.ok) {
+      form.querySelectorAll('input, textarea').forEach(el => { el.value = ''; });
+      say('Thank you, that has been sent. I read everything, though replies can take a few days.', 'good');
+    } else {
+      say(out.error || 'Something went wrong. Please email contact@hillweather.co.uk instead.', 'bad');
+    }
+  } catch (err) {
+    say('Could not reach the server. Please email contact@hillweather.co.uk instead.', 'bad');
+  } finally {
+    send.disabled = false;
+    // A token is single use in practice; get a fresh one for any second message.
+    fetch('/api/contact/token').then(r => r.json()).then(d => { token = d.token; }).catch(() => {});
+  }
+});
+</script>
+</body>
+</html>
