@@ -165,6 +165,25 @@ enough: if the scheduler dies, the last forecast keeps being served and this
 monitor stays green while the data quietly goes stale. That is what the push
 monitor is for.
 
+### After changing CSS or JavaScript
+
+```bash
+python3 scripts/version_assets.py
+```
+
+Then commit the rewritten pages along with the asset. This stamps a content
+hash onto the URL, so a changed file is a changed URL and no cache anywhere can
+serve the old one against new markup.
+
+That failure is worth understanding, because it looks exactly like a code bug:
+new HTML arrives, the stylesheet is still the cached previous version, and the
+site renders with giant icons, unstyled controls and a broken layout while the
+origin is entirely correct throughout.
+
+The usual advice is to set Cloudflare's Browser Cache TTL to "Respect Existing
+Headers", but that option is not on every plan. Versioned URLs need no
+cooperation from the CDN, the browser or a dashboard toggle.
+
 ### Descriptions and route links
 
 `data/sources.json` holds a Wikipedia extract and a Walkhighlands link per
