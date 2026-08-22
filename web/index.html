@@ -74,12 +74,21 @@
   .band:first-child { margin-top: .2rem; }
   .band-note { font-weight: 400; text-transform: none; letter-spacing: 0;
                color: var(--dim); }
+  .head-row { display: flex; justify-content: space-between; align-items: flex-start;
+              gap: 1rem; }
+  .share { flex: none; padding: .4rem .9rem; font-weight: 600; }
+  .share:disabled { opacity: .5; cursor: default; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Hill Weather</h1>
-  <div class="sub" id="stamp">loading…</div>
+  <div class="head-row">
+    <div>
+      <h1>Hill Weather</h1>
+      <div class="sub" id="stamp">loading…</div>
+    </div>
+    <button id="share" class="share" title="Save a picture of today's forecast">Share</button>
+  </div>
 </header>
 
 <div class="bar" id="regions"></div>
@@ -256,6 +265,188 @@ function detailHTML(h, sun) {
       </tr>`).join('')}
     </table>`;
 }
+
+// ---------------------------------------------------------------------------
+// Share card.
+//
+// The growth model for this site is somebody pasting a picture into a walking
+// group on a Friday night, so the card IS the marketing. It is drawn on a
+// canvas rather than screenshotted so it always says where it came from and
+// which day it is for, and so it reads the same in a chat thread whatever
+// theme the sender happens to be using.
+// ---------------------------------------------------------------------------
+
+const CARD = {
+  // Portrait rather than square. Four height bands with a few hills each does
+  // not fit in 1080 square, and the alternative was silently dropping bands,
+  // which could hide the only band that is actually clear.
+  w: 1080, h: 1350,
+  bg: '#14171a', card: '#1c2024', ink: '#e8eaed', dim: '#9aa3ad',
+  line: '#2a2f35', good: '#7fc6a0', mid: '#d9ac5f', bad: '#d98b8b',
+  inv: '#93a6e8',
+  font: '-apple-system, "Segoe UI", system-ui, sans-serif',
+};
+
+function cardColour(v) {
+  return v >= 70 ? CARD.good : v >= 35 ? CARD.mid : CARD.bad;
+}
+
+function drawCard() {
+  const d = state.data[state.region];
+  const c = document.createElement('canvas');
+  c.width = CARD.w; c.height = CARD.h;
+  const x = c.getContext('2d');
+
+  x.fillStyle = CARD.bg;
+  x.fillRect(0, 0, CARD.w, CARD.h);
+
+  const pad = 72;
+  let y = 108;
+
+  x.fillStyle = CARD.ink;
+  x.font = `700 58px ${CARD.font}`;
+  x.fillText('Hill Weather', pad, y);
+
+  x.fillStyle = CARD.dim;
+  x.font = `400 30px ${CARD.font}`;
+  y += 46;
+  const day = new Date(state.day + 'T12:00').toLocaleDateString('en-GB',
+    { weekday: 'long', day: 'numeric', month: 'long' });
+  x.fillText(`${d.meta.label} · ${day}`, pad, y);
+
+  // Rows, grouped exactly as the page groups them, so the card tells the same
+  // story the site does rather than a flattened version of it.
+  const rows = d.hills
+    .map(h => ({ h, s: h.daily[state.day] || {} }))
+    .filter(r => r.s.view_pct != null)
+    .sort((a, b) => b.s.view_pct - a.s.view_pct || b.h.height - a.h.height);
+
+  const bands = d.meta.bands || [[0, 'All hills']];
+  y += 74;
+
+  // Work out how many hills each band can show BEFORE drawing anything, so
+  // every band that has hills always appears. Dropping bands when space runs
+  // out would be the worst possible failure here: on a bad day the low band is
+  // the only one with anything clear in it, and that is the whole message.
+  const populated = bands.filter(([floor]) => rows.some(r =>
+    r.h.height >= floor && !bands.some(([f]) => f > floor && r.h.height >= f)));
+  const FOOTER_Y = CARD.h - 200;
+  const BAND_CHROME = 90;          // header, rule and trailing gap
+  const ROW_H = 50;
+  const perBand = (FOOTER_Y - y) / Math.max(1, populated.length);
+  const rowsPerBand = Math.max(1, Math.min(3,
+    Math.floor((perBand - BAND_CHROME) / ROW_H)));
+
+  for (const [floor, label] of bands) {
+    const inBand = rows.filter(r => r.h.height >= floor &&
+      !bands.some(([f]) => f > floor && r.h.height >= f));
+    if (!inBand.length) continue;
+
+    const clear = inBand.filter(r => r.s.view_pct >= 70).length;
+    x.fillStyle = CARD.dim;
+    x.font = `600 26px ${CARD.font}`;
+    x.fillText(label.toUpperCase(), pad, y);
+    x.textAlign = 'right';
+    x.fillText(clear ? `${clear} of ${inBand.length} clear` : 'none clear',
+               CARD.w - pad, y);
+    x.textAlign = 'left';
+
+    y += 14;
+    x.strokeStyle = CARD.line; x.lineWidth = 2;
+    x.beginPath(); x.moveTo(pad, y); x.lineTo(CARD.w - pad, y); x.stroke();
+    y += 46;
+
+    for (const { h, s } of inBand.slice(0, rowsPerBand)) {
+
+      // Right hand side first, so we know how much room the name has left.
+      const pct = `${s.view_pct}%`;
+      x.font = `700 38px ${CARD.font}`;
+      const pctW = x.measureText(pct).width;
+      x.fillStyle = cardColour(s.view_pct);
+      x.textAlign = 'right';
+      x.fillText(pct, CARD.w - pad, y);
+      x.textAlign = 'left';
+
+      const height = `${h.height}m`;
+      x.font = `400 26px ${CARD.font}`;
+      const heightW = x.measureText(height).width;
+
+      // Truncate the name to whatever is genuinely left rather than guessing a
+      // character count: "An Teallach - Bidein a' Ghlas Thuill" is real.
+      const room = CARD.w - pad * 2 - pctW - heightW - 60;
+      x.font = `500 34px ${CARD.font}`;
+      let name = h.name;
+      while (x.measureText(name).width > room && name.length > 4) {
+        name = name.slice(0, -2);
+      }
+      if (name !== h.name) name = name.trimEnd() + '…';
+      x.fillStyle = CARD.ink;
+      x.fillText(name, pad, y);
+      const nameW = x.measureText(name).width;
+
+      x.fillStyle = CARD.dim;
+      x.font = `400 26px ${CARD.font}`;
+      x.fillText(height, pad + nameW + 18, y);
+
+      y += ROW_H;
+    }
+    y += 30;
+  }
+
+  // Inversions are the reason anyone forwards this, so they get called out.
+  const best = rows.reduce((a, r) =>
+    (r.s.inversion || 0) > (a?.s.inversion || 0) ? r : a, null);
+  if (best && best.s.inversion >= 25) {
+    x.fillStyle = CARD.inv;
+    x.font = `600 30px ${CARD.font}`;
+    x.fillText(`Possible inversion: ${best.h.name}`, pad, CARD.h - 190);
+  }
+
+  x.strokeStyle = CARD.line;
+  x.beginPath(); x.moveTo(pad, CARD.h - 150); x.lineTo(CARD.w - pad, CARD.h - 150);
+  x.stroke();
+
+  x.fillStyle = CARD.ink;
+  x.font = `600 32px ${CARD.font}`;
+  x.fillText('hillweather.co.uk', pad, CARD.h - 96);
+  x.fillStyle = CARD.dim;
+  x.font = `400 24px ${CARD.font}`;
+  x.fillText('Chance of a view from the summit. Planning aid, not a forecast service.',
+             pad, CARD.h - 58);
+
+  return c;
+}
+
+async function share() {
+  const btn = document.getElementById('share');
+  btn.disabled = true;
+  btn.textContent = '…';
+  try {
+    const canvas = drawCard();
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+    const name = `hillweather-${state.region}-${state.day}.png`;
+    const file = new File([blob], name, { type: 'image/png' });
+
+    // Phones get the real share sheet, which is where this actually gets used.
+    // Everything else falls back to a download.
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file] });
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+  } catch (e) {
+    if (e.name !== 'AbortError') console.error('share failed', e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Share';
+  }
+}
+
+document.getElementById('share').onclick = share;
 
 boot().catch(e => document.getElementById('list').textContent =
   'Failed to load: ' + e + ': serve over http, not file://');
