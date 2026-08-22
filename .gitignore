@@ -1,0 +1,15 @@
+# Generated forecast output - rebuilt twice daily on the VPS, never committed.
+web/data/
+
+# Raw forecast archive - lives on the VPS and syncs to the NAS.
+# This is the validation record; it must not be in git history.
+archive/
+
+# Extracted from the committed hillcsv.zip on first use.
+data/DoBIH_v18_5.csv
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hill Weather — cloud base and inversions</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --ink: #16191d; --dim: #666e78;
+    --line: #e2e5ea; --accent: #2f6f4f;
+    --good: #2f6f4f; --mid: #b07d2b; --bad: #8a3d3d; --inv: #4a5fa8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171a; --card: #1c2024; --ink: #e8eaed; --dim: #9aa3ad;
+      --line: #2a2f35; --accent: #7fc6a0;
+      --good: #7fc6a0; --mid: #d9ac5f; --bad: #d98b8b; --inv: #93a6e8;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 0 0 3rem;
+  }
+  header { padding: 1.1rem 1rem .6rem; max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 1.15rem; margin: 0 0 .15rem; letter-spacing: -.01em; }
+  .sub { color: var(--dim); font-size: .8rem; }
+  .bar { display: flex; gap: .4rem; flex-wrap: wrap; padding: .5rem 1rem;
+         max-width: 780px; margin: 0 auto; }
+  button {
+    font: inherit; font-size: .82rem; padding: .32rem .7rem; cursor: pointer;
+    background: var(--card); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 999px;
+  }
+  button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent);
+    color: var(--bg); font-weight: 600; }
+  main { max-width: 780px; margin: 0 auto; padding: .3rem 1rem; }
+  .row {
+    display: grid; grid-template-columns: 3.2rem 1fr auto;
+    gap: .75rem; align-items: center;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 10px; padding: .6rem .75rem; margin-bottom: .4rem;
+    cursor: pointer;
+  }
+  .pct { font-size: 1.25rem; font-weight: 650; text-align: right;
+         font-variant-numeric: tabular-nums; }
+  .name { font-weight: 600; }
+  .meta { color: var(--dim); font-size: .78rem; margin-top: .1rem; }
+  .tags { display: flex; gap: .3rem; flex-direction: column; align-items: flex-end; }
+  .tag { font-size: .68rem; padding: .1rem .4rem; border-radius: 4px;
+         border: 1px solid currentColor; white-space: nowrap; }
+  .t-inv { color: var(--inv); } .t-light { color: var(--mid); }
+  .g { color: var(--good); } .m { color: var(--mid); } .b { color: var(--bad); }
+  .detail { display: none; padding: .5rem .75rem .7rem; margin: -.3rem 0 .5rem;
+    background: var(--card); border: 1px solid var(--line); border-top: 0;
+    border-radius: 0 0 10px 10px; font-size: .8rem; }
+  .detail.open { display: block; }
+  .detail table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .detail th { text-align: left; color: var(--dim); font-weight: 500; font-size: .72rem; }
+  .detail td, .detail th { padding: .14rem .3rem; border-bottom: 1px solid var(--line); }
+  .sun { color: var(--dim); margin-bottom: .4rem; }
+  footer { max-width: 780px; margin: 1.5rem auto 0; padding: 0 1rem;
+           color: var(--dim); font-size: .72rem; }
+  footer a { color: var(--dim); }
+  .warn { background: var(--card); border: 1px solid var(--line);
+          border-left: 3px solid var(--mid); padding: .5rem .7rem;
+          border-radius: 6px; font-size: .78rem; margin-bottom: .7rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Hill Weather</h1>
+  <div class="sub" id="stamp">loading…</div>
+</header>
+
+<div class="bar" id="regions"></div>
+<div class="bar" id="days"></div>
+<div class="bar" id="sorts"></div>
+
+<main>
+  <div class="warn">
+    Internal viewer. Forecast is <strong>unvalidated</strong> — the cloud-base
+    method has not yet been checked against observations.
+  </div>
+  <div id="list"></div>
+</main>
+
+<footer>
+  Planning aid only — not a substitute for
+  <a href="https://www.mwis.org.uk">MWIS</a> or, in winter,
+  <a href="https://www.sais.gov.uk">SAIS</a>.<br>
+  Weather: <a href="https://open-meteo.com">Open-Meteo</a>, UK Met Office 2km model.
+  Hills: <a href="https://www.hill-bagging.co.uk/dobih">DoBIH</a> v18.5, CC-BY-4.0.
+</footer>
+
+<script>
+const state = { region: null, day: null, sort: 'view_pct', data: {}, open: null };
+
+const cls = v => v >= 70 ? 'g' : v >= 35 ? 'm' : 'b';
+const hhmm = iso => iso ? iso.slice(11, 16) : '–';
+const compass = d => d == null ? '' :
+  ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d/22.5)%16];
+
+const DATA = 'data/';
+const detailCache = {};
+
+// Hourly detail is fetched only when a hill is tapped, and cached. The summary
+// alone is enough to render the whole ranked list.
+async function loadDetail(region, slug) {
+  const key = region + '/' + slug;
+  if (!detailCache[key])
+    detailCache[key] = (await fetch(`${DATA}${region}/hills/${slug}.json`)).json();
+  return detailCache[key];
+}
+
+async function boot() {
+  const index = await (await fetch(DATA + 'index.json')).json();
+  for (const r of index.regions)
+    state.data[r.region] = await (await fetch(DATA + r.summary)).json();
+
+  state.region = index.regions[0].region;
+  const first = state.data[state.region];
+  document.getElementById('stamp').textContent =
+    'forecast ' + first.meta.forecast_fetched_utc.replace('T', ' ').slice(0, 16) +
+    ' UTC · ' + first.meta.model;
+
+  chips('regions', index.regions.map(r => [r.region, r.label]),
+        () => state.region, v => { state.region = v; state.day = null; render(); });
+  chips('sorts', [['view_pct', 'Chance of a view'], ['inversion', 'Inversion'],
+                  ['light_dawn', 'Sunrise light']],
+        () => state.sort, v => { state.sort = v; render(); });
+  render();
+}
+
+function chips(id, items, get, set) {
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  for (const [val, label] of items) {
+    const b = document.createElement('button');
+    b.textContent = label;
+    b.setAttribute('aria-pressed', get() === val);
+    b.onclick = () => { set(val); };
+    el.appendChild(b);
+  }
+}
+
+function render() {
+  const d = state.data[state.region];
+  const days = Object.keys(d.hills[0].daily).sort();
+  if (!state.day || !days.includes(state.day)) state.day = days[0];
+
+  chips('regions', Object.entries(state.data).map(([k, v]) => [k, v.meta.label]),
+        () => state.region, v => { state.region = v; state.day = null; render(); });
+  chips('days', days.map(x => [x, new Date(x + 'T12:00')
+        .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })]),
+        () => state.day, v => { state.day = v; render(); });
+  chips('sorts', [['view_pct', 'Chance of a view'], ['inversion', 'Inversion'],
+                  ['light_dawn', 'Sunrise light']],
+        () => state.sort, v => { state.sort = v; render(); });
+
+  const rows = d.hills
+    .map(h => ({ h, s: h.daily[state.day] || {} }))
+    .filter(r => r.s.view_pct != null)
+    .sort((a, b) => (b.s[state.sort] || 0) - (a.s[state.sort] || 0)
+                 || b.h.height - a.h.height);
+
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  for (const { h, s } of rows) {
+    const cloud = s.cloud_base == null ? ''
+      : `cloud ${s.cloud_base}${s.cloud_top ? '–' + s.cloud_top : ''}m`;
+
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = `
+      <div class="pct ${cls(s.view_pct)}">${s.view_pct}<span style="font-size:.6em">%</span></div>
+      <div>
+        <div class="name">${h.name} <span style="color:var(--dim);font-weight:400">${h.height}m</span></div>
+        <div class="meta">${s.verdict}${cloud ? ' · ' + cloud : ''}${
+          s.view_best !== s.view_worst
+            ? ` · ${s.view_worst}–${s.view_best}% across the day` : ''}</div>
+      </div>
+      <div class="tags">
+        ${s.inversion > 15 ? `<span class="tag t-inv">inversion ${s.inversion}</span>` : ''}
+        ${s.light_dawn > 25 ? `<span class="tag t-light">dawn light ${s.light_dawn}</span>` : ''}
+      </div>`;
+
+    const det = document.createElement('div');
+    det.className = 'detail';
+    det.textContent = 'loading…';
+
+    row.onclick = async () => {
+      const isOpen = det.classList.toggle('open');
+      if (!isOpen) return;
+      const full = await loadDetail(state.region, h.slug);
+      det.innerHTML = detailHTML(full, full.sun[state.day] || {});
+    };
+    list.append(row, det);
+  }
+}
+
+function detailHTML(h, sun) {
+  const hrs = h.hours.filter(x => x.t.startsWith(state.day)
+    && +x.t.slice(11, 13) >= 5 && +x.t.slice(11, 13) <= 21);
+  return `
+    <div class="sun">
+      sunrise ${hhmm(sun.sunrise)} (${compass(sun.sunrise_azimuth)} ${sun.sunrise_azimuth ?? ''}°)
+      · sunset ${hhmm(sun.sunset)} (${compass(sun.sunset_azimuth)})
+      · ${sun.daylight_hours ?? '–'} h daylight
+    </div>
+    <table>
+      <tr><th>h</th><th>view</th><th>cloud</th><th>temp</th><th>wind</th><th>inv</th><th>light</th></tr>
+      ${hrs.map(x => `<tr>
+        <td>${x.t.slice(11, 16)}</td>
+        <td class="${cls(x.view_pct)}">${x.view_pct}%</td>
+        <td>${x.cloud_base ?? '–'}${x.cloud_top ? '–' + x.cloud_top : ''}m${x.uncertain ? ' ?' : ''}</td>
+        <td>${x.temp ?? '–'}°</td>
+        <td>${x.wind ?? '–'} ${compass(x.wind_dir)}</td>
+        <td>${x.inversion || ''}</td>
+        <td>${x.light || ''}</td>
+      </tr>`).join('')}
+    </table>`;
+}
+
+boot().catch(e => document.getElementById('list').textContent =
+  'Failed to load: ' + e + ' — serve over http, not file://');
+</script>
+</body>
+</html>
