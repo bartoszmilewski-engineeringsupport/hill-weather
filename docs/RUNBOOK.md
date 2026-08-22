@@ -261,7 +261,14 @@ tail -f /opt/hillweather/web/.once.log
 ```
 
 **Then purge the Cloudflare cache**, or the site keeps serving the old
-forecast for up to thirty minutes and it looks like the build failed:
+forecast for up to thirty minutes and it looks like the build failed.
+
+The same trap catches CSS and JS changes. Cloudflare applies its own multi-hour
+default to those extensions unless told otherwise, so a stylesheet change
+shipped alongside new markup left the site serving four-hour-old styles against
+a new page: giant icons, unstyled controls, a broken layout that looked like a
+code bug and was not. `nginx.conf` now sets five minutes on CSS and JS, but
+purge anyway if you want a change visible immediately:
 
 Cloudflare, hillweather.co.uk, Caching, Configuration, Purge Everything.
 
