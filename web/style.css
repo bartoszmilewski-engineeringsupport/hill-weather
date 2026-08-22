@@ -133,6 +133,30 @@
     body { font-size: 16px; }
     .hills { grid-template-columns: 1fr; }
     .hill { padding: 13px 0; min-height: 44px; }
+    /* Proper tap targets cost vertical space, so the masthead gives some
+       back. On a phone the forecast should be near the top, not below half a
+       screen of furniture. */
+    .masthead { padding-top: 14px; }
     .masthead-top { font-size: 11px; }
+    .masthead-top span + span { display: none; }   /* the no-ads strapline */
+    .masthead-main { padding: 12px 0 10px; }
+    .masthead-main .tagline { margin-top: 6px; letter-spacing: .14em; }
     .footer-inner { grid-template-columns: 1fr; }
+  }
+
+  /* Touch input, at any screen size. Keyed on the pointer rather than the
+     width because a 768px tablet is every bit as much a finger as a phone is,
+     and the whole premise of this site is somebody checking it one-handed in a
+     car park in the rain. A 24px tab is not hittable in that situation. */
+  @media (pointer: coarse) {
+    .nav-inner { gap: 0 clamp(12px, 3vw, 28px); padding: 4px 0; }
+    .navgroup { gap: 0 clamp(12px, 4vw, 22px); }
+    .navgroup button, .navgroup a {
+      min-height: 44px; display: flex; align-items: center;
+      padding: 0 0 2px; border-bottom-width: 3px;
+    }
+    .hill { min-height: 48px; }
+  }
+  @media (pointer: coarse) and (max-width: 620px) {
+    .navgroup { width: 100%; justify-content: space-between; }
   }
