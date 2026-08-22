@@ -1,0 +1,130 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: #6FD3C0; } a:hover { color: #4FB8A4; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; overflow: hidden; background: #0D1013; color: #E6EBF0; font-family: 'Space Grotesk', system-ui, sans-serif; display: flex; flex-direction: column;">
+
+  <div style="padding: 22px 20px 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+      <div style="font-size: 19px; font-weight: 700; letter-spacing: -0.02em;">Hill Weather</div>
+      <div style="font-size: 11px; font-weight: 500; color: #0D1013; background: #6FD3C0; border-radius: 20px; padding: 5px 13px;">Share</div>
+    </div>
+    <div style="font-size: 12px; color: #7C8794; margin-top: 4px; font-variant-numeric: tabular-nums;">Lake District &middot; Sat 22 Aug &middot; updated 09:41</div>
+  </div>
+
+  <div style="display: flex; gap: 6px; padding: 0 20px 14px;">
+    <div style="font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 20px; background: #1B2127; color: #E6EBF0;">Chance of a view</div>
+    <div style="font-size: 12px; padding: 7px 14px; border-radius: 20px; color: #7C8794; border: 1px solid #232A31;">Inversion</div>
+    <div style="font-size: 12px; padding: 7px 14px; border-radius: 20px; color: #7C8794; border: 1px solid #232A31;">Light</div>
+  </div>
+
+  <div style="flex-grow: 1; overflow: hidden;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px 8px;">
+      <div style="font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #7C8794;">Above 800 m</div>
+      <div style="font-size: 11px; color: #E08D7A; font-variant-numeric: tabular-nums;">0 of 42 clear</div>
+    </div>
+
+    <div style="display: flex; align-items: stretch; gap: 14px; padding: 12px 20px; background: #12171B; border-left: 2px solid #E08D7A;">
+      <svg viewBox="0 0 14 52" width="14" height="52" aria-hidden="true" style="flex: none;">
+        <rect x="5" y="0" width="4" height="52" rx="2" fill="#1B2127"></rect>
+        <rect x="5" y="8" width="4" height="26" fill="#39424C"></rect>
+        <rect x="0" y="17" width="14" height="2.5" rx="1.25" fill="#E08D7A"></rect>
+      </svg>
+      <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-size: 16px; font-weight: 500;">Blencathra</div>
+        <div style="font-size: 11.5px; color: #7C8794; margin-top: 2px; font-variant-numeric: tabular-nums;">868 m &middot; cloud 873&ndash;1249 m</div>
+        <div style="font-size: 11.5px; color: #7C8794; margin-top: 1px; font-variant-numeric: tabular-nums;">4&deg;C &middot; 18 mph NW</div>
+      </div>
+      <div style="text-align: right; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-size: 30px; font-weight: 700; line-height: 1; color: #E3B457; font-variant-numeric: tabular-nums;">65</div>
+        <div style="font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #56606B; margin-top: 4px;">on the edge</div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: stretch; gap: 14px; padding: 12px 20px; border-top: 1px solid #171D22;">
+      <svg viewBox="0 0 14 52" width="14" height="52" aria-hidden="true" style="flex: none;">
+        <rect x="5" y="0" width="4" height="52" rx="2" fill="#1B2127"></rect>
+        <rect x="5" y="4" width="4" height="34" fill="#39424C"></rect>
+        <rect x="0" y="11" width="14" height="2.5" rx="1.25" fill="#E08D7A"></rect>
+      </svg>
+      <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-size: 16px; font-weight: 500;">Helvellyn</div>
+        <div style="font-size: 11.5px; color: #7C8794; margin-top: 2px; font-variant-numeric: tabular-nums;">950 m &middot; cloud 692&ndash;1374 m</div>
+        <div style="font-size: 11.5px; color: #7C8794; margin-top: 1px; font-variant-numeric: tabular-nums;">3&deg;C &middot; 24 mph NW</div>
+      </div>
+      <div style="text-align: right; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-size: 30px; font-weight: 700; line-height: 1; color: #E08D7A; font-variant-numeric: tabular-nums;">55</div>
+        <div style="font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #56606B; margin-top: 4px;">in cloud</div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 20px 8px;">
+      <div style="font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #7C8794;">400 to 600 m</div>
+      <div style="font-size: 11px; color: #6FD3C0; font-variant-numeric: tabular-nums;">2 of 2 clear</div>
+    </div>
+
+    <div style="display: flex; align-items: stretch; gap: 14px; padding: 12px 20px; background: #12171B; border-left: 2px solid #6FD3C0;">
+      <svg viewBox="0 0 14 52" width="14" height="52" aria-hidden="true" style="flex: none;">
+        <rect x="5" y="0" width="4" height="52" rx="2" fill="#1B2127"></rect>
+        <rect x="5" y="2" width="4" height="16" fill="#39424C"></rect>
+        <rect x="0" y="33" width="14" height="2.5" rx="1.25" fill="#6FD3C0"></rect>
+      </svg>
+      <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-size: 16px; font-weight: 500;">Cat Bells</div>
+        <div style="font-size: 11.5px; color: #7C8794; margin-top: 2px; font-variant-numeric: tabular-nums;">451 m &middot; cloud base 975 m</div>
+        <div style="font-size: 11.5px; color: #7C8794; margin-top: 1px; font-variant-numeric: tabular-nums;">9&deg;C &middot; 11 mph NW</div>
+      </div>
+      <div style="text-align: right; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-size: 30px; font-weight: 700; line-height: 1; color: #6FD3C0; font-variant-numeric: tabular-nums;">92</div>
+        <div style="font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #56606B; margin-top: 4px;">clear</div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: stretch; gap: 14px; padding: 12px 20px; border-top: 1px solid #171D22;">
+      <svg viewBox="0 0 14 52" width="14" height="52" aria-hidden="true" style="flex: none;">
+        <rect x="5" y="0" width="4" height="52" rx="2" fill="#1B2127"></rect>
+        <rect x="5" y="1" width="4" height="19" fill="#39424C"></rect>
+        <rect x="0" y="26" width="14" height="2.5" rx="1.25" fill="#6FD3C0"></rect>
+      </svg>
+      <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-size: 16px; font-weight: 500;">Haystacks</div>
+        <div style="font-size: 11.5px; color: #7C8794; margin-top: 2px; font-variant-numeric: tabular-nums;">597 m &middot; cloud base 808 m</div>
+        <div style="font-size: 11.5px; color: #7C8794; margin-top: 1px; font-variant-numeric: tabular-nums;">8&deg;C &middot; 14 mph NW</div>
+      </div>
+      <div style="text-align: right; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-size: 30px; font-weight: 700; line-height: 1; color: #6FD3C0; font-variant-numeric: tabular-nums;">91</div>
+        <div style="font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #56606B; margin-top: 4px;">clear</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="padding: 14px 20px 18px; border-top: 1px solid #171D22; font-size: 10.5px; color: #56606B; line-height: 1.6;">
+    Planning aid only. Not a substitute for <a href="#">MWIS</a> or, in winter, <a href="#">SAIS</a>.
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

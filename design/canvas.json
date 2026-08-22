@@ -1,0 +1,23 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "Forecast", "x": 0, "y": 0, "w": 1280, "h": 1560 },
+    { "file": "HowToRead.dc.html", "title": "How to read this", "x": 1400, "y": 0, "w": 1280, "h": 1720 }
+  ],
+  "annotations": [
+    {
+      "id": "forecast-note",
+      "x": 0,
+      "y": -190,
+      "w": 560,
+      "text": "FORECAST PAGE, desktop\n\nBroadsheet layout: masthead, a written lede that says what today is actually like, then hills in three columns under section rules by height band.\n\nThe lede is generated from the numbers, not hand-written. It is what makes the page readable rather than a spreadsheet."
+    },
+    {
+      "id": "explainer-note",
+      "x": 1400,
+      "y": -190,
+      "w": 560,
+      "text": "HOW TO READ THIS\n\nFor a first-time visitor. Three short sections: the one idea, why other forecasts get summits wrong, and why the number is a chance rather than a promise. Then a glossary.\n\nThe red-ruled box is deliberate: the forecast is unvalidated and the page says so plainly rather than burying it."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}
