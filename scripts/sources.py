@@ -177,8 +177,10 @@ def save_cache(cache):
         "hills": len(cache["hills"]),
     }
     CACHE.parent.mkdir(parents=True, exist_ok=True)
+    # Explicit LF: this runs on Windows during development but the file is
+    # committed, and the platform default would rewrite every line each time.
     CACHE.write_text(json.dumps(cache, indent=1, ensure_ascii=False),
-                     encoding="utf-8")
+                     encoding="utf-8", newline=chr(10))
 
 
 def key(hill):
