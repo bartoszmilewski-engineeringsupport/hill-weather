@@ -57,8 +57,7 @@ def main():
             # Explicit LF. This script runs on Windows and rewrites files that
             # are committed, so the platform default would leave every page
             # showing as modified after a run that changed nothing.
-            p.write_text(text, encoding="utf-8", newline="
-")
+            p.write_text(text, encoding="utf-8", newline=chr(10))
             changed += 1
         print(f"  {page}: {'updated' if text != original else 'already current'}")
 

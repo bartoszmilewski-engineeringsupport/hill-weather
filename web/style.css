@@ -35,6 +35,9 @@
   --row-hover: #F5EEDF;
   --sun-core: #F7E3B6;
   --sun-glow: #F2D9A4;
+  --hero-ridge: #EFE8DA;        /* board 2b, inversion hero */
+  --hero-deck: #E7DDC8;
+  --hero-haze: #EFE8DA;
   --measure: 1360px;
   --pad: clamp(16px, 4vw, 56px);
   color-scheme: light;
@@ -52,6 +55,7 @@
   --glyph-hill: #2E271C; --glyph-hill-line: #8C8175;
   --glyph-cloud: #4A4136; --glyph-cloud-op: .75;
   --row-hover: #201B14; --sun-core: #E8C07A; --sun-glow: #CC9A5B;
+  --hero-ridge: #262019; --hero-deck: #3A322A; --hero-haze: #2E271E;
   color-scheme: dark;
 }
 
@@ -66,6 +70,7 @@
     --glyph-hill: #2E271C; --glyph-hill-line: #8C8175;
     --glyph-cloud: #4A4136; --glyph-cloud-op: .75;
     --row-hover: #201B14; --sun-core: #E8C07A; --sun-glow: #CC9A5B;
+    --hero-ridge: #262019; --hero-deck: #3A322A; --hero-haze: #2E271E;
     color-scheme: dark;
   }
 }
@@ -282,6 +287,42 @@ td { padding: 8px 16px 8px 0; font-size: 16px; border-bottom: 1px solid var(--ha
 td.soft { color: var(--muted); }
 th:last-child, td:last-child { padding-right: 0; }
 
+/* ------------------------------------------------------------------ hero -- */
+
+/* Board 2b. Present only on an inversion day, which is why it is allowed to be
+   this loud: two 3 px ochre rules and the one piece of motion on the site. */
+.kicker-inv { font-size: 13px; letter-spacing: .24em; text-transform: uppercase;
+              color: var(--ochre); font-weight: 600; margin-bottom: 10px; }
+.hero { border-top: 3px solid var(--ochre); border-bottom: 3px solid var(--ochre);
+        margin-top: 26px; padding: 20px 0 18px; }
+.hero-svg { display: block; width: 100%; height: auto; }
+.hero-svg text { font-family: "Newsreader", Georgia, serif; }
+.hero-stats { display: flex; margin-top: 16px; border-top: 1px solid var(--rule);
+              padding-top: 14px; gap: 24px; }
+.hero-stats > div { flex: 1; }
+.hero-stats > div + div { border-left: 1px solid var(--rule); padding-left: 24px; }
+.hero-stats > div:last-child { flex: 1.3; }
+.stat-k { font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+          color: var(--faint); }
+.stat-v { font-size: clamp(20px, 2.1vw, 28px); }
+.stat-n { font-size: 13.5px; font-style: italic; color: var(--faint); }
+.hero-caveat { margin-top: 14px; font-size: 12px; letter-spacing: .18em;
+               text-transform: uppercase; color: var(--faint); text-align: right; }
+
+/* The motion is decorative and it repeats for ever, so it goes entirely when
+   the reader has asked for less of it. Static shapes take over. */
+[data-static] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  [data-anim] { display: none; }
+  [data-static] { display: inline; }
+}
+
+/* On an inversion day the legend leads with ABOVE CLOUD rather than CLEAR,
+   because that is the band people are reading the page for. */
+.legend-inv .l-clear { display: none; }
+.legend .l-above { display: none; }
+.legend-inv .l-above { display: inline; }
+
 /* ---------------------------------------------------------------- footer -- */
 
 footer { padding-top: clamp(28px, 3.4vw, 44px); }
@@ -315,6 +356,12 @@ footer { padding-top: clamp(28px, 3.4vw, 44px); }
 }
 
 @media (max-width: 860px) {
+  /* Four stat cells in a row are unreadable much under a thousand pixels, so
+     they fold to two by two rather than squeezing. */
+  .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+  .hero-stats > div + div { border-left: 0; padding-left: 0; }
+  .hero-stats > div:nth-child(even) { border-left: 1px solid var(--rule);
+                                      padding-left: 20px; }
   .lede { grid-template-columns: 1fr; padding-top: 16px; gap: 16px; }
   .hills { grid-template-columns: 1fr; }
   .entry-body { grid-template-columns: 1fr; padding-top: 18px; }
@@ -338,6 +385,21 @@ footer { padding-top: clamp(28px, 3.4vw, 44px); }
    boxed and prominent, and the first hill lands about half a screen down. */
 @media (max-width: 620px) {
   body { font-size: 16px; }
+  /* Scaled to fit, the hero would be a 55 px strip. It is given a real height
+     and allowed to crop its own sides instead, which keeps the sun and the
+     drifting deck at a size that is worth having on the page at all. Its
+     labels go for the same reason the section drawing's do. */
+  .hero { margin-top: 18px; padding: 14px 0 12px; }
+  .hero-svg { height: 150px; }
+  .hero-svg text { display: none; }
+  .hero-caveat { text-align: left; }
+  /* At-a-glance sits directly above and already carries tops above cloud and
+     cloud top, so on a phone the hero keeps only what it alone says. That is
+     roughly ninety pixels of duplication removed from above the first hill. */
+  .hero-stats > div:nth-child(-n+2) { display: none; }
+  .hero-stats > div:nth-child(3) { border-left: 0; padding-left: 0; }
+  .hero-stats > div:nth-child(4) { border-left: 1px solid var(--rule);
+                                   padding-left: 20px; }
   /* Scaled to phone width the section drawing is about 340 px across, which
      puts its 13 px labels at roughly six. Every one of them repeats something
      the entry head or the verdict sentence has already said in words, so the
