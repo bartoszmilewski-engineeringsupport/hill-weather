@@ -40,10 +40,11 @@
   --hero-haze: #EFE8DA;
   --measure: 1360px;
   --pad: clamp(18px, 4vw, 56px);
-  /* How far the expanded entry's background reaches past the grid, which is
-     also how far its text is inset from that background. Kept under --pad so
-     the bleed always has room inside the page gutter. */
-  --entry-bleed: clamp(12px, 1.6vw, 24px);
+  /* The expanded entry paints a raised background, so its text needs to be
+     inset from that background's own edge. The panel edge itself stays exactly
+     on the band rule rather than bleeding past it: it is the only full width
+     block in the column, and anything sticking out reads as misalignment. */
+  --entry-pad: clamp(14px, 1.8vw, 26px);
   color-scheme: light;
 }
 
@@ -241,8 +242,7 @@ nav .links { display: flex; gap: clamp(16px, 2.4vw, 30px); flex-wrap: wrap;
 .detail { grid-column: 1 / -1; }
 .detail-inner { background: var(--paper-raised); border-top: 1px solid var(--ink);
                 border-bottom: 1px solid var(--ink);
-                padding: 18px var(--entry-bleed) 30px;
-                margin-inline: calc(-1 * var(--entry-bleed)); }
+                padding: 18px var(--entry-pad) 30px; }
 
 /* The tapped row, repeated full width at the head of the entry. On a phone the
    entry can open well below the row it came from, so it has to name itself. */
