@@ -37,7 +37,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
-<link rel="stylesheet" href="style.css?v=9e1f5f8d">
+<link rel="stylesheet" href="style.css?v=725e62cf">
 </head>
 <body>
 
@@ -777,18 +777,12 @@ function detailHTML(h) {
   ].filter(Boolean).join(' &middot; ');
 
   return `<div class="detail-inner">
-    <div class="entry-head">
-      ${hillGlyph(h.name, h.height, s.cloud_base, scale, aboveDeck(h, s))}
-      <div>
-        <div class="entry-name">${h.name}</div>
-        <div class="entry-meta">${phrase(h, s)}</div>
-      </div>
-      <div class="entry-pct ${cls}">${s.view_pct}%</div>
-    </div>
-    <div class="rule-2"></div>
     <div class="entry-body">
       <div>
-        <h4>${h.name}</h4>
+        <div class="entry-title">
+          <h4>${h.name}</h4>
+          <span class="entry-pct ${cls}">${s.view_pct}%</span>
+        </div>
         ${h.alt ? `<div class="gaelic">${h.alt}</div>` : ''}
         <dl>${facts(h)}</dl>
         <div class="links">
@@ -996,7 +990,7 @@ boot().catch(e => {
   document.getElementById('standfirst').textContent = String(e);
 });
 </script>
-<script src="share.js?v=cf7e6d1a"></script>
+<script src="share.js?v=cb53beaf"></script>
 <script src="theme.js?v=59f3cbe2"></script>
 </body>
 </html>

@@ -21,10 +21,24 @@
   --rule: #DCD2C0;              /* hairlines between at-a-glance rows */
   --hair: #E5DCCB;              /* hairlines between hill rows */
   --hair-soft: #EDE5D7;
-  --ochre: #A8763F;             /* single accent: active tabs, links, inversion */
-  --clear: #3F6B4A;             /* verdict 70% and up */
-  --edge: #8A6A2E;              /* verdict 40 to 69% */
-  --incloud: #9C4B36;           /* verdict under 40% */
+  /* The single accent: active tabs, links, the inversion. The handoff gives
+     #A8763F, which measures 3.69:1 on this paper and so fails AA for every
+     link and every italic band note on the site. Darkened just far enough to
+     pass, a shift of deltaE 5.9 that is hard to see side by side. */
+  --ochre: #9A6737;             /* 4.5:1 on paper */
+  /* The verdict ramp. Green and amber used to sit six points apart in
+     lightness with low chroma, which made them read as the same muted tone at
+     percentage size, and only deltaE 13 apart under protanopia: for a red-green
+     colour blind reader "clear" and "on the edge" were effectively one colour.
+
+     Measured against the current values, this ramp moves every pair apart:
+     green to amber 27 -> 35, amber to rust 18 -> 27, green to rust 40 -> 48,
+     and under protanopia 13 -> 32. The green leans very slightly towards teal,
+     which is what survives red-green deficiency, and the amber is far enough
+     from the link ochre (8 -> 12) to stop reading as a link. */
+  --clear: #235C49;             /* verdict 70% and up,   7.3:1 on paper */
+  --edge: #826D17;              /* verdict 40 to 69%,    4.7:1 */
+  --incloud: #9E3D2E;           /* verdict under 40%,    6.2:1 */
   --above: #A8763F;             /* verdict ABOVE CLOUD */
   --glyph-bg: #F1EADB;
   --glyph-frame: #D8CDB8;
@@ -54,8 +68,8 @@
   --paper: #16140F;  --paper-raised: #201B14;
   --ink: #EFE8DB;    --muted: #A89A88;       --faint: #8C8175;
   --rule: #3A332A;   --hair: #2A2419;        --hair-soft: #2A2419;
-  --ochre: #CC9A5B;  --clear: #86C495;       --edge: #DBB165;
-  --incloud: #DE8F79; --above: #CC9A5B;
+  --ochre: #CC9A5B;  --clear: #72C4AE;       --edge: #EAC05A;
+  --incloud: #E08A72; --above: #CC9A5B;
   --glyph-bg: #201B14; --glyph-frame: #3A332A;
   --glyph-hill: #2E271C; --glyph-hill-line: #8C8175;
   --glyph-cloud: #4A4136; --glyph-cloud-op: .75;
@@ -69,8 +83,8 @@
     --paper: #16140F;  --paper-raised: #201B14;
     --ink: #EFE8DB;    --muted: #A89A88;       --faint: #8C8175;
     --rule: #3A332A;   --hair: #2A2419;        --hair-soft: #2A2419;
-    --ochre: #CC9A5B;  --clear: #86C495;       --edge: #DBB165;
-    --incloud: #DE8F79; --above: #CC9A5B;
+    --ochre: #CC9A5B;  --clear: #72C4AE;       --edge: #EAC05A;
+    --incloud: #E08A72; --above: #CC9A5B;
     --glyph-bg: #201B14; --glyph-frame: #3A332A;
     --glyph-hill: #2E271C; --glyph-hill-line: #8C8175;
     --glyph-cloud: #4A4136; --glyph-cloud-op: .75;
@@ -160,6 +174,12 @@ nav .links { display: flex; gap: clamp(16px, 2.4vw, 30px); flex-wrap: wrap;
            border: 1px solid var(--muted); max-height: 62vh; overflow-y: auto;
            display: none; box-shadow: 0 14px 34px rgba(42, 37, 33, .16); }
 .results.open { display: block; }
+.results { scrollbar-width: thin; scrollbar-color: var(--rule) transparent; }
+.results::-webkit-scrollbar { width: 8px; }
+.results::-webkit-scrollbar-track { background: transparent; }
+.results::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 0;
+                                    border: 2px solid var(--paper-raised); }
+.results::-webkit-scrollbar-thumb:hover { background: var(--faint); }
 .results button { display: flex; width: 100%; text-align: left; gap: 12px;
                   align-items: baseline; padding: 11px 16px;
                   border-bottom: 1px solid var(--hair); min-height: 44px; }
@@ -246,15 +266,13 @@ nav .links { display: flex; gap: clamp(16px, 2.4vw, 30px); flex-wrap: wrap;
 
 /* The tapped row, repeated full width at the head of the entry. On a phone the
    entry can open well below the row it came from, so it has to name itself. */
-.entry-head { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto;
-              gap: 18px; align-items: center; padding: 4px 0 12px; }
-.entry-head svg { display: block; }
-.entry-name { font-size: clamp(20px, 1.9vw, 24px); }
-.entry-meta { font-size: 14px; font-style: italic; color: var(--faint); }
-.entry-pct { font-size: clamp(24px, 2.4vw, 30px); font-variant-numeric: tabular-nums; }
+.entry-title { display: flex; justify-content: space-between; align-items: baseline;
+               gap: 16px; }
+.entry-pct { font-size: clamp(24px, 2.4vw, 30px); font-variant-numeric: tabular-nums;
+             flex: none; }
 
 .entry-body { display: grid; grid-template-columns: 380px minmax(0, 1fr);
-              gap: clamp(20px, 4vw, 72px); align-items: start; padding-top: 26px; }
+              gap: clamp(20px, 4vw, 72px); align-items: start; }
 .detail h4 { margin: 0; font-weight: 400; line-height: 1.1;
              font-size: clamp(24px, 2.6vw, 36px); }
 .detail .gaelic { font-size: 17px; font-style: italic; color: var(--muted);
