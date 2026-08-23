@@ -1,0 +1,64 @@
+<!-- Hill Weather — inversion hero: animated sun + drifting cloud deck.
+     Pure SVG (SMIL) + CSS. No JavaScript. Static-files friendly.
+     Reduced motion: elements marked data-anim hide, data-static fallbacks show.
+     Required CSS (in the site stylesheet):
+
+       [data-static] { display: none; }
+       @media (prefers-reduced-motion: reduce) {
+         [data-anim]   { display: none; }
+         [data-static] { display: inline; }
+       }
+-->
+<svg viewBox="0 0 1112 216" width="100%" role="img"
+     aria-label="Section drawing: summits standing clear above a cloud-filled glen; the sun rises out of the deck">
+  <defs>
+    <radialGradient id="sunGlow">
+      <stop offset="0%"   stop-color="#FFF6DF" stop-opacity="0.95"/>
+      <stop offset="35%"  stop-color="#F2D9A4" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#F2D9A4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- animated sun: rises out of the deck (drawn later, so the deck occludes it while low),
+       climbs a curved arc over the ridge, fades, loops. 16 s cycle. -->
+  <g data-anim="true">
+    <animateMotion dur="16s" repeatCount="indefinite" calcMode="spline"
+      keyTimes="0;1" keySplines="0.3 0 0.6 1"
+      path="M70,205 C180,120 340,30 560,26 C760,22 940,60 1060,96"/>
+    <animate attributeName="opacity" values="0;1;1;1;0"
+      keyTimes="0;0.07;0.85;0.96;1" dur="16s" repeatCount="indefinite"/>
+    <circle r="46" fill="url(#sunGlow)">
+      <animate attributeName="r" values="40;56;40" dur="3.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="13" fill="#F7E3B6" stroke="#A8763F" stroke-width="1.4"/>
+  </g>
+
+  <!-- ridge -->
+  <polygon points="0,206 55,192 130,120 195,152 258,86 320,142 400,58 468,132 540,96 610,150 676,66 748,138 820,104 888,158 958,88 1030,148 1112,196 1112,208 0,208"
+    fill="#EFE8DA" stroke="#2A2521" stroke-width="1.2"/>
+
+  <!-- cloud deck: two layers drifting in opposite directions (26 s / 18 s).
+       Paths are drawn 80 px wider than the viewBox on each side so the drift never shows an edge. -->
+  <path data-anim="true" d="M-80,138 Q-40,131 0,136 T80,133 T160,138 T240,133 T320,137 T400,132 T480,137 T560,133 T640,138 T720,133 T800,137 T880,132 T960,137 T1040,134 T1120,138 T1192,134 L1192,206 L-80,206 Z"
+    fill="#EFE8DA" opacity="0.6">
+    <animateTransform attributeName="transform" type="translate" values="0 0; -30 0; 0 0"
+      keyTimes="0;0.5;1" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"
+      dur="26s" repeatCount="indefinite"/>
+  </path>
+  <path data-anim="true" d="M-80,132 Q-40,124 0,130 T80,128 T160,133 T240,127 T320,132 T400,126 T480,131 T560,127 T640,132 T720,128 T800,133 T880,127 T960,131 T1040,129 T1120,132 T1192,128 L1192,206 L-80,206 Z"
+    fill="#E7DDC8" opacity="0.94">
+    <animateTransform attributeName="transform" type="translate" values="0 0; 26 0; 0 0"
+      keyTimes="0;0.5;1" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"
+      dur="18s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- static fallbacks for prefers-reduced-motion -->
+  <path data-static="true" d="M0,132 Q40,124 80,130 T160,128 T240,133 T320,127 T400,132 T480,126 T560,131 T640,127 T720,132 T800,128 T880,133 T960,127 T1040,131 T1112,129 L1112,206 L0,206 Z"
+    fill="#E7DDC8" opacity="0.94"/>
+  <circle data-static="true" cx="180" cy="70" r="13" fill="#F7E3B6" stroke="#A8763F" stroke-width="1.4"/>
+
+  <line x1="0" y1="130" x2="1112" y2="130" stroke="#8C8175" stroke-width="0.9" stroke-dasharray="4 4"/>
+  <text x="388" y="48" font-size="12.5" letter-spacing="1.5" fill="#2A2521" font-family="Newsreader, serif">BEN NEVIS</text>
+  <text x="646" y="56" font-size="12.5" letter-spacing="1.5" fill="#2A2521" font-family="Newsreader, serif">AONACH BEAG</text>
+  <text x="12" y="38" font-size="13" font-style="italic" fill="#6B6156" font-family="Newsreader, serif">the sun climbs out of the deck — sunrise 06:31 · bearing 068°</text>
+</svg>

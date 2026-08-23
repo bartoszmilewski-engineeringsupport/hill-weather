@@ -36,8 +36,8 @@ try {
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&display=swap">
-<link rel="stylesheet" href="style.css?v=1b97c4d8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
+<link rel="stylesheet" href="style.css?v=15d4e680">
 </head>
 <body>
 
@@ -46,6 +46,7 @@ try {
     <span id="dateline">&nbsp;</span>
     <span>Free &middot; No accounts &middot; No advertising</span>
   </div>
+  <div class="rule-2"></div>
   <div class="masthead-main">
     <h1>Hill Weather</h1>
     <div class="tagline">Cloud base &amp; inversions for British hills</div>
@@ -53,53 +54,65 @@ try {
 </header>
 
 <nav class="wrap">
-  <div class="nav-inner">
+  <div class="rule-1"></div>
+  <div class="tabs">
     <div class="navgroup" id="regions"></div>
     <div class="navgroup" id="days"></div>
-    <div class="navgroup">
-      <button id="locate" type="button" style="letter-spacing:.13em">Nearest to me</button>
-      <a href="how-to-read.html">How to read this</a>
-      <button id="theme" class="theme" type="button" aria-pressed="false" title="Switch theme">
-        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-          <circle cx="12" cy="12" r="4.2"/>
-          <path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" stroke-linecap="round"/>
+  </div>
+  <div class="links">
+    <button id="locate" type="button">Nearest to me</button>
+    <a href="how-to-read.html">How to read this</a>
+    <button id="theme" class="theme" type="button" aria-pressed="false" title="Switch theme">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2"/>
+        <path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" stroke-linecap="round"/>
+      </svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z" stroke-linejoin="round"/>
+      </svg>
+      <span>Theme</span>
+    </button>
+    <button id="share" class="share-btn" type="button">Share</button>
+  </div>
+  <div class="rule-1"></div>
+  <div class="searchbar">
+    <div class="search">
+      <label for="q">
+        <svg viewBox="0 0 15 15" aria-hidden="true">
+          <circle cx="6.2" cy="6.2" r="4.6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+          <line x1="9.6" y1="9.6" x2="13.4" y2="13.4" stroke="currentColor" stroke-width="1.3"/>
         </svg>
-        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-          <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z" stroke-linejoin="round"/>
-        </svg>
-        <span>Theme</span>
-      </button>
-      <button id="share" type="button" style="letter-spacing:.13em">Share</button>
+        <span class="sr">Search hills</span>
+      </label>
+      <input id="q" type="search" autocomplete="off" placeholder="Find a hill by name&hellip;">
+      <span class="search-hint" id="searchhint">All hills &middot; press <kbd>/</kbd></span>
+      <div class="results" id="results" role="listbox"></div>
     </div>
   </div>
+  <div class="rule-1"></div>
 </nav>
-
-<div class="searchbar wrap">
-  <div class="search">
-    <label for="q">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-        <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 21 21" stroke-linecap="round"/>
-      </svg>
-      <span class="sr">Search hills</span>
-    </label>
-    <input id="q" type="search" autocomplete="off"
-           placeholder="Find a hill by name&hellip;">
-    <div class="results" id="results" role="listbox"></div>
-  </div>
-  <div class="searchbar-note" id="searchnote"></div>
-</div>
 
 <main class="wrap">
   <section class="lede">
     <div>
       <h2 id="headline">Loading the forecast&hellip;</h2>
       <p class="standfirst" id="standfirst"></p>
+      <p class="unverified">The method is unverified against real observations &mdash;
+        read every number as a chance, not a promise.</p>
     </div>
-    <aside class="glance">
-      <div class="kicker">At a glance</div>
-      <dl id="glance"></dl>
-    </aside>
+    <div class="glance-wrap">
+      <div class="glance-head">At a glance</div>
+      <dl class="glance" id="glance"></dl>
+    </div>
   </section>
+
+  <div class="legend">
+    <span><span class="c-clear">&#9679;</span>&nbsp;Clear &mdash; 70% and up</span>
+    <span><span class="c-edge">&#9679;</span>&nbsp;On the edge &mdash; 40&ndash;69%</span>
+    <span><span class="c-cloud">&#9679;</span>&nbsp;In cloud &mdash; under 40%</span>
+    <span class="tip">tap any hill for routes, sun times and the hour-by-hour</span>
+  </div>
+
   <div id="bands"></div>
 </main>
 
@@ -119,48 +132,47 @@ try {
     <div>
       <h5>How it is made</h5>
       Pressure-level data interpolated to true summit height, rebuilt twice a day.
-      <a href="how-to-read.html">How to read this</a>
-      <button id="theme" class="theme" type="button" aria-pressed="false" title="Switch theme">
+      <a href="how-to-read.html">How to read this</a> &middot;
+      <button class="theme foot-btn" type="button" title="Switch theme">
         <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <circle cx="12" cy="12" r="4.2"/>
           <path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" stroke-linecap="round"/>
         </svg>
         <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z" stroke-linejoin="round"/>
-        </svg>
-        <span>Theme</span>
-      </button>.
+        </svg><span>Theme</span></button> &middot;
+      <button class="share-btn foot-btn" type="button">Share a picture</button>
     </div>
     <div>
       <h5>Sources</h5>
       Weather from <a href="https://open-meteo.com">Open-Meteo</a>, UK Met Office 2&nbsp;km model.
       Hill data from the <a href="https://www.hill-bagging.co.uk/dobih">Database of British
       and Irish Hills</a> v18.5, CC&nbsp;BY&nbsp;4.0.
-      Descriptions from <a href="https://en.wikipedia.org">Wikipedia</a>,
-      CC&nbsp;BY-SA&nbsp;4.0. Routes linked to
-      <a href="https://www.walkhighlands.co.uk">Walkhighlands</a>, never copied.
+      Descriptions from <a href="https://en.wikipedia.org">Wikipedia</a>, CC&nbsp;BY-SA&nbsp;4.0.
+      Routes linked to <a href="https://www.walkhighlands.co.uk">Walkhighlands</a>, never copied.
     </div>
   </div>
 </footer>
 
+<script src="glyph.js"></script>
 <script>
-const state = { region: null, day: null, data: {}, open: null, here: null, pinned: null };
+/* Board 2a. Everything renders from the prebuilt summary JSON; a hill's full
+   detail is fetched only when it is opened. State is deliberately tiny:
+   region, day, which hill is expanded, which hill is pinned into view. */
+const state = { region: null, day: null, data: {}, open: null, pinned: null, here: null };
+const DATA = 'data/';
+const SHOWN_PER_BAND = 9;
+const detailCache = {};
 
-// Which region leads is a remembered preference, not a guess.
-//
-// Deliberately no geolocation prompt on arrival: asking before someone knows
-// what the site is gets declined by a lot of people, and location is not
-// intent anyway - somebody in Manchester planning a Scotland trip does not
-// want the Lakes forced on them. What they last chose tracks intent far
-// better, and costs no permission. "Nearest to me" is there for the people
-// who actively want it.
+const band = v => v >= 70 ? 'c-clear' : v >= 40 ? 'c-edge' : 'c-cloud';
+const hhmm = iso => iso ? iso.slice(11, 16) : '-';
+const compass = d => d == null ? '' :
+  ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d / 22.5) % 16];
+const metres = m => m == null ? '-' : m.toLocaleString('en-GB') + ' m';
+
 const REMEMBERED = 'hw.region';
-function rememberedRegion() {
-  try { return localStorage.getItem(REMEMBERED); } catch (e) { return null; }
-}
-function rememberRegion(r) {
-  try { localStorage.setItem(REMEMBERED, r); } catch (e) { /* private mode */ }
-}
+const remembered = () => { try { return localStorage.getItem(REMEMBERED); } catch (e) { return null; } };
+const remember = r => { try { localStorage.setItem(REMEMBERED, r); } catch (e) {} };
 
 function haversine(a, b, c, d) {
   const R = 6371, rad = Math.PI / 180;
@@ -169,14 +181,6 @@ function haversine(a, b, c, d) {
     Math.cos(a * rad) * Math.cos(c * rad) * Math.sin(dLon / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
-const DATA = 'data/';
-const detailCache = {};
-
-const band = v => v >= 70 ? 'c-clear' : v >= 35 ? 'c-edge' : 'c-cloud';
-const hhmm = iso => iso ? iso.slice(11, 16) : '-';
-const compass = d => d == null ? '' :
-  ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d / 22.5) % 16];
-const metres = m => m == null ? '-' : m.toLocaleString('en-GB') + ' m';
 
 async function loadDetail(region, slug) {
   const key = region + '/' + slug;
@@ -185,32 +189,19 @@ async function loadDetail(region, slug) {
   return detailCache[key];
 }
 
-// A hill drawn in section, with the cloud layer laid across it. The whole
-// point of the site in one glyph: a summit under a grey band, or standing
-// clear of it, is a fact you take in without reading anything.
-const SCALE = 1600;
-function relief(height, base, top, verdict) {
-  const W = 56, H = 42, GROUND = 40;
-  const y = m => Math.max(0, Math.min(H, H - (m / SCALE) * (H - 4)));
-  const peak = y(height);
-  const shape = `M2 ${GROUND} L${W * 0.36} ${peak + 14} L${W * 0.57} ${peak + 22}
-                 L${W * 0.79} ${peak} L${W - 2} ${GROUND} Z`;
-  let cloud = '';
-  if (base != null) {
-    const b = y(base), t = top != null ? y(top) : 0;
-    cloud = `<rect x="0" y="${t}" width="${W}" height="${Math.max(3, b - t)}"
-             fill="var(--cloud)" opacity=".42"></rect>
-             <line x1="0" y1="${b}" x2="${W}" y2="${b}" stroke="#8C8175"
-             stroke-width="1" stroke-dasharray="3 3"></line>`;
-  }
-  return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">
-    <path d="${shape}" fill="var(--relief)" stroke="var(--relief-line)" stroke-width="1"></path>
-    ${cloud}</svg>`;
+/* Region and day live in the URL hash, so a particular day on a particular
+   region can be sent to somebody rather than only described. */
+function readHash() {
+  const m = /^#\/([a-z]+)(?:\/(\d{4}-\d{2}-\d{2}))?/.exec(location.hash || '');
+  return m ? { region: m[1], day: m[2] } : {};
+}
+function writeHash() {
+  const h = `#/${state.region}/${state.day}`;
+  if (location.hash !== h) history.replaceState(null, '', h);
 }
 
-// The opening paragraph, written from the numbers. Without it the page is a
-// table of 214 percentages and the reader has to work out what kind of day it
-// is for themselves.
+/* ------------------------------------------------------------------ lede -- */
+
 function writeLede(hills, day, label) {
   const rows = hills.map(h => ({ h, s: h.daily[day] })).filter(r => r.s);
   const clear = rows.filter(r => r.s.view_pct >= 70);
@@ -224,26 +215,26 @@ function writeLede(hills, day, label) {
 
   let headline, standfirst;
   if (inv.length) {
-    headline = `A cloud inversion is possible, with tops standing clear above the deck.`;
+    headline = 'A cloud inversion is possible, with tops standing clear above the deck.';
     standfirst = `Cloud tops sit around ${metres(inv[0].s.cloud_top)}, and ${inv.length}
       ${inv.length === 1 ? 'summit rises' : 'summits rise'} above it, ${inv[0].h.name} the
       most convincingly. Inversions are the best mornings of the year and the hardest to
       forecast, so treat this as worth setting an alarm for rather than a promise.`;
   } else if (!bases.length || frac >= 0.9) {
-    headline = `Clear on almost every top.`;
+    headline = 'Clear on almost every top.';
     standfirst = `Little low cloud anywhere in the ${label} today. Days like this are the
       exception rather than the rule, so the question is less where to go than how early
       you can get out.`;
   } else if (frac <= 0.05) {
-    headline = `In cloud everywhere. A day for the valleys.`;
+    headline = 'In cloud everywhere. A day for the valleys.';
     standfirst = `Cloud base is down around ${metres(lo)}, below all but the lowest ground.
       Nothing on this list will give you a view, and no amount of driving will change that.`;
   } else {
-    const highestClear = clear.reduce((a, r) => r.h.height > (a?.h.height || 0) ? r : a, null);
+    const highest = clear.reduce((a, r) => r.h.height > (a?.h.height || 0) ? r : a, null);
     headline = `The tops are in cloud. Everything below about ${metres(mid)} is clear.`;
     standfirst = `Cloud base runs from ${metres(lo)} to ${metres(hi)} across the ${label}.
       ${clear.length} of ${rows.length} tops should stay out of it, the highest of them
-      ${highestClear ? `${highestClear.h.name} at ${metres(highestClear.h.height)}` : 'well down the list'}.
+      ${highest ? `${highest.h.name} at ${metres(highest.h.height)}` : 'well down the list'}.
       Go low today and you will still get your view.`;
   }
   document.getElementById('headline').textContent = headline;
@@ -252,50 +243,108 @@ function writeLede(hills, day, label) {
   const first = rows[0].s;
   const sunrise = rows[0].h.sunrise ? rows[0].h.sunrise[day] : null;
   document.getElementById('glance').innerHTML = [
-    ['Cloud base', bases.length ? `${lo.toLocaleString('en-GB')}&ndash;${hi.toLocaleString('en-GB')} m` : 'none'],
+    ['Cloud base', bases.length
+      ? `${lo.toLocaleString('en-GB')}&ndash;${hi.toLocaleString('en-GB')} m` : 'none'],
     ['Freezing level', metres(first.freezing_level)],
-    ['Sunrise', sunrise ? `${hhmm(sunrise)}` : '-'],
-    ['Tops clear', `${clear.length} <small>of ${rows.length}</small>`],
+    ['Sunrise', sunrise ? hhmm(sunrise) : '-'],
+    ['Tops clear', `<span class="c-clear">${clear.length}</span> <small>of ${rows.length}</small>`],
   ].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
 }
+
+/* ----------------------------------------------------------------- chips -- */
 
 function chips(id, items, get, set) {
   const el = document.getElementById(id);
   el.innerHTML = '';
-  for (const [val, label] of items) {
+  for (const [val, label, short] of items) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.textContent = label;
+    b.innerHTML = short
+      ? `<span class="lg">${label}</span><span class="sm">${short}</span>`
+      : label;
     b.setAttribute('aria-pressed', String(get() === val));
     b.onclick = () => set(val);
     el.appendChild(b);
   }
 }
 
+/* ----------------------------------------------------------------- render -- */
+
+function phrase(h, s) {
+  if (s.cloud_base == null) return `${h.height} m &middot; no low cloud about`;
+  const gap = s.cloud_base - h.height;
+  if (s.verdict === 'ABOVE CLOUD' && s.cloud_top != null)
+    return `${h.height} m &middot; ${Math.round(h.height - s.cloud_top)} m above the deck`;
+  if (gap > 60) return `${h.height} m &middot; ${Math.round(gap)} m below cloud`;
+  if (gap < -60) return `${h.height} m &middot; well inside`;
+  return `${h.height} m &middot; in and out`;
+}
+
+function hillRow(h, s, scale, grid) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'hill';
+  btn.innerHTML =
+    hillGlyph(h.name, h.height, s.cloud_base, scale, s.verdict === 'ABOVE CLOUD') +
+    `<span><span class="hill-name">${h.name}</span>` +
+    `<span class="hill-meta" style="display:block">${phrase(h, s)}</span></span>` +
+    `<span class="hill-pct ${s.verdict === 'ABOVE CLOUD' ? 'c-above' : band(s.view_pct)}">${s.view_pct}%</span>`;
+
+  const holder = document.createElement('div');
+  holder.className = 'detail';
+  holder.hidden = true;
+
+  btn.onclick = async () => {
+    const opening = state.open !== h.slug;
+    grid.querySelectorAll('.detail').forEach(x => { x.hidden = true; });
+    state.open = opening ? h.slug : null;
+    if (!opening) return;
+    holder.hidden = false;
+    holder.innerHTML = '<div class="detail-inner"><em>Loading&hellip;</em></div>';
+    try {
+      holder.innerHTML = detailHTML(await loadDetail(state.region, h.slug));
+    } catch (err) {
+      // A failed fetch used to leave the panel on "Loading..." for ever.
+      delete detailCache[state.region + '/' + h.slug];
+      holder.innerHTML = '<div class="detail-inner"><em>That hill&rsquo;s detail ' +
+        'could not be loaded. Try again in a moment.</em></div>';
+    }
+  };
+  grid.append(btn, holder);
+  return btn;
+}
+
 function render() {
   const d = state.data[state.region];
   const days = Object.keys(d.hills[0].daily).sort();
   if (!state.day || !days.includes(state.day)) state.day = days[0];
+  writeHash();
 
   document.getElementById('dateline').textContent =
     new Date(state.day + 'T12:00').toLocaleDateString('en-GB',
       { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-  chips('regions', Object.entries(state.data).map(([k, v]) => [k, v.meta.label]),
+  chips('regions', Object.entries(state.data).map(([k, v]) =>
+          [k, v.meta.label, v.meta.label.replace(/^Scottish /, '').replace(/ District$/, 's')]),
         () => state.region,
-        v => { state.region = v; rememberRegion(v); state.day = null; state.open = null; render(); });
-  chips('days', days.map(x => [x, new Date(x + 'T12:00')
-        .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })]),
-        () => state.day, v => { state.day = v; state.open = null; render(); });
+        v => { state.region = v; remember(v); state.day = null;
+               state.open = state.pinned = null; render(); });
+  chips('days', days.map(x => {
+          const dt = new Date(x + 'T12:00');
+          return [x,
+            dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }),
+            dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' })];
+        }),
+        () => state.day,
+        v => { state.day = v; state.open = state.pinned = null; render(); });
 
   writeLede(d.hills, state.day, d.meta.label);
 
+  const scale = d.meta.scale || 1600;
   const rows = d.hills.map(h => ({ h, s: h.daily[state.day] }))
     .filter(r => r.s)
     .sort((a, b) => b.s.view_pct - a.s.view_pct || b.h.height - a.h.height);
 
-  // Grouped by height band. A single ranking puts the smallest fells on top,
-  // because they sit below the cloud: correct, and useless.
   const bands = d.meta.bands && d.meta.bands.length ? d.meta.bands : [[0, 'All hills']];
   const out = document.getElementById('bands');
   out.innerHTML = '';
@@ -309,71 +358,74 @@ function render() {
     const best = inBand[0];
     const section = document.createElement('section');
     section.className = 'band';
-    section.innerHTML = `
-      <div class="band-head">
-        <h3>${label}</h3>
-        <div class="band-note ${clear.length ? 'c-clear' : 'c-cloud'}">${
-          clear.length
+    section.innerHTML =
+      `<div class="band-head"><h3>${label}</h3><div class="band-note">${
+        clear.length === inBand.length
+          ? `All ${inBand.length} clear &mdash; the valleys are yours`
+          : clear.length
             ? `${clear.length} of ${inBand.length} clear of the cloud`
-            : `None clear &middot; best chance ${best.s.view_pct}% on ${best.h.name}`}</div>
-      </div>
-      <div class="hills"></div>`;
+            : `None clear &middot; best chance ${best.s.view_pct}% on ${best.h.name}`
+      }</div></div><div class="rule-2"></div><div class="hills"></div>`;
     const grid = section.querySelector('.hills');
 
-    // Only nine per band are shown, so a hill chosen from search can easily
-    // fall outside the list and picking it would appear to do nothing. Pin it
-    // in, keeping it in rank order rather than dumping it at the top.
-    let shown = inBand.slice(0, 9);
+    let shown = inBand.slice(0, SHOWN_PER_BAND);
+    // A hill reached from search can sit past the nine shown, so pin it in
+    // rather than letting the click appear to do nothing.
     if (state.pinned && !shown.some(r => r.h.slug === state.pinned)) {
-      const pinned = inBand.find(r => r.h.slug === state.pinned);
-      if (pinned) shown = [...shown, pinned].sort(
+      const pin = inBand.find(r => r.h.slug === state.pinned);
+      if (pin) shown = [...shown, pin].sort(
         (a, b) => b.s.view_pct - a.s.view_pct || b.h.height - a.h.height);
     }
-    for (const { h, s } of shown) {
-      const gap = s.cloud_base == null ? null : s.cloud_base - h.height;
-      const sub = s.cloud_base == null ? 'no low cloud about'
-        : gap > 60 ? `${h.height} m &middot; ${Math.round(gap)} m below cloud`
-        : gap < -60 ? `${h.height} m &middot; well inside`
-        : `${h.height} m &middot; in and out`;
+    for (const { h, s } of shown) hillRow(h, s, scale, grid);
 
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'hill';
-      btn.innerHTML = `
-        ${relief(h.height, s.cloud_base, s.cloud_top, s.verdict)}
-        <span class="hill-body">
-          <span class="hill-name">${h.name}</span>
-          <span class="hill-sub" style="display:block">${sub}</span>
-        </span>
-        <span class="hill-pct ${band(s.view_pct)}">${s.view_pct}%</span>`;
-
-      const holder = document.createElement('div');
-      holder.className = 'detail';
-      holder.hidden = true;
-
-      btn.onclick = async () => {
-        const opening = state.open !== h.slug;
-        grid.querySelectorAll('.detail').forEach(x => { x.hidden = true; });
-        state.open = opening ? h.slug : null;
-        if (!opening) return;
-        holder.hidden = false;
-        holder.innerHTML = '<div class="detail-inner"><em>Loading&hellip;</em></div>';
-        holder.innerHTML = detailHTML(await loadDetail(state.region, h.slug));
-      };
-      grid.append(btn, holder);
-    }
-
-    if (inBand.length > shown.length) {
-      const note = document.createElement('div');
-      note.className = 'more';
-      const rest = inBand.length - shown.length;
-      const restClear = inBand.slice(shown.length).filter(r => r.s.view_pct >= 70).length;
-      note.textContent = `${rest} more in this band, ${restClear ? `${restClear} of them clear` : 'all in cloud'}`;
-      section.appendChild(note);
+    // The dense tier: the remainder as a readable run of names, each tappable,
+    // rather than a flat "and 36 more" line that tells you nothing.
+    const rest = inBand.filter(r => !shown.includes(r));
+    if (rest.length) {
+      const named = rest.slice(0, 8);
+      const tail = rest.slice(named.length);
+      const dense = document.createElement('div');
+      dense.className = 'dense';
+      named.forEach((r, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.innerHTML = `${r.h.name}&nbsp;<span class="${band(r.s.view_pct)}">${r.s.view_pct}%</span>`;
+        b.onclick = () => { state.pinned = r.h.slug; state.open = null; render(); openPinned(); };
+        dense.append(b);
+        if (i < named.length - 1 || tail.length) {
+          const sep = document.createElement('span');
+          sep.className = 'sep';
+          sep.innerHTML = '&nbsp;&middot;&nbsp; ';
+          dense.append(sep);
+        }
+      });
+      if (tail.length) {
+        const pcts = tail.map(r => r.s.view_pct);
+        const span = document.createElement('span');
+        span.className = 'rest';
+        span.textContent = `and ${tail.length} more, ` +
+          (Math.min(...pcts) === Math.max(...pcts)
+            ? `${pcts[0]}%` : `${Math.min(...pcts)}–${Math.max(...pcts)}%`);
+        dense.append(span);
+      }
+      section.append(dense);
     }
     out.appendChild(section);
   }
 }
+
+function openPinned() {
+  if (!state.pinned) return;
+  const el = [...document.querySelectorAll('.hill')].find(b =>
+    b.querySelector('.hill-name').textContent ===
+    (state.data[state.region].hills.find(h => h.slug === state.pinned) || {}).name);
+  if (!el) return;
+  el.classList.add('flash');
+  el.click();
+  el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
+/* ---------------------------------------------------------------- detail -- */
 
 function facts(h) {
   const rows = [];
@@ -384,53 +436,47 @@ function facts(h) {
   if (h.county) rows.push(['County', h.county + (h.country ? ', ' + h.country : '')]);
   if (h.grid_ref) rows.push(['Grid ref', h.grid_ref]);
   if (h.map50) rows.push(['OS Landranger', h.map50]);
-  // What actually marks the top. A small thing, and exactly the sort of detail
-  // that tells a walker this was made by someone who has stood on these hills.
   if (h.feature) rows.push(['Summit', h.feature]);
-  if (state.here) {
-    const km = haversine(state.here.lat, state.here.lon, h.lat, h.lon);
-    rows.push(['From you', `${Math.round(km)} km`]);
-  }
-  return rows.map(([k, v]) =>
-    `<div style="display:flex;justify-content:space-between;gap:16px;
-      border-bottom:1px dotted var(--rule);padding:6px 0">
-      <dt style="color:#4A423A;flex:none">${k}</dt>
-      <dd style="margin:0;text-align:right">${v}</dd></div>`).join('');
+  if (state.here) rows.push(['From you',
+    `${Math.round(haversine(state.here.lat, state.here.lon, h.lat, h.lon))} km`]);
+  return rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
 }
 
 function detailHTML(h) {
   const sun = h.sun[state.day] || {};
+  const s = h.daily[state.day] || {};
   const hrs = h.hours.filter(x => x.t.startsWith(state.day) &&
     +x.t.slice(11, 13) >= 6 && +x.t.slice(11, 13) <= 20 && +x.t.slice(11, 13) % 2 === 0);
+  const cls = s.verdict === 'ABOVE CLOUD' ? 'c-above' : band(s.view_pct || 0);
+  const said = {
+    'ABOVE CLOUD': 'standing clear above the deck.',
+    'CLEAR': 'clear of the cloud.',
+    'ON THE EDGE': 'in and out of it all day.',
+    'IN CLOUD': 'in cloud all day.',
+  }[s.verdict] || '';
+
   return `<div class="detail-inner">
     <div>
       <h4>${h.name}</h4>
-      <div class="hill-sub">${h.alt ? h.alt : (h.country || '')}</div>
-      <dl style="margin:14px 0 0;font-size:15px">${facts(h)}</dl>
-      <div style="margin-top:14px;font-size:14px;display:flex;gap:16px;flex-wrap:wrap">
+      ${h.alt ? `<div class="gaelic">${h.alt}</div>` : ''}
+      <dl>${facts(h)}</dl>
+      <div class="links">
         <a href="https://www.openstreetmap.org/?mlat=${h.lat}&amp;mlon=${h.lon}#map=14/${h.lat}/${h.lon}"
            target="_blank" rel="noopener">Map</a>
         ${h.walkhighlands ? `<a href="${h.walkhighlands}" target="_blank" rel="noopener">Routes on Walkhighlands</a>` : ''}
         ${h.url ? `<a href="${h.url}" target="_blank" rel="noopener">Hill-bagging</a>` : ''}
       </div>
-      <dl style="margin:18px 0 0;display:flex;flex-direction:column;gap:9px;font-size:15px">
-        <div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted var(--rule);padding-bottom:7px">
-          <dt style="color:#4A423A">Sunrise</dt><dd style="margin:0">${hhmm(sun.sunrise)} <small style="color:var(--faint)">${compass(sun.sunrise_azimuth)}</small></dd></div>
-        <div style="display:flex;justify-content:space-between;gap:12px;border-bottom:1px dotted var(--rule);padding-bottom:7px">
-          <dt style="color:#4A423A">Sunset</dt><dd style="margin:0">${hhmm(sun.sunset)} <small style="color:var(--faint)">${compass(sun.sunset_azimuth)}</small></dd></div>
-        <div style="display:flex;justify-content:space-between;gap:12px">
-          <dt style="color:#4A423A">Daylight</dt><dd style="margin:0">${sun.daylight_hours ?? '-'} hours</dd></div>
+      <dl style="margin-top:18px">
+        <div><dt>Sunrise</dt><dd>${hhmm(sun.sunrise)} <small style="color:var(--faint)">${compass(sun.sunrise_azimuth)}</small></dd></div>
+        <div><dt>Sunset</dt><dd>${hhmm(sun.sunset)} <small style="color:var(--faint)">${compass(sun.sunset_azimuth)}</small></dd></div>
+        <div><dt>Daylight</dt><dd>${sun.daylight_hours ?? '-'} hours</dd></div>
       </dl>
     </div>
     <div>
-      ${h.wikipedia ? `
-      <div style="margin-bottom:20px">
-        <p style="font-size:16px;line-height:1.68;color:#3A342D;margin:0;text-wrap:pretty">${h.wikipedia.extract}</p>
-        <div style="font-size:12px;color:var(--faint);margin-top:8px">
-          From <a href="${h.wikipedia.url}" target="_blank" rel="noopener">Wikipedia</a>,
-          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>
-        </div>
-      </div>` : ''}
+      <p class="verdict"><span class="${cls}">${s.view_pct}%</span> &mdash; <em>${said}</em></p>
+      ${h.wikipedia ? `<p class="wiki">${h.wikipedia.extract}</p>
+        <div class="wiki-credit">From <a href="${h.wikipedia.url}" target="_blank" rel="noopener">Wikipedia</a>,
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></div>` : ''}
       <table>
         <tr><th>Hour</th><th>View</th><th>Cloud</th><th>Temp</th><th>Wind</th></tr>
         ${hrs.map(x => `<tr>
@@ -446,56 +492,8 @@ function detailHTML(h) {
   </div>`;
 }
 
-// Opt-in only, and it never blocks the page. Picks the region whose hills are
-// nearest, then keeps the fix so hill detail can show a distance.
-async function locate() {
-  const btn = document.getElementById('locate');
-  if (!navigator.geolocation) { btn.textContent = 'Location unavailable'; return; }
-  const original = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Finding you…';
-  try {
-    const pos = await new Promise((res, rej) =>
-      navigator.geolocation.getCurrentPosition(res, rej,
-        { timeout: 10000, maximumAge: 600000 }));
-    state.here = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+/* ---------------------------------------------------------------- search -- */
 
-    let best = null;
-    for (const [key, d] of Object.entries(state.data)) {
-      const nearest = Math.min(...d.hills.map(h =>
-        haversine(state.here.lat, state.here.lon, h.lat, h.lon)));
-      if (!best || nearest < best.km) best = { key, km: nearest };
-    }
-    if (best) {
-      state.region = best.key;
-      rememberRegion(best.key);
-      state.day = null;
-      state.open = null;
-      render();
-      btn.textContent = `${Math.round(best.km)} km away`;
-      return;
-    }
-  } catch (e) {
-    // Declined, timed out, or blocked. Say so quietly and carry on.
-    btn.textContent = e && e.code === 1 ? 'Location declined' : 'Could not locate you';
-    setTimeout(() => { btn.textContent = original; }, 4000);
-  } finally {
-    btn.disabled = false;
-  }
-}
-
-document.getElementById('locate').addEventListener('click', locate);
-
-// ---------------------------------------------------------------------------
-// Search.
-//
-// Across BOTH regions, because people think in hill names rather than in
-// regions: somebody typing "scafell" should not first have to know it is in
-// the Lakes. Picking a result switches region if it has to, opens the day
-// currently selected, and scrolls the hill into view.
-//
-// Gaelic names are searched too. "Beinn Nibheis" should find Ben Nevis.
-// ---------------------------------------------------------------------------
 const fold = s => (s || '').toLowerCase()
   .normalize('NFKD').replace(/[̀-ͯ]/g, '')
   .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -504,14 +502,10 @@ let searchIndex = null;
 function buildIndex() {
   if (searchIndex) return searchIndex;
   searchIndex = [];
-  for (const [region, d] of Object.entries(state.data)) {
-    for (const h of d.hills) {
-      searchIndex.push({
-        region, label: d.meta.label, hill: h,
-        hay: fold(h.name) + ' ' + fold(h.alt || ''),
-      });
-    }
-  }
+  for (const [region, d] of Object.entries(state.data))
+    for (const h of d.hills)
+      searchIndex.push({ region, label: d.meta.label, hill: h,
+                         hay: fold(h.name) + ' ' + fold(h.alt || '') });
   return searchIndex;
 }
 
@@ -524,7 +518,6 @@ function search(term) {
     if (at === 0 || row.hay.includes(' ' + q)) starts.push(row);
     else if (at > 0) contains.push(row);
   }
-  // Whole-word matches first, then the tallest, so "ben" leads with Ben Nevis.
   const rank = (a, b) => b.hill.height - a.hill.height;
   return [...starts.sort(rank), ...contains.sort(rank)].slice(0, 12);
 }
@@ -542,8 +535,7 @@ function showResults(rows) {
       <span class="r-name">${r.hill.name}</span>
       <span class="r-meta">${r.hill.height} m &middot; ${r.label}</span>
       <span class="r-pct ${s.view_pct != null ? band(s.view_pct) : ''}">${
-        s.view_pct != null ? s.view_pct + '%' : ''}</span>
-    </button>`;
+        s.view_pct != null ? s.view_pct + '%' : ''}</span></button>`;
   }).join('');
   box.classList.add('open');
   box.querySelectorAll('button').forEach(b =>
@@ -555,28 +547,19 @@ function pick(row) {
   document.getElementById('q').value = '';
   if (state.region !== row.region) {
     state.region = row.region;
-    rememberRegion(row.region);
+    remember(row.region);
     state.day = null;
   }
   state.pinned = row.hill.slug;
   state.open = null;
   render();
-  // render() is synchronous, so the row already exists: no need to wait for a
-  // frame, and requestAnimationFrame is throttled in background tabs anyway.
-  const el = [...document.querySelectorAll('.hill')]
-    .find(b => b.querySelector('.hill-name').textContent === row.hill.name);
-  if (el) {
-    el.classList.add('flash');
-    el.click();
-    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }
+  openPinned();
 }
 
 function wireSearch() {
   const input = document.getElementById('q');
   const box = document.getElementById('results');
-  let rows = [];
-  let cursor = -1;
+  let rows = [], cursor = -1;
 
   input.addEventListener('input', () => {
     rows = search(input.value);
@@ -603,20 +586,74 @@ function wireSearch() {
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.search')) box.classList.remove('open');
   });
+
+  // "/" jumps to search, the way it does in every tool people already use.
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    e.preventDefault();
+    input.focus();
+    input.select();
+  });
 }
+
+/* -------------------------------------------------------------- location -- */
+
+async function locate() {
+  const btn = document.getElementById('locate');
+  if (!navigator.geolocation) { btn.textContent = 'Location unavailable'; return; }
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Finding you…';
+  try {
+    const pos = await new Promise((res, rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej,
+        { timeout: 10000, maximumAge: 600000 }));
+    state.here = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+    let best = null;
+    for (const [key, d] of Object.entries(state.data)) {
+      const nearest = Math.min(...d.hills.map(h =>
+        haversine(state.here.lat, state.here.lon, h.lat, h.lon)));
+      if (!best || nearest < best.km) best = { key, km: nearest };
+    }
+    if (best) {
+      state.region = best.key;
+      remember(best.key);
+      state.day = null;
+      state.open = state.pinned = null;
+      render();
+      btn.textContent = `${Math.round(best.km)} km away`;
+      return;
+    }
+  } catch (e) {
+    btn.textContent = e && e.code === 1 ? 'Location declined' : 'Could not locate you';
+    setTimeout(() => { btn.textContent = original; }, 4000);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ------------------------------------------------------------------ boot -- */
 
 async function boot() {
   const index = await (await fetch(DATA + 'index.json')).json();
   for (const r of index.regions)
     state.data[r.region] = await (await fetch(DATA + r.summary)).json();
-  const saved = rememberedRegion();
-  state.region = state.data[saved] ? saved : index.regions[0].region;
+
+  const hash = readHash();
+  const saved = remembered();
+  state.region = state.data[hash.region] ? hash.region
+    : state.data[saved] ? saved : index.regions[0].region;
+  if (hash.day) state.day = hash.day;
+
   render();
   wireSearch();
+  document.getElementById('locate').addEventListener('click', locate);
 
   const total = Object.values(state.data).reduce((n, d) => n + d.hills.length, 0);
-  const note = document.getElementById('searchnote');
-  if (note) note.textContent = `all ${total} hills, both regions`;
+  document.getElementById('searchhint').innerHTML =
+    `All ${total} hills &middot; press <kbd>/</kbd>`;
 }
 
 boot().catch(e => {
@@ -624,7 +661,7 @@ boot().catch(e => {
   document.getElementById('standfirst').textContent = String(e);
 });
 </script>
-<script src="share.js?v=5d315ac4"></script>
-<script src="theme.js?v=056c2945"></script>
+<script src="share.js?v=bbeda398"></script>
+<script src="theme.js?v=b23cb8ce"></script>
 </body>
 </html>

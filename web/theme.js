@@ -25,13 +25,12 @@
     const dark = mode === 'dark' || (!mode && systemIsDark());
     const meta = document.querySelector('meta[name="theme-color"]:not([media])');
     if (meta) meta.content = dark ? '#16140F' : '#FBF7F0';
-    const btn = document.getElementById('theme');
-    if (btn) {
+    document.querySelectorAll('.theme').forEach(btn => {
       btn.setAttribute('aria-pressed', String(dark));
       btn.title = mode
         ? `Theme: ${mode}. Tap to follow your device again.`
         : 'Theme: following your device. Tap to switch.';
-    }
+    });
   }
 
   // Cycle light -> dark -> follow the device, so there is always a way back
@@ -47,8 +46,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     apply(current());
-    const btn = document.getElementById('theme');
-    if (btn) btn.addEventListener('click', next);
+    document.querySelectorAll('.theme').forEach(b => b.addEventListener('click', next));
   });
 
   // Follow the device live, but only while the reader has not overridden it.

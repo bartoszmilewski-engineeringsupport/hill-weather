@@ -1,265 +1,354 @@
-  /* A newspaper, not a dashboard. Warm paper, one serif, hairline rules,
-     hierarchy from size and weight rather than boxes and colour. */
-  /* Dark is a warm inversion, not a switch to slate. Newsprint in low light
-     is still paper: near-black brown rather than blue-grey, warm off-white
-     rather than pure white, and the ochre and verdict colours lifted so they
-     hold their contrast without going neon. */
-  :root {
-    --paper: #FBF7F0;
-    --ink: #2A2521;
-    --muted: #6B6156;
-    --faint: #8C8175;
-    --rule: #DCD2C0;
-    --hair: #EDE5D7;
-    --ochre: #A8763F;
-    --clear: #3F6B4A;
-    --edge: #8A6A2E;
-    --incloud: #9C4B36;
-    --relief: #EDE5D7;
-    --relief-line: #C9BCA3;
-    --cloud: #B9AE99;
-    --body: #4A423A;
-    --measure: 1280px;
-    color-scheme: light;
-  }
+/* Hill Weather.
+ *
+ * Newspaper direction: warm cream paper, near-black ink, one serif throughout,
+ * hairline rules, letter-spaced small caps, a single ochre accent. Hierarchy
+ * comes from size and weight rather than boxes and colour.
+ *
+ * Implements board 2a of the design handoff (design/handoff/README.md), with
+ * the phone layout from 2e and the dark palette from 3a. The handoff gives
+ * measurements at 1360 desktop and 390 phone; they are expressed in clamp()
+ * here so the design holds between those points rather than only at them.
+ */
 
-  :root[data-theme="dark"] {
-    --paper: #16140F;
-    --ink: #EFE8DB;
-    --muted: #A79C8B;
-    --faint: #877D6E;
-    --rule: #3A342A;
-    --hair: #26221A;
-    --ochre: #CC9A5B;
-    --clear: #86C495;
-    --edge: #DBB165;
-    --incloud: #DE8F79;
-    --relief: #2B2519;
-    --relief-line: #4E4534;
-    --cloud: #4A4234;
-    --body: #D5CCBC;
+/* ---------------------------------------------------------------- tokens -- */
+
+:root {
+  --paper: #FBF7F0;
+  --paper-raised: #FDFAF4;      /* search field, expanded entry */
+  --ink: #2A2521;
+  --muted: #6B6156;
+  --faint: #8C8175;
+  --rule: #DCD2C0;              /* hairlines between at-a-glance rows */
+  --hair: #E5DCCB;              /* hairlines between hill rows */
+  --hair-soft: #EDE5D7;
+  --ochre: #A8763F;             /* single accent: active tabs, links, inversion */
+  --clear: #3F6B4A;             /* verdict 70% and up */
+  --edge: #8A6A2E;              /* verdict 40 to 69% */
+  --incloud: #9C4B36;           /* verdict under 40% */
+  --above: #A8763F;             /* verdict ABOVE CLOUD */
+  --glyph-bg: #F1EADB;
+  --glyph-frame: #D8CDB8;
+  --glyph-hill: #E7DDC8;
+  --glyph-hill-line: #B3A58A;
+  --glyph-cloud: #DCD2C0;       /* drawn OVER the hill */
+  --glyph-cloud-op: .7;
+  --row-hover: #F5EEDF;
+  --sun-core: #F7E3B6;
+  --sun-glow: #F2D9A4;
+  --measure: 1360px;
+  --pad: clamp(16px, 4vw, 56px);
+  color-scheme: light;
+}
+
+/* Dark is a warm inversion of the same design, not a different personality:
+   near-black brown rather than blue-grey, warm off-white rather than white. */
+:root[data-theme="dark"] {
+  --paper: #16140F;  --paper-raised: #201B14;
+  --ink: #EFE8DB;    --muted: #A89A88;       --faint: #8C8175;
+  --rule: #3A332A;   --hair: #2A2419;        --hair-soft: #2A2419;
+  --ochre: #CC9A5B;  --clear: #86C495;       --edge: #DBB165;
+  --incloud: #DE8F79; --above: #CC9A5B;
+  --glyph-bg: #201B14; --glyph-frame: #3A332A;
+  --glyph-hill: #2E271C; --glyph-hill-line: #8C8175;
+  --glyph-cloud: #4A4136; --glyph-cloud-op: .75;
+  --row-hover: #201B14; --sun-core: #E8C07A; --sun-glow: #CC9A5B;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #16140F;  --paper-raised: #201B14;
+    --ink: #EFE8DB;    --muted: #A89A88;       --faint: #8C8175;
+    --rule: #3A332A;   --hair: #2A2419;        --hair-soft: #2A2419;
+    --ochre: #CC9A5B;  --clear: #86C495;       --edge: #DBB165;
+    --incloud: #DE8F79; --above: #CC9A5B;
+    --glyph-bg: #201B14; --glyph-frame: #3A332A;
+    --glyph-hill: #2E271C; --glyph-hill-line: #8C8175;
+    --glyph-cloud: #4A4136; --glyph-cloud-op: .75;
+    --row-hover: #201B14; --sun-core: #E8C07A; --sun-glow: #CC9A5B;
     color-scheme: dark;
   }
+}
 
-  /* Follow the machine unless the reader has said otherwise. */
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #16140F;
-      --ink: #EFE8DB;
-      --muted: #A79C8B;
-      --faint: #877D6E;
-      --rule: #3A342A;
-      --hair: #26221A;
-      --ochre: #CC9A5B;
-      --clear: #86C495;
-      --edge: #DBB165;
-      --incloud: #DE8F79;
-      --relief: #2B2519;
-      --relief-line: #4E4534;
-      --cloud: #4A4234;
-      --body: #D5CCBC;
-      color-scheme: dark;
-    }
-  }
-  * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0; background: var(--paper); color: var(--ink);
-    font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
-    font-size: 17px; line-height: 1.5;
-    padding-bottom: 3rem;
-  }
-  .wrap { max-width: var(--measure); margin: 0 auto; padding: 0 clamp(16px, 4vw, 64px); }
-  a { color: var(--ochre); text-decoration-thickness: 1px; text-underline-offset: 2px; }
-  a:hover { color: #85592B; }
-  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+/* ------------------------------------------------------------------ base -- */
 
-  .kicker { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: "Newsreader", Georgia, "Times New Roman", serif;
+  font-size: 17px; line-height: 1.5; padding-bottom: 2.5rem;
+}
+.wrap { max-width: var(--measure); margin: 0 auto; padding: 0 var(--pad); }
+a { color: var(--ochre); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { color: #85592B; }
+:root[data-theme="dark"] a:hover { color: #E0B075; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.sr { position: absolute; left: -9999px; }
+.rule-2 { border-top: 2px solid var(--ink); }
+.rule-1 { border-top: 1px solid var(--ink); }
+.kicker { font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase;
+          color: var(--muted); }
 
-  /* Masthead */
-  .masthead { padding-top: 22px; }
-  .masthead-top { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 10px; }
-  .masthead-main {
-    border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink);
-    padding: clamp(14px, 2.6vw, 22px) 0 clamp(12px, 2.2vw, 20px); text-align: center;
-  }
-  .masthead-main h1 {
-    margin: 0; font-weight: 500; letter-spacing: -.015em; line-height: .92;
-    font-size: clamp(38px, 7.6vw, 76px);
-  }
-  .masthead-main .tagline {
-    font-size: clamp(11px, 1.2vw, 15px); letter-spacing: .22em;
-    text-transform: uppercase; color: var(--ochre); margin-top: clamp(8px, 1.2vw, 14px);
-  }
+/* -------------------------------------------------------------- masthead -- */
 
-  /* Navigation */
-  nav { border-bottom: 1px solid var(--ink); }
-  .nav-inner {
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 16px 30px; flex-wrap: wrap; padding: 10px 0;
-  }
-  .navgroup { display: flex; gap: clamp(14px, 2.4vw, 28px); flex-wrap: wrap; }
-  .navgroup button, .navgroup a {
-    font-size: clamp(12px, 1.15vw, 14px); letter-spacing: .13em; text-transform: uppercase;
-    color: var(--faint); padding-bottom: 3px; border-bottom: 2px solid transparent;
-    text-decoration: none;
-  }
-  .navgroup button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--ochre); }
-  .navgroup a { color: var(--ochre); }
+.masthead { padding-top: 18px; }
+.masthead-top { display: flex; justify-content: space-between; align-items: baseline;
+                gap: 16px; }
+.masthead-main { text-align: center;
+                 padding: clamp(14px, 2vw, 24px) 0 clamp(12px, 1.7vw, 20px); }
+.masthead-main h1 { margin: 0; font-weight: 600; line-height: 1;
+                    letter-spacing: -.01em; font-size: clamp(27px, 4.3vw, 58px); }
+.masthead-main .tagline { font-size: clamp(8.5px, 1vw, 13.5px); letter-spacing: .32em;
+                          text-transform: uppercase; color: var(--ochre);
+                          margin-top: clamp(7px, 1vw, 13px); }
 
-  /* Lede */
-  .lede { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
-          gap: clamp(24px, 4vw, 56px); padding-top: clamp(24px, 3.4vw, 34px); align-items: start; }
-  .lede h2 { margin: 0; font-weight: 400; letter-spacing: -.01em;
-             font-size: clamp(26px, 3.4vw, 40px); line-height: 1.16; text-wrap: pretty; }
-  .standfirst { font-size: clamp(15px, 1.4vw, 17px); line-height: 1.65;
-                color: var(--body); margin-top: 16px; max-width: 62ch; text-wrap: pretty; }
-  .glance { border-left: 1px solid var(--rule); padding-left: 28px; }
-  .glance dl { margin: 14px 0 0; display: flex; flex-direction: column; gap: 12px; }
-  .glance div { display: flex; justify-content: space-between; align-items: baseline;
-                gap: 12px; border-bottom: 1px dotted var(--rule); padding-bottom: 9px; }
-  .glance div:last-child { border-bottom: 0; padding-bottom: 0; }
-  .glance dt { font-size: 15px; color: var(--body); }
-  .glance dd { margin: 0; font-size: 20px; font-variant-numeric: tabular-nums; }
-  .glance dd small { font-size: 13px; color: var(--faint); }
+/* ------------------------------------------------------------------- nav -- */
 
-  /* Sections */
-  .band { padding-top: clamp(26px, 3.4vw, 42px); }
-  .band-head { display: flex; justify-content: space-between; align-items: baseline;
-               gap: 16px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; }
-  .band-head h3 { margin: 0; font-weight: 400; font-size: clamp(16px, 1.9vw, 22px);
-                  letter-spacing: .15em; text-transform: uppercase; }
-  .band-note { font-size: clamp(12px, 1.2vw, 14px); font-style: italic; text-align: right; }
-  .hills { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-           gap: 0 clamp(20px, 3.4vw, 44px); }
-  .more { text-align: center; padding-top: 14px; font-size: 14px;
-          font-style: italic; color: var(--faint); }
+nav .tabs { display: flex; justify-content: space-between; align-items: center;
+            gap: 16px 30px; flex-wrap: wrap; padding: 12px 0 2px; }
+nav .links { display: flex; gap: clamp(16px, 2.4vw, 30px); flex-wrap: wrap;
+             padding: 12px 0; }
+.navgroup { display: flex; gap: clamp(14px, 2.2vw, 30px); flex-wrap: wrap; }
+.navgroup button, nav .links button, nav .links a {
+  font-size: clamp(11px, 1.05vw, 13.5px); letter-spacing: .16em;
+  text-transform: uppercase; color: var(--muted); padding-bottom: 3px;
+  border-bottom: 2px solid transparent; text-decoration: none;
+}
+.navgroup .sm { display: none; }
+.foot-btn { font-size: inherit; color: var(--ochre); text-decoration: underline;
+            text-decoration-thickness: 1px; text-underline-offset: 2px;
+            display: inline-flex; align-items: baseline; gap: .3rem; }
+.foot-btn:hover { color: #85592B; }
+:root[data-theme="dark"] .foot-btn:hover { color: #E0B075; }
+.navgroup button[aria-pressed="true"] { color: var(--ink); font-weight: 600;
+                                        border-bottom-color: var(--ochre); }
+.navgroup button:hover, nav .links button:hover, nav .links a:hover {
+  color: var(--ink); border-bottom-color: var(--rule);
+}
 
-  .hill { display: flex; align-items: center; gap: 16px; width: 100%;
-          text-align: left; padding: 15px 0; border-bottom: 1px solid var(--hair); }
-  .hill:hover .hill-name { text-decoration: underline; text-underline-offset: 3px; }
-  .hill svg { flex: none; }
-  .hill-body { flex-grow: 1; min-width: 0; }
-  .hill-name { font-size: clamp(17px, 1.7vw, 21px); }
-  .hill-sub { font-size: 13px; color: var(--muted); font-style: italic;
-              overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .hill-pct { font-size: clamp(21px, 2.2vw, 27px); font-variant-numeric: tabular-nums; }
-  .c-clear { color: var(--clear); } .c-edge { color: var(--edge); } .c-cloud { color: var(--incloud); }
+/* ---------------------------------------------------------------- search -- */
 
-  /* Hill detail */
-  .detail { grid-column: 1 / -1; padding: 4px 0 22px; }
-  .detail-inner { border-top: 1px solid var(--ink); padding-top: 16px;
-                  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-                  gap: clamp(20px, 3vw, 44px); }
-  .detail h4 { margin: 0 0 4px; font-weight: 400; font-size: 26px; }
-  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  th { text-align: left; font-weight: 400; font-size: 11px; letter-spacing: .14em;
-       text-transform: uppercase; color: var(--faint); padding: 0 8px 6px 0;
-       border-bottom: 1px solid var(--rule); }
-  td { padding: 5px 8px 5px 0; font-size: 15px; border-bottom: 1px solid var(--hair); }
+.searchbar { padding: 12px 0; }
+.search { position: relative; display: flex; align-items: center; gap: 14px;
+          border: 1px solid var(--muted); background: var(--paper-raised);
+          padding: 13px 18px; }
+.search:focus-within { border-color: var(--ochre); }
+.search > label { display: flex; align-items: center; color: var(--ink); flex: none; }
+.search > label svg { width: 19px; height: 19px; }
+.search input { flex: 1; width: 100%; font: inherit;
+                font-size: clamp(16px, 1.5vw, 19px); color: var(--ink);
+                background: transparent; border: 0; padding: 0; }
+.search input::placeholder { color: var(--muted); font-style: italic; opacity: 1; }
+.search input:focus { outline: 0; }
+.search-hint { font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+               color: var(--faint); white-space: nowrap; flex: none; }
+.search-hint kbd { font: inherit; border: 1px solid var(--rule); padding: 1px 6px;
+                   letter-spacing: 0; }
+.results { position: absolute; z-index: 20; left: -1px; right: -1px;
+           top: calc(100% + 13px); background: var(--paper-raised);
+           border: 1px solid var(--muted); max-height: 62vh; overflow-y: auto;
+           display: none; box-shadow: 0 14px 34px rgba(42, 37, 33, .16); }
+.results.open { display: block; }
+.results button { display: flex; width: 100%; text-align: left; gap: 12px;
+                  align-items: baseline; padding: 11px 16px;
+                  border-bottom: 1px solid var(--hair); min-height: 44px; }
+.results button:hover, .results button[aria-selected="true"] { background: var(--row-hover); }
+.results .r-name { flex-grow: 1; font-size: 17px; }
+.results .r-meta { color: var(--faint); font-size: 13px; font-style: italic;
+                   white-space: nowrap; }
+.results .r-pct { font-variant-numeric: tabular-nums; }
+.results .none { padding: 14px 16px; color: var(--muted); font-style: italic; }
 
-  /* Footer */
-  footer { padding-top: clamp(30px, 4vw, 48px); }
-  .footer-inner { border-top: 3px solid var(--ink); padding-top: 18px;
-                  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-                  gap: clamp(20px, 3vw, 44px); font-size: 13.5px; line-height: 1.7;
-                  color: var(--muted); }
-  .footer-inner h5 { margin: 0 0 7px; font-weight: 400; font-size: 12px;
-                     letter-spacing: .16em; text-transform: uppercase; color: var(--ink); }
+/* ------------------------------------------------------------------ lede -- */
 
-  @media (max-width: 900px) {
-    .lede { grid-template-columns: 1fr; }
-    .glance { border-left: 0; border-top: 1px solid var(--rule); padding: 18px 0 0; }
-    .hills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .detail-inner { grid-template-columns: 1fr; }
-    .footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
-  @media (max-width: 620px) {
-    body { font-size: 16px; }
-    .hills { grid-template-columns: 1fr; }
-    .hill { padding: 13px 0; min-height: 44px; }
-    /* Proper tap targets cost vertical space, so the masthead gives some
-       back. On a phone the forecast should be near the top, not below half a
-       screen of furniture. */
-    .masthead { padding-top: 14px; }
-    .masthead-top { font-size: 11px; }
-    .masthead-top span + span { display: none; }   /* the no-ads strapline */
-    .masthead-main { padding: 12px 0 10px; }
-    .masthead-main .tagline { margin-top: 6px; letter-spacing: .14em; }
-    .footer-inner { grid-template-columns: 1fr; }
-  }
+.lede { display: grid; grid-template-columns: minmax(0, 1fr) 340px;
+        gap: clamp(24px, 4vw, 64px); align-items: start;
+        padding-top: clamp(22px, 2.6vw, 32px); }
+.lede h2 { margin: 0; font-weight: 500; line-height: 1.18; text-wrap: pretty;
+           font-size: clamp(24px, 3.2vw, 42px); }
+.standfirst { font-size: clamp(15px, 1.35vw, 17.5px); line-height: 1.65;
+              color: var(--muted); margin: 14px 0 0; max-width: 62ch;
+              text-wrap: pretty; }
+/* The unverified notice. Never a footnote: people may make hill decisions from
+   this, and the method has not been checked against observations yet. */
+.unverified { font-size: 14px; font-style: italic; color: var(--faint);
+              margin-top: 12px; }
+.glance-head { font-size: 13px; letter-spacing: .22em; text-transform: uppercase;
+               padding-bottom: 10px; }
+.glance div { display: flex; justify-content: space-between; align-items: baseline;
+              gap: 12px; padding: 11px 0; border-top: 1px solid var(--rule); }
+.glance div:last-child { border-bottom: 1px solid var(--rule); }
+.glance dt { font-size: 16px; }
+.glance dd { margin: 0; font-size: 20px; font-variant-numeric: tabular-nums; }
+.glance dd small { font-size: 14px; color: var(--faint); }
 
-  /* Touch input, at any screen size. Keyed on the pointer rather than the
-     width because a 768px tablet is every bit as much a finger as a phone is,
-     and the whole premise of this site is somebody checking it one-handed in a
-     car park in the rain. A 24px tab is not hittable in that situation. */
-  @media (pointer: coarse) {
-    .nav-inner { gap: 0 clamp(12px, 3vw, 28px); padding: 4px 0; }
-    .navgroup { gap: 0 clamp(12px, 4vw, 22px); }
-    .navgroup button, .navgroup a {
-      min-height: 44px; display: flex; align-items: center;
-      padding: 0 0 2px; border-bottom-width: 3px;
-    }
-    .hill { min-height: 48px; }
-  }
-  @media (pointer: coarse) and (max-width: 620px) {
-    .navgroup { width: 100%; justify-content: space-between; }
-  }
+/* ---------------------------------------------------------------- legend -- */
 
-  /* Theme switch */
-  .theme { display: inline-flex; align-items: center; gap: .4rem; }
-  .theme svg { width: 15px; height: 15px; flex: none; }
-  .theme .moon { display: none; }
-  :root[data-theme="dark"] .theme .sun { display: none; }
-  :root[data-theme="dark"] .theme .moon { display: inline; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .theme .sun { display: none; }
-    :root:not([data-theme="light"]) .theme .moon { display: inline; }
-  }
+.legend { display: flex; flex-wrap: wrap; gap: 22px; align-items: baseline;
+          font-size: 12px; letter-spacing: .13em; text-transform: uppercase;
+          color: var(--muted); margin-top: clamp(20px, 2.6vw, 34px); }
+.legend .tip { margin-left: auto; font-style: italic; letter-spacing: 0;
+               text-transform: none; font-size: 13.5px; color: var(--faint); }
 
-  /* Search.
-     With 496 hills and nine shown per band, somebody who already knows they
-     are going up Blencathra could not find Blencathra. Searching across both
-     regions at once matters: people think in hill names, not in regions. */
-  .sr { position: absolute; left: -9999px; }
-  .searchbar { display: flex; align-items: baseline; gap: 20px;
-               border-bottom: 1px solid var(--ink); padding: 0; }
-  .searchbar-note { color: var(--faint); font-size: .8rem; font-style: italic;
-                    white-space: nowrap; padding-bottom: 12px; }
-  .search { position: relative; flex: 1 1 auto; display: flex;
-            align-items: center; gap: 10px; }
-  .search label { display: flex; align-items: center; color: var(--faint); flex: none; }
-  .search label svg { width: 19px; height: 19px; }
-  .search:focus-within label { color: var(--ochre); }
-  .search input {
-    width: 100%; font: inherit; font-size: clamp(16px, 1.5vw, 19px);
-    color: var(--ink); background: transparent; border: 0;
-    padding: 14px 2px; min-height: 52px;
-  }
-  .search input::placeholder { color: var(--faint); font-style: italic; }
-  .search input:focus { outline: 0; }
-  .searchbar:focus-within { border-bottom-color: var(--ochre); }
-  .results {
-    position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 1px);
-    background: var(--paper); border: 1px solid var(--rule); border-top: 0;
-    max-height: 62vh; overflow-y: auto; display: none;
-    box-shadow: 0 14px 34px rgba(42, 37, 33, .14);
-  }
-  .results.open { display: block; }
-  .results button {
-    display: flex; width: 100%; text-align: left; gap: 10px; align-items: baseline;
-    padding: 10px 12px; border-bottom: 1px solid var(--hair); min-height: 44px;
-  }
-  .results button:hover, .results button[aria-selected="true"] { background: var(--hair); }
-  .results .r-name { flex-grow: 1; }
-  .results .r-meta { color: var(--faint); font-size: .78rem; white-space: nowrap; }
-  .results .r-pct { font-variant-numeric: tabular-nums; }
-  .results .none { padding: 12px; color: var(--muted); font-style: italic; }
-  .hill.flash { animation: flash 1.6s ease-out; }
-  @keyframes flash { from { background: var(--hair); } to { background: transparent; } }
+/* ----------------------------------------------------------------- bands -- */
 
-  /* On a narrow screen the note would squeeze the field it is describing, and
-     the placeholder already says the same thing. */
-  @media (max-width: 620px) {
-    .searchbar-note { display: none; }
+.band { margin-top: clamp(26px, 3vw, 38px); }
+.band-head { display: flex; justify-content: space-between; align-items: baseline;
+             gap: 16px; padding-bottom: 8px; }
+.band-head h3 { margin: 0; font-weight: 400; letter-spacing: .22em;
+                text-transform: uppercase; font-size: clamp(13px, 1.3vw, 17px); }
+.band-note { font-size: clamp(12px, 1.15vw, 14.5px); font-style: italic;
+             color: var(--ochre); text-align: right; }
+.hills { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+         gap: 0 clamp(20px, 4vw, 56px); }
+
+.hill { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 16px;
+        align-items: center; width: 100%; text-align: left; padding: 13px 6px;
+        margin: 0 -6px; border-bottom: 1px solid var(--hair); }
+.hill:hover { background: var(--row-hover); }
+.hill svg { display: block; flex: none; }
+.hill-name { font-size: clamp(16.5px, 1.5vw, 19.5px); }
+.hill-meta { font-size: 13.5px; font-style: italic; color: var(--faint);
+             margin-top: 2px; overflow: hidden; text-overflow: ellipsis;
+             white-space: nowrap; }
+.hill-pct { font-size: clamp(21px, 2vw, 26px); font-variant-numeric: tabular-nums; }
+.c-clear { color: var(--clear); }
+.c-edge { color: var(--edge); }
+.c-cloud { color: var(--incloud); }
+.c-above { color: var(--above); }
+
+/* The dense tier: the rest of the band as a readable run rather than a flat
+   "36 more" line. Names are tappable and expand the hill like any row. */
+.dense { text-align: center; padding: 12px clamp(0px, 3vw, 40px) 0;
+         font-size: 13.5px; line-height: 2; color: var(--muted); }
+.dense button { font-size: inherit; white-space: nowrap; padding: 2px 0; }
+.dense button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.dense .sep { color: var(--rule); }
+.dense .rest { font-style: italic; color: var(--faint); }
+
+/* ---------------------------------------------------------------- detail -- */
+
+.detail { grid-column: 1 / -1; }
+.detail-inner { background: var(--paper-raised); border-top: 1px solid var(--ink);
+                border-bottom: 1px solid var(--ink); padding: 22px 0 26px;
+                display: grid; grid-template-columns: 380px minmax(0, 1fr);
+                gap: clamp(20px, 4vw, 72px); }
+.detail h4 { margin: 0; font-weight: 400; font-size: clamp(24px, 2.6vw, 36px); }
+.detail .gaelic { font-size: 17px; font-style: italic; color: var(--muted); }
+.detail dl { margin: 16px 0 0; }
+.detail dl > div { display: flex; justify-content: space-between; gap: 16px;
+                   padding: 7px 0; border-bottom: 1px solid var(--hair); }
+.detail dt { color: var(--muted); flex: none; font-size: 15px; }
+.detail dd { margin: 0; text-align: right; font-size: 15px; }
+.detail .links { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px;
+                 font-size: 15px; }
+.verdict { font-size: clamp(18px, 1.9vw, 23px); }
+.verdict em { color: var(--muted); }
+.wiki { font-size: 17px; line-height: 1.65; margin: 18px 0 0; text-wrap: pretty; }
+.wiki-credit { font-size: 12.5px; color: var(--faint); margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums;
+        margin-top: 18px; }
+th { text-align: left; font-weight: 400; font-size: 12.5px; letter-spacing: .14em;
+     text-transform: uppercase; color: var(--faint); padding: 0 8px 6px 0;
+     border-bottom: 1px solid var(--rule); }
+td { padding: 5px 8px 5px 0; font-size: 16px; border-bottom: 1px solid var(--hair); }
+
+/* ---------------------------------------------------------------- footer -- */
+
+footer { padding-top: clamp(28px, 3.4vw, 44px); }
+.footer-inner { border-top: 2px solid var(--ink); padding-top: 18px; display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1.2fr;
+                gap: clamp(20px, 3.2vw, 44px); font-size: 15px; line-height: 1.65;
+                color: var(--muted); }
+.footer-inner h5 { margin: 0 0 9px; font-weight: 400; font-size: 13px;
+                   letter-spacing: .2em; text-transform: uppercase; color: var(--ink); }
+
+/* ----------------------------------------------------------------- theme -- */
+
+.theme { display: inline-flex; align-items: center; gap: .4rem; }
+.theme svg { width: 14px; height: 14px; flex: none; }
+.theme .moon { display: none; }
+:root[data-theme="dark"] .theme .sun { display: none; }
+:root[data-theme="dark"] .theme .moon { display: inline; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme .sun { display: none; }
+  :root:not([data-theme="light"]) .theme .moon { display: inline; }
+}
+
+.hill.flash { animation: flash 1.6s ease-out; }
+@keyframes flash { from { background: var(--row-hover); } to { background: transparent; } }
+
+/* ------------------------------------------------------------ responsive -- */
+
+@media (max-width: 1100px) {
+  .hills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lede { grid-template-columns: minmax(0, 1fr) 280px; }
+}
+
+@media (max-width: 860px) {
+  .lede { grid-template-columns: 1fr; padding-top: 16px; gap: 16px; }
+  .hills { grid-template-columns: 1fr; }
+  .detail-inner { grid-template-columns: 1fr; }
+  .footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* Board 2e trims the lede hard, and the same trim is needed on a tablet:
+     once the lede stacks, the supporting paragraph and the extra at-a-glance
+     rows push the first hill clean off the screen. Headline, the one-line
+     unverified notice, two rows, then the hills. */
+  .standfirst { display: none; }
+  .unverified { margin-top: 8px; font-size: 13px; }
+  .glance-wrap { border-top: 0; padding-top: 0; }
+  .glance-head { display: none; }
+  .glance div:nth-child(2), .glance div:nth-child(3) { display: none; }
+  .glance div { padding: 8px 0; }
+  .legend { margin-top: 14px; }
+  .band:first-child { margin-top: 18px; }
+}
+
+/* Phone, board 2e. Region and day tabs share ONE row, the search box stays
+   boxed and prominent, and the first hill lands about half a screen down. */
+@media (max-width: 620px) {
+  body { font-size: 16px; }
+  .masthead { padding-top: 12px; }
+  .masthead-top { font-size: 10.5px; letter-spacing: .16em; }
+  .masthead-top span + span { display: none; }
+  .masthead-main { padding: 12px 0 10px; }
+  /* Board 2e puts region and day on ONE row and has no secondary link row at
+     the top at all. Those controls are in the footer instead, which is where
+     somebody looks for them anyway once they have the forecast. That row and
+     its rule were 80 px of a phone screen before the first hill. */
+  nav .tabs { padding: 8px 0; gap: 6px 12px; flex-wrap: nowrap; }
+  nav .links { display: none; }
+  nav .links + .rule-1 { display: none; }
+  .navgroup { gap: 10px; flex-wrap: nowrap; }
+  .navgroup .lg { display: none; }
+  .navgroup .sm { display: inline; }
+  .navgroup button { letter-spacing: .1em; }
+  .search { padding: 10px 12px; gap: 10px; }
+  .search-hint { display: none; }
+  /* The legend is explanatory rather than operational, and "How to read this"
+     covers it properly. On a phone the verdict colours plus the percentage are
+     self-evident enough to buy back the space. */
+  .legend { display: none; }
+
+  .lede { padding-top: 14px; }
+  .footer-inner { grid-template-columns: 1fr; }
+  .dense { padding-left: 0; padding-right: 0; }
+}
+
+/* Touch input at any screen size. Keyed on the pointer rather than the width
+   because a 768px tablet is every bit as much a finger as a phone is. */
+@media (pointer: coarse) {
+  .navgroup button, nav .links button, nav .links a {
+    min-height: 44px; display: flex; align-items: center;
   }
+  .hill { min-height: 56px; }
+  .dense button { min-height: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hill.flash { animation: none; }
+  [data-anim] { display: none !important; }
+  [data-static] { display: block !important; }
+}

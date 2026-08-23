@@ -166,8 +166,8 @@
     return c;
   }
 
-  async function share() {
-    const btn = document.getElementById('share');
+  async function share(ev) {
+    const btn = (ev && ev.currentTarget) || document.getElementById('share');
     const label = btn.textContent;
     btn.disabled = true;
     btn.textContent = '…';
@@ -199,6 +199,6 @@
     }
   }
 
-  document.getElementById('share').addEventListener('click', share);
+  document.querySelectorAll('.share-btn').forEach(b => b.addEventListener('click', share));
   window.drawShareCard = draw;
 })();

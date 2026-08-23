@@ -57,6 +57,8 @@ REGIONS = {
         "label": "Scottish Highlands", "column": "M", "list_name": "Munros",
         "order": 1,
         "area_column": "Region",
+        # Vertical scale for the elevation glyph, from the design handoff.
+        "scale": 1600,
         "bands": [(1200, "Over 1200m"), (1100, "1100 to 1200m"),
                   (1000, "1000 to 1100m"), (0, "Under 1000m")],
     },
@@ -64,8 +66,12 @@ REGIONS = {
         "label": "Lake District", "column": "W", "list_name": "Wainwrights",
         "order": 2,
         "area_column": "Area",
-        "bands": [(800, "Over 800m"), (600, "600 to 800m"),
-                  (400, "400 to 600m"), (0, "Under 400m")],
+        "scale": 1200,
+        # Finer than the old 800/600/400 split, per board 2a: with cloud base
+        # usually somewhere between 700 and 1000 m, those are the boundaries
+        # that actually decide whether a Lakeland top is in it.
+        "bands": [(900, "Over 900m"), (800, "800 to 900m"),
+                  (700, "700 to 800m"), (0, "Under 700m")],
     },
 }
 

@@ -216,6 +216,8 @@ def build(meta, hill_defs, responses, source):
             # Height bands for display, defined per region in hills.py. Sent
             # with the data so the page does not need its own copy to drift.
             "bands": REGIONS.get(meta["region"], {}).get("bands", []),
+            # Vertical scale the elevation glyph draws against.
+            "scale": REGIONS.get(meta["region"], {}).get("scale", 1600),
         },
         "hills": hills_out,
     }

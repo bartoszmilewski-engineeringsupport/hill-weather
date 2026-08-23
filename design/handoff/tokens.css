@@ -1,0 +1,55 @@
+/* Hill Weather — design tokens
+   Newspaper direction. One serif (Newsreader) throughout.
+   Light is the default; dark is a warm inversion of the same design. */
+
+:root {
+  /* light (default) */
+  --paper: #FBF7F0;
+  --paper-raised: #FDFAF4;   /* search field, expanded entry */
+  --ink: #2A2521;
+  --muted: #6B6156;
+  --faint: #8C8175;
+  --rule: #DCD2C0;           /* hairlines between at-a-glance rows */
+  --hair: #E5DCCB;           /* hairlines between hill rows */
+  --hair-soft: #EDE5D7;
+  --ochre: #A8763F;          /* single accent: active tabs, links, inversion */
+  --clear: #3F6B4A;          /* verdict >= 70% */
+  --edge: #8A6A2E;           /* verdict 40-69% */
+  --incloud: #9C4B36;        /* verdict < 40% */
+  --above: #A8763F;          /* verdict ABOVE CLOUD (= ochre) */
+  --glyph-bg: #F1EADB;
+  --glyph-frame: #D8CDB8;
+  --glyph-hill: #E7DDC8;
+  --glyph-hill-line: #B3A58A;
+  --glyph-cloud: #DCD2C0;    /* draw at opacity .7 OVER the hill */
+  --row-hover: #F5EEDF;
+  --sun-core: #F7E3B6;
+  --sun-glow: #F2D9A4;
+}
+
+[data-theme="dark"] {
+  --paper: #16140F;
+  --paper-raised: #201B14;
+  --ink: #EFE8DB;
+  --muted: #A89A88;
+  --faint: #8C8175;
+  --rule: #3A332A;
+  --hair: #2A2419;
+  --hair-soft: #2A2419;
+  --ochre: #CC9A5B;
+  --clear: #86C495;
+  --edge: #DBB165;
+  --incloud: #DE8F79;
+  --above: #CC9A5B;
+  --glyph-bg: #201B14;
+  --glyph-frame: #3A332A;
+  --glyph-hill: #2E271C;
+  --glyph-hill-line: #8C8175;
+  --glyph-cloud: #4A4136;    /* opacity .75 */
+  --row-hover: #201B14;
+  --sun-core: #E8C07A;
+  --sun-glow: #CC9A5B;
+}
+
+/* Typography: Newsreader (Google Fonts), everything. Hierarchy from size and weight.
+   Load: https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap */
