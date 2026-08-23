@@ -54,7 +54,11 @@ def main():
             text = re.sub(rf'(["\'/]){stem}(\?v=[0-9a-f]+)?(["\'])',
                           rf'\g<1>{name}?v={ver}\g<3>', text)
         if text != original:
-            p.write_text(text, encoding="utf-8")
+            # Explicit LF. This script runs on Windows and rewrites files that
+            # are committed, so the platform default would leave every page
+            # showing as modified after a run that changed nothing.
+            p.write_text(text, encoding="utf-8", newline="
+")
             changed += 1
         print(f"  {page}: {'updated' if text != original else 'already current'}")
 
