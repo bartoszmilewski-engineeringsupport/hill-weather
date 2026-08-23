@@ -39,7 +39,11 @@
   --hero-deck: #E7DDC8;
   --hero-haze: #EFE8DA;
   --measure: 1360px;
-  --pad: clamp(16px, 4vw, 56px);
+  --pad: clamp(18px, 4vw, 56px);
+  /* How far the expanded entry's background reaches past the grid, which is
+     also how far its text is inset from that background. Kept under --pad so
+     the bleed always has room inside the page gutter. */
+  --entry-bleed: clamp(12px, 1.6vw, 24px);
   color-scheme: light;
 }
 
@@ -236,7 +240,9 @@ nav .links { display: flex; gap: clamp(16px, 2.4vw, 30px); flex-wrap: wrap;
 
 .detail { grid-column: 1 / -1; }
 .detail-inner { background: var(--paper-raised); border-top: 1px solid var(--ink);
-                border-bottom: 1px solid var(--ink); padding: 18px 0 30px; }
+                border-bottom: 1px solid var(--ink);
+                padding: 18px var(--entry-bleed) 30px;
+                margin-inline: calc(-1 * var(--entry-bleed)); }
 
 /* The tapped row, repeated full width at the head of the entry. On a phone the
    entry can open well below the row it came from, so it has to name itself. */

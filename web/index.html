@@ -37,7 +37,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
-<link rel="stylesheet" href="style.css?v=777ffa57">
+<link rel="stylesheet" href="style.css?v=586f9279">
 </head>
 <body>
 
@@ -344,7 +344,7 @@ function heroHTML(iv) {
     <div class="hero-stats">
       ${stat('Tops above cloud', `<span class="c-above">${iv.above} of ${iv.total}</span>`)}
       ${stat('Cloud top', iv.deck != null ? 'about ' + metres(iv.deck) : 'not resolved')}
-      ${stat('Sunrise light', `${iv.light} of 10`)}
+      ${stat('Sunrise light', `${iv.light} of 100`)}
       ${stat('Window', iv.dawnOnly ? 'first light' : 'through the morning',
              iv.dawnOnly ? 'then the deck lifts' : 'if it holds')}
     </div>
@@ -376,11 +376,24 @@ function writeLede(hills, day, label) {
 
   let headline, standfirst;
   if (showHero) {
-    // "The glens are full" is only true of a deck that is actually down in
-    // them. Above about 900 m it is most of the hill that is buried, not a glen.
-    headline = iv.deck == null ? 'Above the cloud, with the glens full.'
-      : iv.deck < 900 ? `Above the cloud, with the glens full to about ${metres(iv.deck)}.`
-      : `Above the cloud, with the deck lying at about ${metres(iv.deck)}.`;
+    /* Two claims of very different size share this layout. When most of the
+       list stands above the deck the sweeping headline is earned. When a
+       handful do, it is not: the day is a cloud sea with some tops out of it,
+       and saying so keeps the headline honest against the count printed
+       immediately below it.
+
+       "The glens are full" is likewise only true of a deck that is actually
+       down in them; above about 900 m it is most of the hill that is buried. */
+    const share = iv.above / iv.total;
+    if (share >= 0.4) {
+      headline = iv.deck == null ? 'Above the cloud, with the glens full.'
+        : iv.deck < 900 ? `Above the cloud, with the glens full to about ${metres(iv.deck)}.`
+        : `Above the cloud, with the deck lying at about ${metres(iv.deck)}.`;
+    } else {
+      headline = `A cloud sea, with ${iv.above} ${iv.above === 1 ? 'top' : 'tops'}` +
+        (iv.deck == null ? ' standing above it.'
+                         : ` standing above it at about ${metres(iv.deck)}.`);
+    }
     standfirst = `Cold air is pinned in the valleys and ${iv.above} of ${iv.total}
       ${iv.above === 1 ? 'top stands' : 'tops stand'} clear above a white sea.
       Inversions are the best mornings of the year and the hardest to forecast, so treat
