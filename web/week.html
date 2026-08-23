@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The week ahead: Hill Weather</title>
+<meta name="description" content="Which of the next three days is worth taking off work. The whole country compared, day by day.">
+<script>
+// Applied before first paint so the page never flashes the wrong theme.
+try {
+  var m = localStorage.getItem('hw.theme');
+  if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+} catch (e) {}
+</script>
+<link rel="canonical" href="https://hillweather.co.uk/week.html">
+<meta name="theme-color" content="#FBF7F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16140F" media="(prefers-color-scheme: dark)">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hill Weather">
+<meta property="og:title" content="The week ahead: which day is worth taking off">
+<meta property="og:description" content="Weather sweeps the whole country at once, so the honest question is usually not which hill but which day.">
+<meta property="og:url" content="https://hillweather.co.uk/week.html">
+<meta property="og:image" content="https://hillweather.co.uk/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Hill Weather: cloud base and inversions for British hills">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The week ahead: which day is worth taking off">
+<meta name="twitter:description" content="Weather sweeps the whole country at once, so the honest question is usually not which hill but which day.">
+<meta name="twitter:image" content="https://hillweather.co.uk/og.png">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
+<link rel="stylesheet" href="style.css?v=777ffa57">
+</head>
+<body>
+
+<header class="masthead wrap">
+  <div class="masthead-top kicker">
+    <span><a href="index.html">Back to the forecast</a></span>
+    <span>Free &middot; No accounts &middot; No advertising</span>
+  </div>
+  <div class="rule-2"></div>
+  <div class="masthead-main compact">
+    <h1>Hill Weather</h1>
+    <div class="tagline">The week ahead</div>
+  </div>
+  <div class="rule-1"></div>
+</header>
+
+<main class="wrap">
+  <section class="guide-lede">
+    <h2 id="headline">Working out which day&hellip;</h2>
+    <p class="soft" id="intro"></p>
+  </section>
+
+  <div class="days" id="days"></div>
+
+  <p class="week-note" id="note"></p>
+</main>
+
+<footer class="wrap">
+  <div class="footer-inner">
+    <div>
+      <h5>Get in touch</h5>
+      Corrections, collaboration and observations all welcome.
+      <a href="contact.html">Contact</a>.
+    </div>
+    <div>
+      <h5>Before you go</h5>
+      A planning aid, not a forecast service. Always read
+      <a href="https://www.mwis.org.uk">MWIS</a>, and in winter
+      <a href="https://www.sais.gov.uk">SAIS</a> for avalanche risk.
+    </div>
+    <div>
+      <h5>How it is made</h5>
+      Pressure-level data interpolated to true summit height, rebuilt twice a day.
+      <a href="how-to-read.html">How to read this</a>.
+    </div>
+    <div>
+      <h5>Sources</h5>
+      Weather from <a href="https://open-meteo.com">Open-Meteo</a>, UK Met Office 2&nbsp;km model.
+      Hill data from the <a href="https://www.hill-bagging.co.uk/dobih">Database of British
+      and Irish Hills</a> v18.5, CC&nbsp;BY&nbsp;4.0.
+    </div>
+  </div>
+</footer>
+
+<script>
+/* Board 2d, the week ahead.
+ *
+ * The premise came out of measuring the forecast rather than from the design:
+ * aggregated across every hill, the median swings far more from day to day than
+ * it does from one part of the country to another. So on most weeks the useful
+ * question is not which hill but which day, and that deserves its own page.
+ *
+ * Everything here is computed from the same two summary files the front page
+ * uses. Nothing is asserted that cannot be derived from them: no claim about a
+ * front clearing west to east, because that needs the spatial work that is
+ * waiting on validation. */
+const DATA = 'data/';
+const band = v => v >= 70 ? 'clear' : v >= 40 ? 'edge' : 'incloud';
+const metres = m => m == null ? null : m.toLocaleString('en-GB') + ' m';
+const median = a => a.length ? a.slice().sort((x, y) => x - y)[Math.floor(a.length / 2)] : null;
+
+const longDay = d => new Date(d + 'T12:00').toLocaleDateString('en-GB', { weekday: 'long' });
+const shortDay = d => new Date(d + 'T12:00')
+  .toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
+/* One day, one region: the split between the three verdict bands, the median
+   cloud base, and how many tops are clear. */
+function tally(hills, day) {
+  const rows = hills.map(h => h.daily[day]).filter(Boolean);
+  if (!rows.length) return null;
+  const counts = { clear: 0, edge: 0, incloud: 0 };
+  for (const s of rows) counts[band(s.view_pct)]++;
+  const withCloud = rows.filter(s => s.cloud_base != null);
+  return {
+    total: rows.length,
+    ...counts,
+    pct: Math.round(100 * counts.clear / rows.length),
+    base: median(withCloud.map(s => s.cloud_base)),
+    cloudy: withCloud.length,
+  };
+}
+
+/* The mini scene. A fixed ridge with the day's median cloud base drawn across
+   it, so three of them side by side show the deck rising or falling. The ridge
+   is the same on all three deliberately: the only thing that should appear to
+   change between the columns is the weather. */
+function scene(base, scale) {
+  const G = 78, TOP = 5, k = 60 / scale;
+  let cloud = '';
+  if (base != null) {
+    const by = Math.min(G - 2, Math.max(TOP, +(G - base * k).toFixed(1)));
+    cloud =
+      `<rect x="1" y="${TOP}" width="218" height="${(by - TOP).toFixed(1)}" ` +
+      `fill="var(--glyph-cloud)" opacity="var(--glyph-cloud-op)"></rect>` +
+      `<line x1="2" y1="${by}" x2="218" y2="${by}" stroke="var(--faint)" ` +
+      `stroke-width="0.9" stroke-dasharray="3 3"></line>`;
+  }
+  return `<svg viewBox="0 0 220 84" class="dayscene" role="img" aria-label="${
+      base == null ? 'No low cloud' : 'Cloud base about ' + metres(base)}">` +
+    `<rect x="0.5" y="0.5" width="219" height="83" fill="var(--glyph-bg)" ` +
+    `stroke="var(--glyph-frame)"></rect>` +
+    `<polygon points="4,78 30,60 60,32 90,56 120,24 150,52 180,36 205,64 216,70 216,78" ` +
+    `fill="var(--glyph-hill)" stroke="var(--glyph-hill-line)" stroke-width="1"></polygon>` +
+    cloud + `</svg>`;
+}
+
+function sentence(t) {
+  if (!t) return 'No forecast for this day.';
+  // Below about a third of hills carrying any low cloud, a median base is drawn
+  // from too few of them to describe the day, so the day is described instead.
+  const sparse = t.base == null || t.cloudy / t.total < 0.34;
+  const where = `around ${metres(t.base)}`;
+  if (sparse && t.pct >= 60)
+    return 'Little low cloud anywhere. Days like this are the exception, so the question is less where to go than how early you can get out.';
+  if (sparse)
+    return `Low cloud on only ${t.cloudy} of ${t.total} tops, so what keeps the rest off the list is height and wind rather than cloud.`;
+  if (t.pct >= 80) return `Clear on nearly every top, with what cloud there is ${where}.`;
+  if (t.pct >= 50) return `More clear than not. The base sits ${where}, so the lower half of
+    the list is the safer bet.`;
+  if (t.pct >= 20) return `Mostly in cloud, with the base ${where}. Worth going only if you
+    pick low.`;
+  return `The tops are in cloud, base down ${where}. A day for the valleys.`;
+}
+
+async function boot() {
+  const index = await (await fetch(DATA + 'index.json')).json();
+  const regions = {};
+  for (const r of index.regions)
+    regions[r.region] = await (await fetch(DATA + r.summary)).json();
+
+  const keys = Object.keys(regions);
+  const days = Object.keys(regions[keys[0]].hills[0].daily).sort();
+
+  // Combined across every hill in every region, so one large region cannot
+  // decide the week on its own weight alone.
+  const overall = days.map(day => {
+    let clear = 0, total = 0;
+    for (const k of keys) {
+      const t = tally(regions[k].hills, day);
+      if (t) { clear += t.clear; total += t.total; }
+    }
+    return { day, pct: total ? Math.round(100 * clear / total) : 0 };
+  });
+
+  const best = overall.reduce((a, b) => b.pct > a.pct ? b : a);
+  const rest = overall.filter(o => o.day !== best.day);
+  const runnerUp = rest.length ? Math.max(...rest.map(o => o.pct)) : best.pct;
+  const swing = Math.max(...overall.map(o => o.pct)) - Math.min(...overall.map(o => o.pct));
+  const decisive = best.pct - runnerUp >= 15;
+
+  document.getElementById('headline').textContent = decisive
+    ? `${longDay(best.day)} is the day.`
+    : swing <= 10 ? 'No day stands out this week.'
+    : `${longDay(best.day)} looks best, but not by much.`;
+
+  document.getElementById('intro').innerHTML = `Weather sweeps the whole country at once, so
+    most weeks the honest question is not <em>which hill</em> but <em>which day</em>.
+    ${swing >= 10
+      ? `Across these three days the share of tops out of cloud swings
+         ${swing} percentage points.`
+      : `Across these three days the share of tops out of cloud barely moves,
+         ${swing} percentage points from best to worst.`}`;
+
+  const out = document.getElementById('days');
+  out.innerHTML = days.map(day => {
+    const o = overall.find(x => x.day === day);
+    const win = decisive && day === best.day;
+    let bar = '', rows = '';
+    let total = 0, clear = 0, edge = 0, incloud = 0, bases = [];
+    for (const k of keys) {
+      const t = tally(regions[k].hills, day);
+      if (!t) continue;
+      total += t.total; clear += t.clear; edge += t.edge; incloud += t.incloud;
+      if (t.base != null) bases.push(t.base);
+      rows += `<div><dt>${regions[k].meta.label}</dt>` +
+        `<dd class="c-${band(t.pct)}">${t.pct}%</dd></div>`;
+    }
+    const baseMed = median(bases);
+    // Same test the lede uses, so the row cannot print a median the sentence
+    // above it has just said is not worth quoting.
+    const cloudyAll = keys.map(k => tally(regions[k].hills, day)).filter(Boolean)
+      .reduce((n, x) => n + x.cloudy, 0);
+    rows += `<div><dt>Cloud base</dt><dd>${
+      baseMed == null || cloudyAll / total < 0.34
+        ? `little <small>(${cloudyAll} of ${total} tops)</small>`
+        : metres(baseMed)}</dd></div>`;
+    const w = n => (100 * n / total).toFixed(1) + '%';
+    bar = `<div class="daybar" role="img" aria-label="${clear} clear, ${edge} on the edge, ${
+      incloud} in cloud"><i class="b-clear" style="width:${w(clear)}"></i>` +
+      `<i class="b-edge" style="width:${w(edge)}"></i>` +
+      `<i class="b-incloud" style="width:${w(incloud)}"></i></div>`;
+
+    const perRegion = keys.map(k => tally(regions[k].hills, day)).filter(Boolean);
+    const spread = perRegion.length > 1
+      ? Math.max(...perRegion.map(x => x.pct)) - Math.min(...perRegion.map(x => x.pct)) : 0;
+    let split = '';
+    if (spread >= 30) {
+      const bestRegion = keys[perRegion.indexOf(
+        perRegion.reduce((a, b) => b.pct > a.pct ? b : a))];
+      split = `<p class="day-split">The two regions split today: ${
+        regions[bestRegion].meta.label} is ${spread} points better.</p>`;
+    }
+    const t = { total, clear, edge, incloud, pct: o.pct, base: baseMed,
+                cloudy: perRegion.reduce((n, x) => n + x.cloudy, 0) };
+    return `<section class="day${win ? ' day-win' : ''}">
+      <div class="day-head">
+        <span class="day-name">${shortDay(day)}</span>
+        ${win ? '<span class="day-tag">The day</span>' : ''}
+      </div>
+      <div class="day-pct c-${band(o.pct)}">${o.pct}%</div>
+      <div class="day-of">of all tops clear</div>
+      ${bar}
+      <div class="day-barnote">${clear} clear &middot; ${edge} on the edge &middot;
+        ${incloud} in cloud</div>
+      ${scene(baseMed, 1600)}
+      <p class="day-lede">${sentence(t).replace(/\s+/g, ' ')}</p>
+      ${split}
+      <dl class="day-rows">${rows}</dl>
+      <a class="day-link" href="index.html#/${keys[0]}/${day}">See the hills for this day</a>
+    </section>`;
+  }).join('');
+
+  document.getElementById('note').textContent = decisive
+    ? `If you can only walk one day, wait for ${longDay(best.day)}.`
+    : swing <= 10
+      ? 'There is little to choose between the three. Pick the day that suits you and go low if it is poor.'
+      : `${longDay(best.day)} is the pick, but the margin is inside what the forecast can really tell apart. Check again tomorrow.`;
+}
+
+boot().catch(err => {
+  document.getElementById('headline').textContent = 'The week could not be loaded.';
+  document.getElementById('intro').textContent =
+    'Try again in a moment, or go back to the forecast.';
+});
+</script>
+<script src="theme.js?v=59f3cbe2"></script>
+</body>
+</html>
