@@ -159,6 +159,12 @@ def pipeline():
     if not run("og_image.py"):
         log("link preview not regenerated, keeping the previous one")
 
+    # The sitemap dates the two forecast pages by when the forecast was built,
+    # so search engines are told the truth about what actually changed. Pure
+    # stdlib, so unlike the link preview this always runs.
+    if not run("sitemap.py"):
+        log("sitemap not regenerated")
+
     write_status(True, "ok")
     heartbeat(True, "build ok")
     return True

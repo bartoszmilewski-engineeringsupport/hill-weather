@@ -1,7 +1,7 @@
 {
  "meta": {
   "note": "Wikipedia extracts are CC BY-SA 4.0 and must be shown with attribution and a link. Walkhighlands is linked only, never copied.",
-  "hills": 472
+  "hills": 522
  },
  "hills": {
   "scotland/Ben Nevis": {
@@ -3575,6 +3575,394 @@
     "url": "https://en.wikipedia.org/wiki/Castle_Crag"
    },
    "walkhighlands": "https://www.walkhighlands.co.uk/wainwrights/castle-crag"
+  },
+  "snowdonia/Snowdon - Yr Wyddfa": {
+   "wikipedia": {
+    "extract": "Snowdon, or Yr Wyddfa, is a mountain in Snowdonia in North Wales. With an elevation of 1,085 metres (3,560 ft) above sea level, it is the highest mountain in Wales, and the highest in the British Isles south of the Scottish Highlands. Snowdon is designated a national nature reserve for its rare flora and fauna, and is located within Snowdonia National Park.",
+    "title": "Snowdon",
+    "url": "https://en.wikipedia.org/wiki/Snowdon"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/snowdon"
+  },
+  "snowdonia/Crib y Ddysgl": {
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/crib-y-ddysgl"
+  },
+  "snowdonia/Carnedd Llewelyn": {
+   "wikipedia": {
+    "extract": "Carnedd Llewelyn, also spelled Carnedd Llywelyn, is a mountain massif in the Carneddau range in Snowdonia, north-west Wales. It is the highest point of the Carneddau at 1,064 metres (3,491 ft) and the second-highest peak by relative height in Wales, 49th in the British Isles and lies on the border between Gwynedd and Conwy.",
+    "title": "Carnedd Llewelyn",
+    "url": "https://en.wikipedia.org/wiki/Carnedd_Llewelyn"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/carnedd-llewelyn"
+  },
+  "snowdonia/Carnedd Dafydd": {
+   "wikipedia": {
+    "extract": "Carnedd Dafydd is a mountain peak in the Carneddau range in Snowdonia, Wales, and is the fourth highest peak in Wales. Situated south-west of Carnedd Llewelyn and north of Pen yr Ole Wen, Carnedd Dafydd is on the main ridge of the Carneddau, and on the border between Gwynedd and Conwy. The average annual temperature of the mountain is around 3–4 °C (37–39 °F).",
+    "title": "Carnedd Dafydd",
+    "url": "https://en.wikipedia.org/wiki/Carnedd_Dafydd"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/carnedd-dafydd"
+  },
+  "snowdonia/Glyder Fawr": {
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/glyder-fawr"
+  },
+  "snowdonia/Glyder Fach": {
+   "wikipedia": {
+    "extract": "Glyder Fach is a mountain in Snowdonia, north-west Wales, and is the second highest of the Glyderau and the sixth highest in Wales.\nRoutes to the summit lead from Tryfan and Bristly Ridge to the north, via Glyder Fawr from Pen-y-Pass to the south, and along the Glyder ridge to the east, towards Capel Curig. It is a popular spot for climbers.",
+    "title": "Glyder Fach",
+    "url": "https://en.wikipedia.org/wiki/Glyder_Fach"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/glyder-fach"
+  },
+  "snowdonia/Pen yr Ole Wen": {
+   "wikipedia": {
+    "extract": "Pen yr Ole Wen is the seventh highest mountain in Snowdonia and in Wales. It is the most southerly of the Carneddau range.",
+    "title": "Pen yr Ole Wen",
+    "url": "https://en.wikipedia.org/wiki/Pen_yr_Ole_Wen"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/pen-yr-ole-wen"
+  },
+  "snowdonia/Foel Grach": {
+   "wikipedia": {
+    "extract": "Foel Grach is a mountain in the Carneddau range. It is the eighth-highest summit in Snowdonia as well as Wales, and is included in the Welsh 3000s.",
+    "title": "Foel Grach",
+    "url": "https://en.wikipedia.org/wiki/Foel_Grach"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/foel-grach"
+  },
+  "snowdonia/Yr Elen": {
+   "wikipedia": {
+    "extract": "Yr Elen is a mountain in the Carneddau range in Snowdonia, Wales. It is the ninth-highest mountain in Snowdonia. The average annual temperature of the peak is around 4 °C (39 °F). It lies on a short ridge running north-northwest off the main northeast-to-southwest ridge of the Carneddau, just over one kilometre from Carnedd Llewelyn.",
+    "title": "Yr Elen",
+    "url": "https://en.wikipedia.org/wiki/Yr_Elen"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/yr-elen"
+  },
+  "snowdonia/Y Garn": {
+   "wikipedia": {
+    "extract": "Y Garn is a mountain in Snowdonia, North Wales, part of the Glyderau.",
+    "title": "Y Garn (Glyderau)",
+    "url": "https://en.wikipedia.org/wiki/Y_Garn_(Glyderau)"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/y-garn"
+  },
+  "snowdonia/Foel-fras": {
+   "wikipedia": {
+    "extract": "Foel-fras is a mountain in the Carneddau range, about 10 km east of Bethesda in North Wales. It lies on the border between the counties of Gwynedd and Conwy. With a summit elevation of 944 metres, it is officially the eleventh-highest summit in Wales.\nFoel-fras is located at the northern end of the main ridge of the Carneddau, between Drum to the north and Foel Grach to the south with the subsidiary summit of Garnedd Uchaf between it and Foel Grach. Due south and 400 m below lies the reservoir of Llyn Dulyn, while the smaller reservoir of Llyn Anafon lies to the north.",
+    "title": "Foel-fras",
+    "url": "https://en.wikipedia.org/wiki/Foel-fras"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/foel-fras"
+  },
+  "snowdonia/Garnedd Uchaf": {
+   "wikipedia": {
+    "extract": "Carnedd Gwenllian, previously known as Carnedd Uchaf until 2009, is a minor summit of the Carneddau range in Snowdonia, Wales, and included in the Welsh 3000s. From the summit, distant views to the north can extend as far as Ireland and the Isle of Man, and to the South as far as the Berwyn Ranges.",
+    "title": "Carnedd Gwenllian",
+    "url": "https://en.wikipedia.org/wiki/Carnedd_Gwenllian"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/garnedd-uchaf"
+  },
+  "snowdonia/Elidir Fawr": {
+   "wikipedia": {
+    "extract": "Elidir Fawr is a mountain in Snowdonia, north Wales, the northernmost peak in the Glyderau. Its name means 'Big Elidir', named after a legendary warrior king of the 6th century also known as Eliffer Gosgorddfawr.",
+    "title": "Elidir Fawr",
+    "url": "https://en.wikipedia.org/wiki/Elidir_Fawr"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/elidir-fawr"
+  },
+  "snowdonia/Crib Goch": {
+   "wikipedia": {
+    "extract": "Crib Goch is a knife-edged arête in the Snowdonia National Park in Gwynedd, Wales. The name means \"red ridge\" in Welsh.",
+    "title": "Crib Goch",
+    "url": "https://en.wikipedia.org/wiki/Crib_Goch"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/crib-goch"
+  },
+  "snowdonia/Tryfan": {
+   "wikipedia": {
+    "extract": "Tryfan is a mountain in the Ogwen Valley, Snowdonia, Wales. It forms part of the Glyderau group, and is one of the most recognisable peaks in Britain, having a classic pointed shape with rugged crags. At 917.5 metres above sea level, it is the fifteenth-highest mountain in Wales. Tryfan was voted Britain's favourite mountain by Trail magazine.",
+    "title": "Tryfan",
+    "url": "https://en.wikipedia.org/wiki/Tryfan"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/tryfan"
+  },
+  "snowdonia/Y Lliwedd": {
+   "wikipedia": {
+    "extract": "Y Lliwedd is a mountain, connected to Snowdon in the Snowdonia National Park, North Wales.",
+    "title": "Y Lliwedd",
+    "url": "https://en.wikipedia.org/wiki/Y_Lliwedd"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/y-lliwedd"
+  },
+  "snowdonia/Moel Siabod": {
+   "wikipedia": {
+    "extract": "Moel Siabod is a mountain in Snowdonia, Wales, which sits isolated above the village of Dolwyddelan. At 872 metres (2,861 ft), it is the highest peak in the Moelwynion mountain range. The UK National Mountain Centre, Plas-y-Brenin, is located at the foot of Moel Siabod. From the top of the mountain, it is reputedly possible to see 13 of the 15 highest peaks in Wales on a clear day without turning one's head.",
+    "title": "Moel Siabod",
+    "url": "https://en.wikipedia.org/wiki/Moel_Siabod"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moel-siabod"
+  },
+  "snowdonia/Llwytmor": {
+   "wikipedia": {
+    "extract": "Llwytmor is a satellite peak of Foel-fras, and forms a part of the Carneddau range. The summit is 849 metres above sea level and it contains a series of boulderfields, a shelter and several cairns. It is the 27th highest peak in Wales. In editions of OS Maps published into the 1960’s it was called Llwydmor and it is likely that the later substitution of ‘t’ for ‘d’ is a typographical error.",
+    "title": "Llwytmor",
+    "url": "https://en.wikipedia.org/wiki/Llwytmor"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/llwytmor"
+  },
+  "snowdonia/Pen yr Helgi Du": {
+   "wikipedia": {
+    "extract": "Pen yr Helgi Du is a mountain peak in the eastern part of the Carneddau in Snowdonia, North Wales.",
+    "title": "Pen yr Helgi Du",
+    "url": "https://en.wikipedia.org/wiki/Pen_yr_Helgi_Du"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/pen-yr-helgi-du"
+  },
+  "snowdonia/Foel-goch": {
+   "wikipedia": {
+    "extract": "Foel-goch is a mountain in Snowdonia, north-west Wales, and forms part of the Glyderau range, in Gwynedd. It lies in between Y Garn and Mynydd Perfedd.",
+    "title": "Foel-goch",
+    "url": "https://en.wikipedia.org/wiki/Foel-goch"
+   }
+  },
+  "snowdonia/Carnedd y Filiast": {
+   "wikipedia": {
+    "extract": "Carnedd y Filiast is a mountain in Snowdonia, Wales, forming part of the Glyderau. It, along with its top Y Fronllwyd, forms the most northerly summit in the Glyderau. The average annual temperature on Carnedd y Filiast is estimated to be around 4 Celsius.",
+    "title": "Carnedd y Filiast (Glyderau)",
+    "url": "https://en.wikipedia.org/wiki/Carnedd_y_Filiast_(Glyderau)"
+   }
+  },
+  "snowdonia/Y Foel Goch": {
+   "wikipedia": {
+    "extract": "Y Foel Goch is a mountain in Snowdonia, north-west Wales, and is a sister peak along with Gallt yr Ogof to Glyder Fach. Between Glyder Fach and its summit lies Llyn Caseg-fraith, a popular lake for photographing Tryfan and its reflection.",
+    "title": "Y Foel Goch",
+    "url": "https://en.wikipedia.org/wiki/Y_Foel_Goch"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/y-foel-goch"
+  },
+  "snowdonia/Pen Llithrig y Wrach": {
+   "wikipedia": {
+    "extract": "Pen Llithrig y Wrach is a mountain peak in Snowdonia, North Wales. It is one of the four Marilyns that make up the Carneddau range. To the east is Creigiau Gleision, another Marilyn, while to the west are Pen yr Helgi Du and Carnedd Llewelyn. Craig Eigiau and Llyn Eigiau can be seen to the north, while Gallt yr Ogof, Glyder Fach and Tryfan can be viewed to the south.",
+    "title": "Pen Llithrig y Wrach",
+    "url": "https://en.wikipedia.org/wiki/Pen_Llithrig_y_Wrach"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/pen-llithrig-y-wrach"
+  },
+  "snowdonia/Moel Hebog": {
+   "wikipedia": {
+    "extract": "Moel Hebog is a mountain in Snowdonia, north Wales, rising to 783 metres above sea level and dominating the western view from the village of Beddgelert. The name means \"hill of the hawk\" in Welsh. It is the principal summit of a range that extends through the north-western corner of Snowdonia, which includes the Nantlle Ridge and Mynydd Mawr. Geologically significant, the mountain comprises a complex succession of Cambrian and Ordovician rocks, including volcanic formations from the Snowdon Volcanic Group. The most prominent secondary summits are Moel yr Ogof, which contains a cave traditionally associated with Owain Glyndŵr, and Moel Lefn. As a Marilyn, Hewitt and Nuttall, Moel Hebog is a popular destination for hillwalkers, offering expansive views of Snowdon and the surrounding landscape.",
+    "title": "Moel Hebog",
+    "url": "https://en.wikipedia.org/wiki/Moel_Hebog"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moel-hebog"
+  },
+  "snowdonia/Drum": {
+   "wikipedia": {
+    "extract": "Drum is a summit in the Carneddau mountains in northern Wales, 2 km north-east of Foel-fras. It is 771 m (2,526 ft) high. It is also known as Carnedd Penyborth-Goch.",
+    "title": "Drum (Wales)",
+    "url": "https://en.wikipedia.org/wiki/Drum_(Wales)"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/drum"
+  },
+  "snowdonia/Moelwyn Mawr": {
+   "wikipedia": {
+    "extract": "Moelwyn Mawr is a mountain in Snowdonia, North Wales and forms part of the Moelwynion. Its summit overlooks the Vale of Ffestiniog and has views in all directions.",
+    "title": "Moelwyn Mawr",
+    "url": "https://en.wikipedia.org/wiki/Moelwyn_Mawr"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moelwyn-mawr"
+  },
+  "snowdonia/Gallt yr Ogof": {
+   "wikipedia": {
+    "extract": "Gallt yr Ogof is a mountain in Snowdonia, North Wales. It is a subsidiary top of Glyder Fawr, and is the most easterly summit over 2,000 feet in the Glyderau mountain range, the most easterly hill being Cefn y Capel. Gallt yr Ogof is 763 metres high.",
+    "title": "Gallt yr Ogof",
+    "url": "https://en.wikipedia.org/wiki/Gallt_yr_Ogof"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/gallt-yr-ogof"
+  },
+  "snowdonia/Drosgl": {
+   "wikipedia": {
+    "extract": "Y Drosgl is a summit of the Carneddau range in Snowdonia, Wales, and forms a part of the western Carneddau, also known as the Berau, meaning 'stacks' or 'ricks'.\nIt lies on a ridge heading west from Carnedd Gwenllian and Bera Mawr towards Bethesda. A large ancient burial cairn, dating from the Bronze Age, adorns the summit, from where good views of Cwm Caseg and the Menai can be seen.",
+    "title": "Drosgl",
+    "url": "https://en.wikipedia.org/wiki/Drosgl"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/drosgl"
+  },
+  "snowdonia/Yr Aran": {
+   "wikipedia": {
+    "extract": "Yr Aran is a mountain peak on a ridge radiating south from Snowdon, Wales' highest mountain, with views of the summit of Snowdon, Moel Hebog and the Nantlle Ridge. It has an elevation of 747.2 m (2,451 ft) and a prominence of 235 m (771 ft).",
+    "title": "Yr Aran",
+    "url": "https://en.wikipedia.org/wiki/Yr_Aran"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/yr-aran"
+  },
+  "snowdonia/Craig Cwm Silyn": {
+   "wikipedia": {
+    "extract": "Craig Cwm Silyn is a mountain in Snowdonia, North Wales which forms the highest point on the celebrated Nantlle Ridge.",
+    "title": "Craig Cwm Silyn",
+    "url": "https://en.wikipedia.org/wiki/Craig_Cwm_Silyn"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/craig-cwm-silyn"
+  },
+  "snowdonia/Moel Eilio": {
+   "wikipedia": {
+    "extract": "Moel Eilio is a mountain in Snowdonia, North Wales, that is situated approximately 3 miles north-west of Snowdon itself. It has two subsidiary tops, Foel Gron and Foel Goch (Eilio). The average annual temperature of the mountain is around 6 °C (43 °F). During the winter season, some significant accumulations of snowfall is known to take place on Moel Eilio, due to its relatively flat, grassy slopes.",
+    "title": "Moel Eilio",
+    "url": "https://en.wikipedia.org/wiki/Moel_Eilio"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moel-eilio"
+  },
+  "snowdonia/Moelwyn Bach": {
+   "wikipedia": {
+    "extract": "Moelwyn Bach is a mountain in Snowdonia, northern Wales and forms part of the Moelwynion. It is connected to its parent peak Moelwyn Mawr via the Craigysgafn ridge.",
+    "title": "Moelwyn Bach",
+    "url": "https://en.wikipedia.org/wiki/Moelwyn_Bach"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moelwyn-bach"
+  },
+  "snowdonia/Trum y Ddysgl": {
+   "wikipedia": {
+    "extract": "Trum y Ddysgl is a mountain in Snowdonia, North Wales and is the second highest summit on the Nantlle Ridge. It is also one half of the two Marilyns that make up the ridge, the other being Craig Cwm Silyn.",
+    "title": "Trum y Ddysgl",
+    "url": "https://en.wikipedia.org/wiki/Trum_y_Ddysgl"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/trum-y-ddysgl"
+  },
+  "snowdonia/Allt-fawr": {
+   "wikipedia": {
+    "extract": "Allt-fawr is a mountain in Snowdonia, North Wales and forms part of the Moelwynion group.",
+    "title": "Allt-fawr",
+    "url": "https://en.wikipedia.org/wiki/Allt-fawr"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/allt-fawr"
+  },
+  "snowdonia/Mynydd Mawr": {
+   "wikipedia": {
+    "extract": "Mynydd Mawr is a mountain in Snowdonia, North Wales, approximately 7 km (4.3 mi) west of Snowdon itself, overlooking Llyn Cwellyn and being the northern outlier of the Moel Hebog group. A popular ascent starts from Rhyd Ddu. On its western flank are the remains of ancient settlements and field systems. The profile of Mynydd Mawr from the north is often thought to resemble an elephant lying down, and consequently the mountain is often colloquially also called \"Yr Eliffant\", or \"Elephant Mountain\" by non-Welsh speakers.",
+    "title": "Mynydd Mawr",
+    "url": "https://en.wikipedia.org/wiki/Mynydd_Mawr"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/mynydd-mawr"
+  },
+  "snowdonia/Mynydd Drws-y-coed": {
+   "wikipedia": {
+    "extract": "Mynydd Drws-y-Coed is a peak on the Nantlle Ridge in Snowdonia, north Wales. It is located at the easterly end of the ridge, and is a subsidiary summit of Trum y Ddysgl. It has steep west-facing cliffs, the summit area being the highest point on a thin ridge.",
+    "title": "Mynydd Drws-y-Coed",
+    "url": "https://en.wikipedia.org/wiki/Mynydd_Drws-y-Coed"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/mynydd-drws-y-coed"
+  },
+  "snowdonia/Cnicht": {
+   "wikipedia": {
+    "extract": "Cnicht is a mountain in Snowdonia which forms part of the Moelwynion mountain range.",
+    "title": "Cnicht",
+    "url": "https://en.wikipedia.org/wiki/Cnicht"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/cnicht"
+  },
+  "snowdonia/Creigiau Gleision": {
+   "wikipedia": {
+    "extract": "Creigiau Gleision is a mountain in Snowdonia, Wales, near Capel Curig. It is the easternmost of the high Carneddau and is separated from the others by Llyn Cowlyd. Directly across this reservoir from Creigiau Gleision is Pen Llithrig y Wrach. To the north-east it runs into the broad ridge of Cefn Cyfarwydd.",
+    "title": "Creigiau Gleision",
+    "url": "https://en.wikipedia.org/wiki/Creigiau_Gleision"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/creigiau-gleision"
+  },
+  "snowdonia/Moel Druman": {
+   "wikipedia": {
+    "extract": "Moel Druman is a mountain in Snowdonia, North Wales and forms part of the Moelwynion. It is a subsidiary summit of Allt-fawr.",
+    "title": "Moel Druman",
+    "url": "https://en.wikipedia.org/wiki/Moel_Druman"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moel-druman"
+  },
+  "snowdonia/Moel Cynghorion": {
+   "wikipedia": {
+    "extract": "Moel Cynghorion is a mountain in Snowdonia, North Wales. It lies two miles north-west of Snowdon, and forms part of the Moel Eilio Horseshoe walk. The summit is situated on a wide plateau, marked by a pile of stones. The southern slopes are gentle, while the northern aspect is precipitous. The summit has close views of Clogwyn Du'r Arddu and Snowdon. Views from the summit can extend as far as Holyhead in Anglesey to nearby towns and villages in Gwynedd such as Caernarfon, Llanrug and Llanberis. On a clear day the Wicklow Mountains in Ireland can be seen across the Irish Sea, at a distance of approximately 80 miles.",
+    "title": "Moel Cynghorion",
+    "url": "https://en.wikipedia.org/wiki/Moel_Cynghorion"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moel-cynghorion"
+  },
+  "snowdonia/Ysgafell Wen": {
+   "wikipedia": {
+    "extract": "Ysgafell Wen Far North Top is a top of Ysgafell Wen North Top in Snowdonia, North Wales. It lies directly to the west of Ysgafell Wen North Top, and rises as a rocky outcrop from one of the dog lakes, Llynnau'r Cwn.",
+    "title": "Ysgafell Wen Far North Top",
+    "url": "https://en.wikipedia.org/wiki/Ysgafell_Wen_Far_North_Top"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/ysgafell-wen"
+  },
+  "snowdonia/Ysgafell Wen North Top": {
+   "wikipedia": {
+    "extract": "Ysgafell Wen Far North Top is a top of Ysgafell Wen North Top in Snowdonia, North Wales. It lies directly to the west of Ysgafell Wen North Top, and rises as a rocky outcrop from one of the dog lakes, Llynnau'r Cwn.",
+    "title": "Ysgafell Wen Far North Top",
+    "url": "https://en.wikipedia.org/wiki/Ysgafell_Wen_Far_North_Top"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/ysgafell-wen-north-top"
+  },
+  "snowdonia/Moel yr Ogof": {
+   "wikipedia": {
+    "extract": "Moel yr Ogof is a summit in Snowdonia, Wales. It is a subsidiary summit of Moel Hebog and a sister peak to the lower Moel Lefn.",
+    "title": "Moel yr Ogof",
+    "url": "https://en.wikipedia.org/wiki/Moel_yr_Ogof"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moel-yr-ogof"
+  },
+  "snowdonia/Mynydd Tal-y-mignedd": {
+   "wikipedia": {
+    "extract": "Mynydd Tal-y-Mignedd is a peak on the Nantlle Ridge in Snowdonia, north Wales. It is located at the centre of the ridge, and is a subsidiary summit of Trum y Ddysgl.",
+    "title": "Mynydd Tal-y-Mignedd",
+    "url": "https://en.wikipedia.org/wiki/Mynydd_Tal-y-Mignedd"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/mynydd-tal-y-mignedd"
+  },
+  "snowdonia/Moel-yr-hydd": {
+   "wikipedia": {
+    "extract": "Moel-yr-hydd is a subsidiary summit of Moelwyn Mawr in Snowdonia, North Wales and forms part of the Moelwynion.",
+    "title": "Moel-yr-hydd",
+    "url": "https://en.wikipedia.org/wiki/Moel-yr-hydd"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moel-yr-hydd"
+  },
+  "snowdonia/Moel Lefn": {
+   "wikipedia": {
+    "extract": "Moel Lefn is a summit in Snowdonia, Wales. It is a subsidiary peak of Moel Hebog and a sister peak of Moel yr Ogof. Its summit marks the end of the Hebog ridge.",
+    "title": "Moel Lefn",
+    "url": "https://en.wikipedia.org/wiki/Moel_Lefn"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/moel-lefn"
+  },
+  "snowdonia/Creigiau Gleision North Top": {
+   "wikipedia": {
+    "extract": "Creigiau Gleision North Top is a mountain in Snowdonia, Wales, near Capel Curig. It is a significant top on the Creigiau Gleision ridge, topping the north end of its crest. Views of Carnedd Llewelyn are better from this summit compared to the main Creigiau Gleision summit, due to less shielding from Pen Llithrig y Wrach.",
+    "title": "Creigiau Gleision North Top",
+    "url": "https://en.wikipedia.org/wiki/Creigiau_Gleision_North_Top"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/creigiau-gleision-north-top"
+  },
+  "snowdonia/Foel Gron": {
+   "wikipedia": {
+    "extract": "Foel Gron is a peak on the Moel Eilio ridge of hills/mountains in Snowdonia, North Wales. This ridge is used as a hiker's route from Llanberis to the summit of Snowdon.",
+    "title": "Foel Gron",
+    "url": "https://en.wikipedia.org/wiki/Foel_Gron"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/foel-gron"
+  },
+  "snowdonia/Tal y Fan": {
+   "wikipedia": {
+    "extract": "Tal y Fan is an outlying peak of the Carneddau mountains in North Wales. It is one of the four Marilyns that make up the Carneddau, the others being Carnedd Llywelyn, Pen Llithrig y Wrach and Creigiau Gleision.",
+    "title": "Tal y Fan",
+    "url": "https://en.wikipedia.org/wiki/Tal_y_Fan"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/tal-y-fan"
+  },
+  "snowdonia/Mynydd Graig Goch": {
+   "wikipedia": {
+    "extract": "Mynydd Graig Goch is the western end peak of the Nantlle Ridge, and is a subsidiary summit of Craig Cwm Silyn. It is also the most westerly 2000 ft peak in Wales. For many years it was excluded from lists of the Welsh 2000 ft mountains because of a spot height of 609 metres (1,998 ft) on OS maps. However, this changed in 2008; after years of speculation a group of hillwalkers carried out a precise GPS survey of the peak, measuring the absolute height as 609.75 metres.",
+    "title": "Mynydd Graig Goch",
+    "url": "https://en.wikipedia.org/wiki/Mynydd_Graig_Goch"
+   },
+   "walkhighlands": "https://www.walkhighlands.co.uk/hewitts/mynydd-graig-goch"
   }
  }
 }

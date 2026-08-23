@@ -54,7 +54,8 @@ DOBIH_VERSION = "v18.5"
 # then remembers whichever the reader last chose.
 REGIONS = {
     "scotland": {
-        "label": "Scottish Highlands", "column": "M", "list_name": "Munros",
+        "label": "Scottish Highlands", "short": "Highlands",
+        "column": "M", "list_name": "Munros",
         "order": 1,
         "area_column": "Region",
         # Vertical scale for the elevation glyph, from the design handoff.
@@ -63,7 +64,8 @@ REGIONS = {
                   (1000, "1000 to 1100m"), (0, "Under 1000m")],
     },
     "lakes": {
-        "label": "Lake District", "column": "W", "list_name": "Wainwrights",
+        "label": "Lake District", "short": "Lakes",
+        "column": "W", "list_name": "Wainwrights",
         "order": 2,
         "area_column": "Area",
         "scale": 1200,
@@ -72,6 +74,26 @@ REGIONS = {
         # that actually decide whether a Lakeland top is in it.
         "bands": [(900, "Over 900m"), (800, "800 to 900m"),
                   (700, "700 to 800m"), (0, "Under 700m")],
+    },
+    "snowdonia": {
+        "label": "Snowdonia", "short": "Snowdonia",
+        "column": "Hew", "list_name": "Hewitts",
+        "order": 3,
+        # DoBIH fills Area for Welsh hills with the range: Snowdon, The
+        # Carneddau, The Glyders, The Moelwyns, Moel Hebog. Five groups over
+        # fifty hills, which is close to ideal for the band headings.
+        "area_column": "Area",
+        # Yr Wyddfa is 1085 m, so the glyphs scale against 1100 rather than the
+        # Highland 1600: on a Highland scale every Welsh hill would draw as a
+        # low bump and the cloud line would sit off the top of the frame.
+        "scale": 1100,
+        "bands": [(900, "Over 900m"), (800, "800 to 900m"),
+                  (700, "700 to 800m"), (0, "Under 700m")],
+        # Hewitts run the length of England and Wales, so list membership alone
+        # would pull in the Pennines and the Lakes as well. Region 30B is
+        # DoBIH's own Snowdonia section.
+        "where": lambda row: (row.get("Country") == "W"
+                              and (row.get("Region") or "").startswith("30B")),
     },
 }
 
@@ -110,6 +132,18 @@ VALIDATION_NAMES = {
         "Great Dodd", "Grasmoor", "St Sunday Crag",
         "High Street", "High Stile", "The Old Man of Coniston", "Kirk Fell",
         "Lingmell", "Haystacks", "Cat Bells", "Loughrigg Fell",
+    ],
+    # No ground truth source is wired up for Wales yet, unlike Helvellyn's Fell
+    # Top Assessor or the Scottish webcams. These are archived anyway: the
+    # archive stores raw API responses, never derived answers, so once a Welsh
+    # observation source does exist the whole history can be scored
+    # retroactively. Waiting would throw away data that cannot be re-fetched.
+    "snowdonia": [
+        "Snowdon - Yr Wyddfa", "Crib y Ddysgl", "Carnedd Llewelyn",
+        "Carnedd Dafydd", "Glyder Fawr", "Glyder Fach", "Pen yr Ole Wen",
+        "Y Garn", "Elidir Fawr", "Crib Goch", "Tryfan", "Y Lliwedd",
+        "Moel Siabod", "Moel Hebog", "Moelwyn Mawr", "Cnicht",
+        "Moel Eilio", "Yr Aran",
     ],
 }
 
@@ -180,9 +214,14 @@ def load_hills(region=None, validation=False):
         raise ValueError(f"unknown region {region!r}; have {sorted(REGIONS)}")
 
     col = REGIONS[region]["column"]
+    where = REGIONS[region].get("where")
     hills = []
     for row in _rows():
         if row.get(col) != "1":
+            continue
+        # Some lists span more than one region, so membership is necessary but
+        # not always sufficient.
+        if where and not where(row):
             continue
         name, alt = _clean(row["Name"])
         try:

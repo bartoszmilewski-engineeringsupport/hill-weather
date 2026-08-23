@@ -37,7 +37,15 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
-<link rel="stylesheet" href="style.css?v=725e62cf">
+<link rel="stylesheet" href="style.css?v=68650e64">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite",
+ "name":"Hill Weather","url":"https://hillweather.co.uk/",
+ "description":"A free cloud base and inversion forecast for every Munro, Wainwright and Snowdonia Hewitt. Whether the summit will be in cloud, above it, or clear.",
+ "inLanguage":"en-GB","isAccessibleForFree":true,
+ "isFamilyFriendly":true,
+ "license":"https://creativecommons.org/licenses/by/4.0/"}
+</script>
 </head>
 <body>
 
@@ -92,6 +100,22 @@ try {
   </div>
   <div class="rule-1"></div>
 </nav>
+
+<noscript>
+  <div class="noscript">
+    <p><strong>This forecast needs JavaScript to draw itself.</strong> It reads a
+    small data file in your browser rather than on a server, which is how the
+    site stays free and keeps no record of who visited.</p>
+    <p>Hill Weather answers one question that mainstream forecasts do not:
+    whether a summit will be <em>in</em> cloud, <em>above</em> it, or clear.
+    It computes the cloud base twice a day for every Munro, every Wainwright
+    and the Hewitts of Snowdonia, by reading the atmosphere above each hill
+    level by level and interpolating to the summit's true surveyed height
+    rather than the flattened height a 2&nbsp;km weather model sees.</p>
+    <p><a href="how-to-read.html">How to read this</a> explains the method and
+    its limits without needing any of this to run.</p>
+  </div>
+</noscript>
 
 <main class="wrap">
   <section class="lede">
@@ -539,7 +563,7 @@ function render() {
       { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   chips('regions', Object.entries(state.data).map(([k, v]) =>
-          [k, v.meta.label, v.meta.label.replace(/^Scottish /, '').replace(/ District$/, 's')]),
+          [k, v.meta.label, v.meta.short || v.meta.label]),
         () => state.region,
         v => { state.region = v; remember(v); state.day = null;
                state.open = state.pinned = null; render(); });

@@ -445,6 +445,10 @@ h3.spaced { margin-top: clamp(24px, 2.8vw, 32px); }
 .week-note { margin-top: 24px; border-top: 1px solid var(--rule); padding-top: 12px;
              font-size: 14.5px; font-style: italic; color: var(--muted); max-width: 82ch; }
 
+.noscript { max-width: 74ch; margin: 0 auto; padding: clamp(20px, 3vw, 32px) var(--pad);
+             border-bottom: 1px solid var(--rule); font-size: 17px; line-height: 1.65; }
+.noscript p { margin: 0 0 12px; text-wrap: pretty; }
+
 /* ---------------------------------------------------------------- footer -- */
 
 footer { padding-top: clamp(28px, 3.4vw, 44px); }
@@ -542,7 +546,13 @@ footer { padding-top: clamp(28px, 3.4vw, 44px); }
      the top at all. Those controls are in the footer instead, which is where
      somebody looks for them anyway once they have the forecast. That row and
      its rule were 80 px of a phone screen before the first hill. */
-  nav .tabs { padding: 8px 0; gap: 6px 12px; flex-wrap: nowrap; }
+  /* Board 2e put region and day on one row, which worked with two regions.
+     With three the row needs 415 px of a 354 px phone and the region group
+     wraps raggedly inside itself. Two honest rows instead, which also scales
+     to a fourth and fifth region without another rethink. */
+  nav .tabs { padding: 8px 0; gap: 4px 12px; flex-wrap: wrap; }
+  .navgroup { width: 100%; gap: 14px; }
+  #days { justify-content: flex-start; }
   nav .links { display: none; }
   nav .links + .rule-1 { display: none; }
   .navgroup { gap: 10px; flex-wrap: nowrap; }

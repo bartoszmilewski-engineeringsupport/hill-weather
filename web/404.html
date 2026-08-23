@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not found: Hill Weather</title>
+<meta name="robots" content="noindex">
+<script>
+// Applied before first paint so the page never flashes the wrong theme.
+try {
+  var m = localStorage.getItem('hw.theme');
+  if (m === 'dark' || m === 'light') document.documentElement.setAttribute('data-theme', m);
+} catch (e) {}
+</script>
+<meta name="theme-color" content="#FBF7F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16140F" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
+<link rel="stylesheet" href="/style.css?v=68650e64">
+</head>
+<body>
+
+<header class="masthead wrap">
+  <div class="masthead-top kicker">
+    <span><a href="/">Back to the forecast</a></span>
+    <span>Free &middot; No accounts &middot; No advertising</span>
+  </div>
+  <div class="rule-2"></div>
+  <div class="masthead-main compact">
+    <h1>Hill Weather</h1>
+    <div class="tagline">Nothing here</div>
+  </div>
+  <div class="rule-1"></div>
+</header>
+
+<main class="wrap">
+  <section class="guide-lede">
+    <h2>That page is in cloud.</h2>
+    <p>There is nothing at this address. It may have been a typo, or a link
+      from somewhere that has since changed.</p>
+    <p class="soft">The forecast covers every Munro, every Wainwright and the
+      Hewitts of Snowdonia. Individual hills do not have their own addresses:
+      search for one from the front page instead.</p>
+  </section>
+
+  <div class="rule-2 spaced"></div>
+
+  <section class="guide-cols">
+    <div>
+      <h3>Where you probably wanted to go</h3>
+      <p>
+        <a href="/">The forecast</a>, for today and the next two days.<br>
+        <a href="/week.html">The week ahead</a>, to see which day is worth taking off.<br>
+        <a href="/how-to-read.html">How to read this</a>, for what cloud base means.<br>
+        <a href="/contact.html">Contact</a>, if something here is wrong.
+      </p>
+    </div>
+    <div>
+      <h3>If a link brought you here</h3>
+      <p>Please <a href="/contact.html">tell me</a> where it came from and I
+        will fix it. Corrections are welcome and always read.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <div class="footer-inner">
+    <div>
+      <h5>Before you go</h5>
+      A planning aid, not a forecast service. Always read
+      <a href="https://www.mwis.org.uk">MWIS</a>, and in winter
+      <a href="https://www.sais.gov.uk">SAIS</a> for avalanche risk.
+    </div>
+    <div>
+      <h5>Sources</h5>
+      Weather from <a href="https://open-meteo.com">Open-Meteo</a>, UK Met Office 2&nbsp;km model.
+      Hill data from the <a href="https://www.hill-bagging.co.uk/dobih">Database of British
+      and Irish Hills</a> v18.5, CC&nbsp;BY&nbsp;4.0.
+    </div>
+  </div>
+</footer>
+
+<script src="/theme.js?v=59f3cbe2"></script>
+</body>
+</html>

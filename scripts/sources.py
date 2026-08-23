@@ -52,7 +52,9 @@ GEO_RADIUS = 3000               # metres
 NAME_RATIO = 0.88
 
 WH_BASE = "https://www.walkhighlands.co.uk"
-WH_PATH = {"scotland": "munros", "lakes": "wainwrights"}
+# Walkhighlands files the 2000ft hills of England and Wales under Hewitts.
+WH_PATH = {"scotland": "munros", "lakes": "wainwrights",
+           "snowdonia": "hewitts"}
 
 
 def fetch_json(url):

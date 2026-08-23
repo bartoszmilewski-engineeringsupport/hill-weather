@@ -1,0 +1,13 @@
+# Hill Weather
+
+User-agent: *
+Allow: /
+
+# The contact handler. Nothing to index, and no reason to crawl it.
+Disallow: /api/
+
+# /data/ is deliberately NOT blocked. The forecast is rendered in the browser
+# from those JSON files, so a crawler shut out of them would render an empty
+# page and index a site with no content on it.
+
+Sitemap: https://hillweather.co.uk/sitemap.xml
