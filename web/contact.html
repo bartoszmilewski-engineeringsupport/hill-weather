@@ -47,7 +47,7 @@ try {
                  text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   .field input, .field textarea {
     width: 100%; font: inherit; font-size: 17px; color: var(--ink);
-    background: #FFFDF9; border: 1px solid var(--rule); border-radius: 2px;
+    background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 2px;
     padding: 11px 12px; min-height: 44px;
   }
   .field textarea { min-height: 180px; resize: vertical; line-height: 1.55; }
@@ -56,13 +56,13 @@ try {
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   .submit { background: var(--ink); color: var(--paper); border: 0; border-radius: 2px;
             padding: 13px 30px; font-size: 16px; letter-spacing: .06em; min-height: 44px; }
-  .submit:hover { background: #443C34; }
+  .submit:hover { opacity: .86; }
   .submit:disabled { opacity: .55; cursor: default; }
   .note { margin-top: 14px; font-size: 15px; line-height: 1.6; }
   .note.bad { color: var(--incloud); }
   .note.good { color: var(--clear); }
   .aside h2 { font-weight: 400; font-size: clamp(19px, 2vw, 23px); margin: 0 0 10px; }
-  .aside p { font-size: 16px; line-height: 1.68; color: #3A342D; margin: 0 0 14px; }
+  .aside p { font-size: 16px; line-height: 1.68; color: var(--muted); margin: 0 0 14px; }
   .aside .box { border: 1px solid var(--rule); padding: 22px 24px; margin-top: 24px; }
   @media (max-width: 900px) { .contact { grid-template-columns: 1fr; } }
 
@@ -71,17 +71,17 @@ try {
   dialog#sent {
     border: 1px solid var(--ink); border-radius: 2px; padding: 0;
     background: var(--paper); color: var(--ink); max-width: 460px; width: calc(100% - 32px);
-    box-shadow: 0 18px 50px rgba(42, 37, 33, .22);
+    box-shadow: 0 18px 50px rgb(0 0 0 / .28);
   }
-  dialog#sent::backdrop { background: rgba(42, 37, 33, .42); }
+  dialog#sent::backdrop { background: rgb(0 0 0 / .5); }
   .sent-inner { padding: 34px 36px 30px; text-align: center; }
   .sent-inner h2 { font-weight: 400; font-size: 30px; margin: 14px 0 0; }
-  .sent-inner p { font-size: 16px; line-height: 1.62; color: #3A342D; margin: 12px 0 0; }
+  .sent-inner p { font-size: 16px; line-height: 1.62; color: var(--muted); margin: 12px 0 0; }
   .sent-rule { height: 1px; background: var(--rule); margin: 22px 0 0; }
   .sent-close { margin-top: 22px; background: var(--ink); color: var(--paper);
                 border: 0; border-radius: 2px; padding: 12px 34px; font-size: 16px;
                 letter-spacing: .06em; min-height: 44px; }
-  .sent-close:hover { background: #443C34; }
+  .sent-close:hover { opacity: .86; }
 </style>
 </head>
 <body>
@@ -166,9 +166,9 @@ try {
 <dialog id="sent" aria-labelledby="sent-title">
   <div class="sent-inner">
     <svg viewBox="0 0 64 48" width="64" height="48" aria-hidden="true">
-      <path d="M2 46 L24 12 L38 24 L52 6 L62 46 Z" fill="var(--relief)"
-            stroke="var(--relief-line)" stroke-width="1"></path>
-      <rect x="0" y="26" width="64" height="12" fill="var(--cloud)" opacity=".42"></rect>
+      <path d="M2 46 L24 12 L38 24 L52 6 L62 46 Z" fill="var(--glyph-hill)"
+            stroke="var(--glyph-hill-line)" stroke-width="1"></path>
+      <rect x="0" y="26" width="64" height="12" fill="var(--glyph-cloud)" opacity="var(--glyph-cloud-op)"></rect>
       <line x1="0" y1="26" x2="64" y2="26" stroke="#8C8175" stroke-width="1"
             stroke-dasharray="3 3"></line>
     </svg>
