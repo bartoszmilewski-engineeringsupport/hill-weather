@@ -146,6 +146,19 @@ def pipeline():
     shutil.rmtree(old, ignore_errors=True)
 
     log("build ok, swapped into web/data")
+
+    # The link preview reports the day it was built for, so it is regenerated
+    # after the swap, from the data now being served.
+    #
+    # This needs Pillow and a serif font, neither of which is in the stock
+    # python:3.12-alpine image, so out of the box it skips and the committed
+    # card stays. That is deliberate: the card carries its own date, so a stale
+    # preview is out of date but never wrong about the day it describes, and a
+    # nice-to-have is not worth risking the build over. To turn it on, see
+    # "Day-specific link preview" in docs/RUNBOOK.md.
+    if not run("og_image.py"):
+        log("link preview not regenerated, keeping the previous one")
+
     write_status(True, "ok")
     heartbeat(True, "build ok")
     return True

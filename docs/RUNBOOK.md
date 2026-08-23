@@ -341,6 +341,55 @@ docker compose exec scheduler python3 /app/scripts/archive.py --status
 
 ---
 
+## Day-specific link preview
+
+`scripts/og_image.py` draws `web/og.png`, the image that appears when the site
+is pasted into WhatsApp, Slack or a forum. It reads the built forecast and
+reports the actual day: "Above the cloud. 241 of 282 tops stand clear", rather
+than a fixed logo. Pasting the link into a walking group is the whole growth
+model, so this is worth more than it looks.
+
+The scheduler calls it after every successful build, but the stock
+`python:3.12-alpine` image has neither Pillow nor a serif font, so by default
+the step skips and the committed card stays in place. The log says
+`link preview not regenerated, keeping the previous one`. Nothing else is
+affected, and the card carries its own date, so a stale preview is out of date
+but never wrong about which day it describes.
+
+To turn it on, give the scheduler container the two things it needs:
+
+```yaml
+  scheduler:
+    image: python:3.12-alpine
+    command: ["sh", "-c",
+              "apk add --no-cache font-dejavu >/dev/null &&
+               pip install --no-cache-dir --quiet pillow &&
+               exec python3 /app/deploy/scheduler.py"]
+```
+
+Then recreate it. Remember that a changed command needs `--force-recreate`,
+because compose leaves a container alone when only its config text moved:
+
+```bash
+docker compose up -d --force-recreate scheduler
+```
+
+This adds a network fetch to every container start. If that is not wanted, the
+alternative is to run the script by hand after a design change and commit the
+result, which is how the card was maintained before:
+
+```bash
+python scripts/og_image.py
+```
+
+One caveat either way. Link scrapers cache the preview hard, and the URL stays
+`/og.png` on purpose, so a link already shared will keep showing whatever
+Facebook or WhatsApp fetched the first time. Giving the file a versioned URL
+would fix that and break every previously shared link instead, which is the
+worse trade.
+
+---
+
 ## Working from two machines
 
 Laptop and desktop both clone from GitHub. Generated data and the archive are
