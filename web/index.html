@@ -37,7 +37,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
-<link rel="stylesheet" href="style.css?v=15d4e680">
+<link rel="stylesheet" href="style.css?v=84c46fbb">
 </head>
 <body>
 
@@ -109,7 +109,7 @@ try {
   <div class="legend">
     <span><span class="c-clear">&#9679;</span>&nbsp;Clear &mdash; 70% and up</span>
     <span><span class="c-edge">&#9679;</span>&nbsp;On the edge &mdash; 40&ndash;69%</span>
-    <span><span class="c-cloud">&#9679;</span>&nbsp;In cloud &mdash; under 40%</span>
+    <span><span class="c-incloud">&#9679;</span>&nbsp;In cloud &mdash; under 40%</span>
     <span class="tip">tap any hill for routes, sun times and the hour-by-hour</span>
   </div>
 
@@ -154,7 +154,7 @@ try {
   </div>
 </footer>
 
-<script src="glyph.js"></script>
+<script src="glyph.js?v=af2de428"></script>
 <script>
 /* Board 2a. Everything renders from the prebuilt summary JSON; a hill's full
    detail is fetched only when it is opened. State is deliberately tiny:
@@ -164,11 +164,21 @@ const DATA = 'data/';
 const SHOWN_PER_BAND = 9;
 const detailCache = {};
 
-const band = v => v >= 70 ? 'c-clear' : v >= 40 ? 'c-edge' : 'c-cloud';
+const band = v => v >= 70 ? 'c-clear' : v >= 40 ? 'c-edge' : 'c-incloud';
 const hhmm = iso => iso ? iso.slice(11, 16) : '-';
 const compass = d => d == null ? '' :
   ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d / 22.5) % 16];
 const metres = m => m == null ? '-' : m.toLocaleString('en-GB') + ' m';
+const escapeXML = s => String(s).replace(/[&<>"]/g, c =>
+  ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const verdictColour = s => s.verdict === 'ABOVE CLOUD' ? 'above'
+  : s.view_pct >= 70 ? 'clear' : s.view_pct >= 40 ? 'edge' : 'incloud';
+
+/* True when the summit stands above the top of the cloud rather than under its
+   base: an inversion, drawn the other way up. Tested on the numbers, not the
+   verdict label, because JUST ABOVE? is the same geometry with less confidence. */
+const aboveDeck = (h, s) => s.cloud_top != null && s.cloud_base != null &&
+  h.height > s.cloud_top;
 
 const REMEMBERED = 'hw.region';
 const remembered = () => { try { return localStorage.getItem(REMEMBERED); } catch (e) { return null; } };
@@ -271,13 +281,15 @@ function chips(id, items, get, set) {
 /* ----------------------------------------------------------------- render -- */
 
 function phrase(h, s) {
-  if (s.cloud_base == null) return `${h.height} m &middot; no low cloud about`;
+  if (s.cloud_base == null) return `${metres(h.height)} &middot; no low cloud about`;
   const gap = s.cloud_base - h.height;
-  if (s.verdict === 'ABOVE CLOUD' && s.cloud_top != null)
-    return `${h.height} m &middot; ${Math.round(h.height - s.cloud_top)} m above the deck`;
-  if (gap > 60) return `${h.height} m &middot; ${Math.round(gap)} m below cloud`;
-  if (gap < -60) return `${h.height} m &middot; well inside`;
-  return `${h.height} m &middot; in and out`;
+  if (aboveDeck(h, s))
+    return `${metres(h.height)} &middot; ${Math.round(h.height - s.cloud_top)} m above the deck`;
+  // The same 100 m window physics.py uses for ON THE EDGE, so the row can never
+  // read "well inside" under a verdict that says the summit is in and out of it.
+  if (gap > 100) return `${metres(h.height)} &middot; ${Math.round(gap)} m below cloud`;
+  if (gap < -100) return `${metres(h.height)} &middot; ${Math.round(-gap)} m inside`;
+  return `${metres(h.height)} &middot; in and out`;
 }
 
 function hillRow(h, s, scale, grid) {
@@ -285,10 +297,10 @@ function hillRow(h, s, scale, grid) {
   btn.type = 'button';
   btn.className = 'hill';
   btn.innerHTML =
-    hillGlyph(h.name, h.height, s.cloud_base, scale, s.verdict === 'ABOVE CLOUD') +
+    hillGlyph(h.name, h.height, s.cloud_base, scale, aboveDeck(h, s)) +
     `<span><span class="hill-name">${h.name}</span>` +
     `<span class="hill-meta" style="display:block">${phrase(h, s)}</span></span>` +
-    `<span class="hill-pct ${s.verdict === 'ABOVE CLOUD' ? 'c-above' : band(s.view_pct)}">${s.view_pct}%</span>`;
+    `<span class="hill-pct c-${verdictColour(s)}">${s.view_pct}%</span>`;
 
   const holder = document.createElement('div');
   holder.className = 'detail';
@@ -430,8 +442,8 @@ function openPinned() {
 function facts(h) {
   const rows = [];
   if (h.lists && h.lists.length) rows.push(['Lists', h.lists.join(', ')]);
-  rows.push(['Height', `${h.height} m` + (h.prominence != null
-    ? ` <small style="color:var(--faint)">(${h.prominence} m of drop)</small>` : '')]);
+  rows.push(['Height', `${metres(h.height)}` + (h.prominence != null
+    ? ` <small>(${h.prominence} m of drop)</small>` : '')]);
   if (h.area) rows.push(['Area', h.area]);
   if (h.county) rows.push(['County', h.county + (h.country ? ', ' + h.country : '')]);
   if (h.grid_ref) rows.push(['Grid ref', h.grid_ref]);
@@ -442,52 +454,173 @@ function facts(h) {
   return rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
 }
 
+/* The hill drawn large and annotated: 700 by 170, with the cloud layer, a
+   labelled summit and the headroom either way. Board 2c.
+
+   It reuses hillRidge deliberately. A hill that looked one shape in the list
+   must not look like a different mountain when it is opened. */
+function sectionSVG(h, s, scale) {
+  const G = 158, TOP = 6, k = 140 / scale;
+  const at = m => Math.min(G - 4, Math.max(TOP, +(G - m * k).toFixed(1)));
+  const ay = Math.min(G - 22, Math.max(TOP + 18, +(G - h.height * k).toFixed(1)));
+  const pts = hillRidge(h.name, ay, G, 30, 670);
+  const apex = pts.split(' ')[3].split(',').map(Number);
+  const inv = aboveDeck(h, s);
+  const deck = inv ? s.cloud_top : s.cloud_base;
+
+  let layer = '', deckLabel = '', by = null;
+  if (deck != null) {
+    by = at(deck);
+    const th = inv ? G - by : by - TOP;
+    if (th > 0)
+      layer =
+        `<rect x="0" y="${inv ? by : TOP}" width="700" height="${th.toFixed(1)}" ` +
+        `fill="var(--glyph-cloud)" opacity="var(--glyph-cloud-op)"></rect>`;
+    layer += `<line x1="0" y1="${by}" x2="700" y2="${by}" stroke="var(--faint)" ` +
+      `stroke-width="0.9" stroke-dasharray="4 4"></line>`;
+    // The label goes under the line, or above it when the line sits near the floor.
+    const ly = by + 16 > G - 4 ? by - 7 : by + 16;
+    deckLabel = `<text x="6" y="${ly.toFixed(1)}" font-size="13" font-style="italic" ` +
+      `fill="var(--faint)">cloud ${inv ? 'top' : 'base'} about ` +
+      `${deck.toLocaleString('en-GB')} m</text>`;
+  }
+
+  // The summit label sits beside the apex and the headroom note at the far
+  // side, so the two never collide however the ridge happens to fall.
+  const right = apex[0] <= 380;
+
+  /* DoBIH names subsidiary tops as "Parent - Top". Spelled out in full and
+     letter-spaced, one of those runs most of the width of the box and lands on
+     the cloud caption. The parent name is the heading directly above the
+     drawing, so the top's own name carries enough here, and the height goes
+     only if the whole line still fits. */
+  let name = h.name;
+  if (name.length > 22 && name.includes(' - ')) name = name.split(' - ').pop();
+  const ht = h.height.toLocaleString('en-GB');
+  const summitText = escapeXML(name.toUpperCase()) +
+    (name.length + ht.length + 4 <= 30 ? ` &#183; ${ht} M` : '');
+
+  const summit =
+    `<circle cx="${apex[0]}" cy="${apex[1]}" r="3" fill="var(--ink)"></circle>` +
+    `<text x="${right ? apex[0] + 13 : apex[0] - 13}" y="${(apex[1] + 5).toFixed(1)}" ` +
+    `text-anchor="${right ? 'start' : 'end'}" font-size="13" letter-spacing="1.5" ` +
+    `fill="var(--ink)">${summitText}</text>`;
+
+  const gapText = deck == null ? 'no low cloud about'
+    : inv ? `${Math.round(h.height - s.cloud_top)} m above the deck`
+    : s.cloud_base - h.height > 0 ? `${Math.round(s.cloud_base - h.height)} m of headroom`
+    : `${Math.round(h.height - s.cloud_base)} m inside`;
+  const note = `<text x="${right ? apex[0] + 13 : apex[0] - 13}" ` +
+    `y="${Math.min(G - 6, apex[1] + 22).toFixed(1)}" ` +
+    `text-anchor="${right ? 'start' : 'end'}" font-size="13" font-style="italic" ` +
+    `fill="var(--${verdictColour(s)})">${gapText}</text>`;
+
+  return `<svg class="section" viewBox="0 0 700 170" role="img" aria-label="${
+      escapeXML(h.name)}, ${h.height} m, with ${deck == null ? 'no low cloud'
+      : `cloud ${inv ? 'top' : 'base'} at ${deck} m`}">` +
+    `<polygon points="${pts}" fill="var(--glyph-hill)" stroke="var(--ink)" ` +
+    `stroke-width="1.2"></polygon>${layer}${summit}${deckLabel}${note}` +
+    `<line x1="0" y1="${G}" x2="700" y2="${G}" stroke="var(--ink)" ` +
+    `stroke-width="1"></line></svg>`;
+}
+
+/* The sentence under the percentage. It says in words what the drawing says in
+   shapes, and names the best hour when one hour is clearly better than the day
+   as a whole, because that is the difference between going and not going. */
+function elaborate(h, s, hours) {
+  const parts = [];
+  if (s.cloud_base == null) {
+    parts.push('There is no low cloud in the profile at all today');
+  } else if (aboveDeck(h, s)) {
+    const clear = Math.round(h.height - s.cloud_top);
+    parts.push(s.verdict === 'JUST ABOVE?'
+      ? `The summit comes out about ${clear} m above the top of the cloud, which is
+         inside the model's own margin of error, so it could go either way`
+      : `The summit stands about ${clear} m above the top of the deck, with cloud
+         filling the ground below`);
+  } else if (s.cloud_base > h.height) {
+    parts.push(`Cloud base sits about ${Math.round(s.cloud_base - h.height)} m above the
+      summit, so the top should stay under a ceiling rather than in it`);
+  } else {
+    parts.push(`The summit sits about ${Math.round(h.height - s.cloud_base)} m
+      inside the layer`);
+  }
+  const best = hours.reduce((a, x) => !a || x.view_pct > a.view_pct ? x : a, null);
+  if (best && best.view_pct - s.view_pct >= 15)
+    parts.push(`the best of it is around ${best.t.slice(11, 16)}, at ${best.view_pct}%`);
+  return (parts.join('; ') + '.').replace(/\s+/g, ' ');
+}
+
 function detailHTML(h) {
   const sun = h.sun[state.day] || {};
   const s = h.daily[state.day] || {};
+  const scale = state.data[state.region].meta.scale || 1600;
   const hrs = h.hours.filter(x => x.t.startsWith(state.day) &&
     +x.t.slice(11, 13) >= 6 && +x.t.slice(11, 13) <= 20 && +x.t.slice(11, 13) % 2 === 0);
-  const cls = s.verdict === 'ABOVE CLOUD' ? 'c-above' : band(s.view_pct || 0);
+  const cls = 'c-' + verdictColour(s);
   const said = {
-    'ABOVE CLOUD': 'standing clear above the deck.',
+    'ABOVE CLOUD': 'above the cloud.',
+    'JUST ABOVE?': 'on top of the cloud, or just in it.',
     'CLEAR': 'clear of the cloud.',
     'ON THE EDGE': 'in and out of it all day.',
     'IN CLOUD': 'in cloud all day.',
-  }[s.verdict] || '';
+  }[s.verdict] || 'the chance of a view.';
+
+  // Both ends of the golden hour, because half the audience is here for the light.
+  const golden = [
+    sun.sunrise && sun.golden_morning_end
+      ? `${hhmm(sun.sunrise)}&ndash;${hhmm(sun.golden_morning_end)}` : null,
+    sun.golden_evening_start && sun.sunset
+      ? `${hhmm(sun.golden_evening_start)}&ndash;${hhmm(sun.sunset)}` : null,
+  ].filter(Boolean).join(' &middot; ');
 
   return `<div class="detail-inner">
-    <div>
-      <h4>${h.name}</h4>
-      ${h.alt ? `<div class="gaelic">${h.alt}</div>` : ''}
-      <dl>${facts(h)}</dl>
-      <div class="links">
-        <a href="https://www.openstreetmap.org/?mlat=${h.lat}&amp;mlon=${h.lon}#map=14/${h.lat}/${h.lon}"
-           target="_blank" rel="noopener">Map</a>
-        ${h.walkhighlands ? `<a href="${h.walkhighlands}" target="_blank" rel="noopener">Routes on Walkhighlands</a>` : ''}
-        ${h.url ? `<a href="${h.url}" target="_blank" rel="noopener">Hill-bagging</a>` : ''}
+    <div class="entry-head">
+      ${hillGlyph(h.name, h.height, s.cloud_base, scale, aboveDeck(h, s))}
+      <div>
+        <div class="entry-name">${h.name}</div>
+        <div class="entry-meta">${phrase(h, s)}</div>
       </div>
-      <dl style="margin-top:18px">
-        <div><dt>Sunrise</dt><dd>${hhmm(sun.sunrise)} <small style="color:var(--faint)">${compass(sun.sunrise_azimuth)}</small></dd></div>
-        <div><dt>Sunset</dt><dd>${hhmm(sun.sunset)} <small style="color:var(--faint)">${compass(sun.sunset_azimuth)}</small></dd></div>
-        <div><dt>Daylight</dt><dd>${sun.daylight_hours ?? '-'} hours</dd></div>
-      </dl>
+      <div class="entry-pct ${cls}">${s.view_pct}%</div>
     </div>
-    <div>
-      <p class="verdict"><span class="${cls}">${s.view_pct}%</span> &mdash; <em>${said}</em></p>
-      ${h.wikipedia ? `<p class="wiki">${h.wikipedia.extract}</p>
-        <div class="wiki-credit">From <a href="${h.wikipedia.url}" target="_blank" rel="noopener">Wikipedia</a>,
-        <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></div>` : ''}
-      <table>
-        <tr><th>Hour</th><th>View</th><th>Cloud</th><th>Temp</th><th>Wind</th></tr>
-        ${hrs.map(x => `<tr>
-          <td>${x.t.slice(11, 16)}</td>
-          <td class="${band(x.view_pct)}">${x.view_pct}%</td>
-          <td>${x.cloud_base == null ? 'none'
-             : `${x.cloud_base}${x.cloud_top ? '&ndash;' + x.cloud_top : ''} m`}${x.uncertain ? ' ?' : ''}</td>
-          <td>${x.temp ?? '-'}&deg;</td>
-          <td>${x.wind ?? '-'} ${compass(x.wind_dir)}</td>
-        </tr>`).join('')}
-      </table>
+    <div class="rule-2"></div>
+    <div class="entry-body">
+      <div>
+        <h4>${h.name}</h4>
+        ${h.alt ? `<div class="gaelic">${h.alt}</div>` : ''}
+        <dl>${facts(h)}</dl>
+        <div class="links">
+          <a href="https://www.openstreetmap.org/?mlat=${h.lat}&amp;mlon=${h.lon}#map=14/${h.lat}/${h.lon}"
+             target="_blank" rel="noopener">Map</a>
+          ${h.walkhighlands ? `<a href="${h.walkhighlands}" target="_blank" rel="noopener">Routes on Walkhighlands</a>` : ''}
+          ${h.url ? `<a href="${h.url}" target="_blank" rel="noopener">Hill-bagging</a>` : ''}
+        </div>
+        <dl class="sun">
+          <div><dt>Sunrise</dt><dd>${hhmm(sun.sunrise)} <small>${compass(sun.sunrise_azimuth)}</small></dd></div>
+          <div><dt>Sunset</dt><dd>${hhmm(sun.sunset)} <small>${compass(sun.sunset_azimuth)}</small></dd></div>
+          ${golden ? `<div><dt>Golden hour</dt><dd>${golden}</dd></div>` : ''}
+          <div><dt>Daylight</dt><dd>${sun.daylight_hours ?? '-'} hours</dd></div>
+        </dl>
+      </div>
+      <div>
+        <p class="verdict"><span class="${cls}">${s.view_pct}% &mdash; ${said}</span>
+          <em>${elaborate(h, s, hrs)}</em></p>
+        ${sectionSVG(h, s, scale)}
+        ${h.wikipedia ? `<p class="wiki">${h.wikipedia.extract}</p>
+          <div class="wiki-credit">From <a href="${h.wikipedia.url}" target="_blank" rel="noopener">Wikipedia</a>,
+          <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a></div>` : ''}
+        <table>
+          <tr><th>Hour</th><th>View</th><th>Cloud</th><th>Temp</th><th>Wind</th></tr>
+          ${hrs.map(x => `<tr>
+            <td>${x.t.slice(11, 16)}</td>
+            <td class="${band(x.view_pct)}">${x.view_pct}%</td>
+            <td class="soft">${x.cloud_base == null ? 'none'
+               : `${x.cloud_base}${x.cloud_top ? '&ndash;' + x.cloud_top : ''} m`}${x.uncertain ? ' ?' : ''}</td>
+            <td>${x.temp ?? '-'}&deg;</td>
+            <td class="soft">${x.wind ?? '-'} ${compass(x.wind_dir)}</td>
+          </tr>`).join('')}
+        </table>
+      </div>
     </div>
   </div>`;
 }

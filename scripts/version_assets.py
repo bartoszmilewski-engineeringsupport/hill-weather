@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 WEB = ROOT / "web"
-ASSETS = ["style.css", "theme.js", "share.js"]
+ASSETS = ["style.css", "glyph.js", "theme.js", "share.js"]
 PAGES = ["index.html", "how-to-read.html", "contact.html"]
 
 

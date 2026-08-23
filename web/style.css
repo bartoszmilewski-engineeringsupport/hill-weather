@@ -215,7 +215,7 @@ nav .links { display: flex; gap: clamp(16px, 2.4vw, 30px); flex-wrap: wrap;
 .hill-pct { font-size: clamp(21px, 2vw, 26px); font-variant-numeric: tabular-nums; }
 .c-clear { color: var(--clear); }
 .c-edge { color: var(--edge); }
-.c-cloud { color: var(--incloud); }
+.c-incloud { color: var(--incloud); }
 .c-above { color: var(--above); }
 
 /* The dense tier: the rest of the band as a readable run rather than a flat
@@ -231,28 +231,56 @@ nav .links { display: flex; gap: clamp(16px, 2.4vw, 30px); flex-wrap: wrap;
 
 .detail { grid-column: 1 / -1; }
 .detail-inner { background: var(--paper-raised); border-top: 1px solid var(--ink);
-                border-bottom: 1px solid var(--ink); padding: 22px 0 26px;
-                display: grid; grid-template-columns: 380px minmax(0, 1fr);
-                gap: clamp(20px, 4vw, 72px); }
-.detail h4 { margin: 0; font-weight: 400; font-size: clamp(24px, 2.6vw, 36px); }
-.detail .gaelic { font-size: 17px; font-style: italic; color: var(--muted); }
-.detail dl { margin: 16px 0 0; }
+                border-bottom: 1px solid var(--ink); padding: 18px 0 30px; }
+
+/* The tapped row, repeated full width at the head of the entry. On a phone the
+   entry can open well below the row it came from, so it has to name itself. */
+.entry-head { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto;
+              gap: 18px; align-items: center; padding: 4px 0 12px; }
+.entry-head svg { display: block; }
+.entry-name { font-size: clamp(20px, 1.9vw, 24px); }
+.entry-meta { font-size: 14px; font-style: italic; color: var(--faint); }
+.entry-pct { font-size: clamp(24px, 2.4vw, 30px); font-variant-numeric: tabular-nums; }
+
+.entry-body { display: grid; grid-template-columns: 380px minmax(0, 1fr);
+              gap: clamp(20px, 4vw, 72px); align-items: start; padding-top: 26px; }
+.detail h4 { margin: 0; font-weight: 400; line-height: 1.1;
+             font-size: clamp(24px, 2.6vw, 36px); }
+.detail .gaelic { font-size: 17px; font-style: italic; color: var(--muted);
+                  margin-top: 4px; }
+.detail dl { margin: 20px 0 0; }
+.detail dl.sun { margin-top: 22px; }
 .detail dl > div { display: flex; justify-content: space-between; gap: 16px;
-                   padding: 7px 0; border-bottom: 1px solid var(--hair); }
-.detail dt { color: var(--muted); flex: none; font-size: 15px; }
-.detail dd { margin: 0; text-align: right; font-size: 15px; }
-.detail .links { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px;
+                   align-items: baseline; padding: 10px 0;
+                   border-top: 1px solid var(--hair); }
+.detail dl > div:last-child { border-bottom: 1px solid var(--hair); }
+.detail dt { color: var(--muted); flex: none; font-size: 15.5px; }
+.detail dd { margin: 0; text-align: right; font-size: 16px; }
+.detail dd small { font-size: 13.5px; color: var(--faint); }
+.detail .links { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 16px;
                  font-size: 15px; }
-.verdict { font-size: clamp(18px, 1.9vw, 23px); }
+
+.verdict { font-size: 18px; margin: 0; text-wrap: pretty; }
+.verdict > span { font-weight: 600; }
 .verdict em { color: var(--muted); }
-.wiki { font-size: 17px; line-height: 1.65; margin: 18px 0 0; text-wrap: pretty; }
-.wiki-credit { font-size: 12.5px; color: var(--faint); margin-top: 8px; }
+
+/* The annotated section. Height is bounded because the drawing is an aside to
+   the verdict, not the point of the page. */
+.section { display: block; width: 100%; max-width: 700px; height: auto;
+           margin-top: 16px; }
+.section text { font-family: "Newsreader", Georgia, serif; }
+
+.wiki { font-size: 17px; line-height: 1.65; margin: 18px 0 0; max-width: 66ch;
+        text-wrap: pretty; }
+.wiki-credit { font-size: 13.5px; color: var(--faint); margin-top: 8px; }
 table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums;
-        margin-top: 18px; }
-th { text-align: left; font-weight: 400; font-size: 12.5px; letter-spacing: .14em;
-     text-transform: uppercase; color: var(--faint); padding: 0 8px 6px 0;
+        margin-top: 24px; }
+th { text-align: left; font-weight: 400; font-size: 12.5px; letter-spacing: .16em;
+     text-transform: uppercase; color: var(--faint); padding: 0 16px 8px 0;
      border-bottom: 1px solid var(--rule); }
-td { padding: 5px 8px 5px 0; font-size: 16px; border-bottom: 1px solid var(--hair); }
+td { padding: 8px 16px 8px 0; font-size: 16px; border-bottom: 1px solid var(--hair); }
+td.soft { color: var(--muted); }
+th:last-child, td:last-child { padding-right: 0; }
 
 /* ---------------------------------------------------------------- footer -- */
 
@@ -289,7 +317,7 @@ footer { padding-top: clamp(28px, 3.4vw, 44px); }
 @media (max-width: 860px) {
   .lede { grid-template-columns: 1fr; padding-top: 16px; gap: 16px; }
   .hills { grid-template-columns: 1fr; }
-  .detail-inner { grid-template-columns: 1fr; }
+  .entry-body { grid-template-columns: 1fr; padding-top: 18px; }
   .footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   /* Board 2e trims the lede hard, and the same trim is needed on a tablet:
@@ -310,6 +338,11 @@ footer { padding-top: clamp(28px, 3.4vw, 44px); }
    boxed and prominent, and the first hill lands about half a screen down. */
 @media (max-width: 620px) {
   body { font-size: 16px; }
+  /* Scaled to phone width the section drawing is about 340 px across, which
+     puts its 13 px labels at roughly six. Every one of them repeats something
+     the entry head or the verdict sentence has already said in words, so the
+     silhouette stays and the lettering goes. */
+  .section text { display: none; }
   .masthead { padding-top: 12px; }
   .masthead-top { font-size: 10.5px; letter-spacing: .16em; }
   .masthead-top span + span { display: none; }

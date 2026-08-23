@@ -4,7 +4,13 @@
     {
       "name": "hill-weather",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8000"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8000",
+        "-d",
+        "C:\\dev\\hill-weather\\web"
+      ],
       "port": 8000
     }
   ]

@@ -39,6 +39,11 @@
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   }
 
+  /* Exposed so the expanded entry can draw the same hill large, with the same
+     silhouette. A hill that looked one way in the list must not look like a
+     different mountain when opened. */
+  window.hillRidge = ridge;
+
   /* h: height m. cloudBase / cloudTop: m or null. scale: region max m.
      inversion: the cloud fills the valley below the summit instead. */
   window.hillGlyph = function (name, h, cloudBase, scale, inversion) {
