@@ -4,10 +4,43 @@ Cloud base and inversion forecasts for British hills. The one question no
 mainstream weather app answers: **will I be in the cloud, above it, or clear?**
 
 Live at **[hillweather.co.uk](https://hillweather.co.uk)**. Free,
-non-commercial, no ads, no accounts. Covers all 282 Munros and 214 Wainwrights.
+non-commercial, no ads, no accounts. Covers all 282 Munros, all 214
+Wainwrights and the 50 Hewitts of Snowdonia.
 
 **Status: unvalidated.** The physics is defensible but has not yet been checked
 against observations. See [Validation](#validation).
+
+---
+
+## What it looks like
+
+The forecast opens with a paragraph written from the numbers rather than a wall
+of percentages, then hills grouped by height band. Light and dark are the same
+design inverted, not two designs.
+
+| | |
+|---|---|
+| ![The forecast, light](docs/screenshots/forecast-light.png) | ![The forecast, dark](docs/screenshots/forecast-dark.png) |
+
+**The week ahead**, which answers the question most weeks actually turn on:
+not which hill, but which day.
+
+![The week ahead](docs/screenshots/week-light.png)
+
+**How to read this**, the explainer.
+
+![How to read this](docs/screenshots/guide-light.png)
+
+On a phone the lede trims to the headline and the at-a-glance figures, and the
+hills go to one column.
+
+<p>
+  <img src="docs/screenshots/phone-light.png" alt="Phone, light" width="300">
+  <img src="docs/screenshots/phone-dark.png" alt="Phone, dark" width="300">
+</p>
+
+Screenshots are of the live site and are regenerated with
+`python scripts/screenshots.py`.
 
 ---
 
@@ -38,7 +71,7 @@ Open-Meteo (UK Met Office 2 km, pressure levels)
         +--> archive.py   raw responses, gzipped, kept forever  -> archive/
         |                 ~40 validation hills, all 75 variables
         |
-        +--> build.py     all 496 hills, minimal variables
+        +--> build.py     all 546 hills, minimal variables
                  |
                  +--> physics.py   cloud base, inversion, light scores
                  +--> solar.py     sunrise/sunset, golden hour, sun azimuth
@@ -76,7 +109,7 @@ Python 3.9+, standard library only. No dependencies, no install step.
 ```bash
 python scripts/hills.py                  # check the hill lists load
 python scripts/archive.py                # collect a validation snapshot
-python scripts/build.py                  # live build, all 496 hills (~7 min)
+python scripts/build.py                  # live build, all 546 hills (~8 min)
 python scripts/archive.py --status       # how much history exists
 ```
 

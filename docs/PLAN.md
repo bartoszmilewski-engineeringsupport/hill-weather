@@ -26,9 +26,11 @@ Last updated 2026-08-22 (end of day).
 | 6. Android, then iOS | Not started |
 
 Live at **hillweather.co.uk** on the IONOS VPS at `/opt/hillweather`, serving
-282 Munros and 214 Wainwrights, rebuilding twice daily behind Cloudflare.
+282 Munros, 214 Wainwrights and the 50 Hewitts of Snowdonia, rebuilding twice
+daily behind Cloudflare.
 
-Three pages: the forecast, **How to read this**, and **Contact**.
+Four pages: the forecast, **The week ahead**, **How to read this** and
+**Contact**, plus a 404.
 
 ---
 
@@ -47,7 +49,10 @@ Three pages: the forecast, **How to read this**, and **Contact**.
 
 ## Phase 1: Data pipeline (done)
 
-- [x] All 496 hills from DoBIH, region-aware from the first commit.
+- [x] All 546 hills from DoBIH, region-aware from the first commit. A region
+      is a list column plus an optional `where` predicate, because Hewitts
+      run the length of England and Wales and membership alone would have
+      pulled in the Pennines with Snowdonia.
 - [x] Batched requests, 25 locations each, with backoff on 429.
 - [x] Ephemeris: sunrise, sunset, golden and blue hour, sun azimuth. Validated
       to within a minute against an independent source.
@@ -157,9 +162,10 @@ where a map might go, and why it waits for validation.
 
 ## Regions
 
-Scotland (Munros) and the Lake District (Wainwrights) are both built and
-served. The Lakes were expected to be a later expansion but cost almost nothing
-to add, and three things make them more than extra coverage:
+Scotland (Munros), the Lake District (Wainwrights) and Snowdonia (Hewitts of
+DoBIH region 30B) are built and served: 546 hills. The Lakes were expected to
+be a later expansion but cost almost nothing to add, and three things make
+them more than extra coverage:
 
 - **Better resolved.** Lakeland tops sit where model pressure levels are about
   215 m apart, not the 466 m gap between 900 and 850 hPa where Munro summits
@@ -169,9 +175,26 @@ to add, and three things make them more than extra coverage:
 - **Bigger audience.** 214 Wainwrights within reach of Manchester, Leeds,
   Newcastle and Glasgow.
 
+**Snowdonia**, added 2026-08-23, is the strongest case of the three for what
+this site does. The 2 km grid smooths **155 m** off Cadair Idris against about
+60 m off Ben Nevis, because Welsh peaks are sharper and more isolated, so
+reading the profile at true summit height matters more there rather than less.
+Coverage came out at 96% Wikipedia and 96% route links, better than either
+existing region: Walkhighlands files the 2000 ft hills of England and Wales
+under `/hewitts/`, and the slug guesser already tried both halves of a
+compound name, so `Snowdon - Yr Wyddfa` resolves without special-casing.
+
 **Still launch one region at a time.** "UK hills" reads generic; one region done
 properly reads local. Scotland first, Lakes as the second announcement, even
-though both are already built.
+though all three are already built.
+
+### What fits next
+
+API cost scales with hills, so the question for any new region is budget.
+Scottish **Corbetts** (222, 762 to 914 m) would take the site to 768 hills and
+fit; **Grahams** on top (231 more) would not leave enough margin. All Welsh
+Hewitts is 136, and English Hewitts outside the Lakes is 65, which together
+with the existing lists would make a national service of about 697.
 
 SAIS avalanche data is Scotland only and does not extend.
 
@@ -209,6 +232,16 @@ Each of these cost real time and each looks like something it is not.
    hourly API budget and everything failed for an hour after.
 5. **A silent build is usually a backoff, not a hang.** Check with
    `docker compose exec scheduler ps` before assuming the worst.
+6. **The API limit that bites is per minute, not per hour.** A build two hours
+   after the previous one still hit a 429 on its first request, because the
+   archive stage finishes and the build stage starts seven seconds later,
+   firing 25-hill chunks a second apart behind the heaviest requests the site
+   makes. The fix is pacing, not fewer hills, which is why adding regions is
+   cheaper than it looks.
+7. **An SPA fallback in nginx is a soft 404.** `try_files ... /index.html`
+   returned the whole site with HTTP 200 for every address that does not
+   exist, which search engines read as unlimited duplicate pages. The site
+   routes on the URL hash and never on the path, so it bought nothing.
 
 When something looks wrong in the browser, check what is actually being served
 before trusting local rendering. One curl settles it.

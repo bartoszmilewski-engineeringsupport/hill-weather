@@ -308,6 +308,25 @@ leave the site stale until the next slot.
 hourly API budget and every build after that failed for an hour. If a rebuild
 is fighting the limit, the 05:15 run will do it with a fresh budget.
 
+**A 429 on the first request of a build is normal, and is about pacing rather
+than volume.** The archive stage finishes and the build stage starts about
+seven seconds later, firing 25-hill chunks a second apart directly behind the
+heaviest requests the site makes: the archive asks for all 75 variables while
+the forecast needs only 46. A build two hours after the previous one has been
+seen to hit a 429 immediately for this reason. `omfetch.py` backs off 60s, then
+120, 240, 480, 600, 600, so it has about thirty-five minutes of patience.
+Leave it alone. Starting a second build is what turns a recoverable backoff
+into an hour of failures.
+
+This is also why adding regions is cheaper than it looks: the binding limit is
+requests per minute, not hills per build.
+
+**A new region does not appear until a build has run.** The code ships with
+`git pull`, but the site can only show regions that have data files, and
+`data/index.json` is the file listing which exist. It is cached for thirty
+minutes, so purge Cloudflare after the build or the old region list keeps
+being served and it looks as though the deploy failed.
+
 Update after a `git push` from the laptop or desktop:
 
 ```bash
@@ -387,6 +406,29 @@ One caveat either way. Link scrapers cache the preview hard, and the URL stays
 Facebook or WhatsApp fetched the first time. Giving the file a versioned URL
 would fix that and break every previously shared link instead, which is the
 worse trade.
+
+---
+
+## Crawler files
+
+`sitemap.xml` and `robots.txt` are **generated**, by `scripts/sitemap.py`, and
+regenerated on every build. Editing either by hand loses the change at 05:15.
+
+Page URLs come from each page's own `<link rel="canonical">`, so the sitemap
+cannot drift from what the pages claim about themselves. `lastmod` is the
+forecast build date for the two pages that render the forecast and the file's
+git commit date for the ones that do not, which is deliberate: claiming
+everything changed today is a good way to be demoted.
+
+`robots.txt` does **not** block `/data/`, and must not. The forecast is
+rendered in the browser from those JSON files, so a crawler shut out of them
+would render an empty page and index a site with no content on it.
+
+`nginx.conf` serves a real 404 from `web/404.html`. It used to fall back to
+`/index.html`, which returned the whole site with HTTP 200 for every address
+that does not exist; search engines read that as an unlimited supply of
+duplicate pages. The site routes on the URL hash and never on the path, so the
+fallback was buying nothing.
 
 ---
 
