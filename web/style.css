@@ -323,6 +323,56 @@ th:last-child, td:last-child { padding-right: 0; }
 .legend .l-above { display: none; }
 .legend-inv .l-above { display: inline; }
 
+/* ----------------------------------------------------------------- guide -- */
+
+/* Board 2f, the explainer page. These rules used to live in a <style> block on
+   that page, where they hardcoded three ink colours and referenced tokens the
+   2a rewrite had removed: the three scene drawings were filling black and the
+   body copy was near invisible in dark. Moving them here puts the whole design
+   system in one file, on tokens. */
+.masthead-main.compact { padding: clamp(12px, 1.6vw, 18px) 0 clamp(10px, 1.3vw, 15px); }
+.masthead-main.compact h1 { font-size: clamp(24px, 3vw, 36px); }
+.masthead-main.compact .tagline { font-size: clamp(8.5px, .9vw, 12.5px); }
+
+.spaced { margin-top: clamp(26px, 3.2vw, 36px); }
+h3.spaced { margin-top: clamp(24px, 2.8vw, 32px); }
+.section-head { font-weight: 400; font-size: clamp(15px, 1.6vw, 17px);
+                letter-spacing: .22em; text-transform: uppercase; margin: 0 0 8px; }
+
+.guide-lede { padding-top: clamp(24px, 3.2vw, 34px); max-width: 74ch; }
+.guide-lede h2 { margin: 0; font-weight: 500; line-height: 1.1;
+                 font-size: clamp(30px, 4vw, 44px); text-wrap: pretty; }
+.guide-lede p { font-size: clamp(16px, 1.6vw, 18px); line-height: 1.65;
+                margin: 14px 0 0; text-wrap: pretty; }
+.guide-lede p.soft { color: var(--muted); margin-top: 12px; }
+
+.scenes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: clamp(20px, 3vw, 40px); padding-top: 24px; }
+.scenes svg { display: block; width: 100%; height: auto; }
+.scene-name { font-size: 13px; letter-spacing: .18em; text-transform: uppercase;
+              font-weight: 600; margin-top: 12px; }
+.scenes p { font-size: 15.5px; line-height: 1.55; color: var(--muted);
+            margin: 5px 0 0; text-wrap: pretty; }
+
+.guide-cols { display: grid; grid-template-columns: 1fr 1fr;
+              gap: clamp(24px, 4vw, 56px); padding-top: 22px; }
+.guide-cols h3 { margin: 0 0 10px; font-weight: 600; font-size: 13px;
+                 letter-spacing: .2em; text-transform: uppercase; }
+.guide-cols p { font-size: clamp(15.5px, 1.5vw, 16.5px); line-height: 1.62;
+                color: var(--muted); margin: 0 0 12px; text-wrap: pretty; }
+.caveat { border: 1px solid var(--rule); padding: 14px 18px; margin-top: 16px;
+          font-size: 15px; line-height: 1.6; font-style: italic; color: var(--muted); }
+
+.glossary { padding-top: clamp(28px, 3.6vw, 36px); }
+.terms { display: grid; grid-template-columns: 1fr 1fr; gap: 0 clamp(24px, 4vw, 56px);
+         margin: 0; }
+.terms > div { padding: 10px 0; border-bottom: 1px solid var(--hair);
+               font-size: 15.5px; line-height: 1.55; }
+.terms dt { display: inline; font-size: 12.5px; letter-spacing: .16em;
+            text-transform: uppercase; font-weight: 600; }
+.terms dt::after { content: ","; letter-spacing: 0; }
+.terms dd { display: inline; margin: 0 0 0 .4em; color: var(--muted); }
+
 /* ---------------------------------------------------------------- footer -- */
 
 footer { padding-top: clamp(28px, 3.4vw, 44px); }
@@ -356,6 +406,9 @@ footer { padding-top: clamp(28px, 3.4vw, 44px); }
 }
 
 @media (max-width: 860px) {
+  .scenes { grid-template-columns: 1fr; }
+  .guide-cols { grid-template-columns: 1fr; }
+  .terms { grid-template-columns: 1fr; }
   /* Four stat cells in a row are unreadable much under a thousand pixels, so
      they fold to two by two rather than squeezing. */
   .hero-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }

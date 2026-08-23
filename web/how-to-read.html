@@ -36,215 +36,149 @@ try {
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&display=swap">
-<link rel="stylesheet" href="style.css?v=be180534">
-<style>
-  .guide-head { padding-top: clamp(30px, 4.6vw, 52px); text-align: center; }
-  .guide-head h1 { margin: 14px 0 0; font-weight: 400; letter-spacing: -.015em;
-                   line-height: 1.06; font-size: clamp(34px, 5.4vw, 60px); }
-  .guide-head .deck { font-size: clamp(16px, 1.7vw, 20px); font-style: italic;
-                      color: #4A423A; margin: 16px auto 0; max-width: 62ch;
-                      line-height: 1.5; text-wrap: pretty; }
-  .guide-head hr { border: 0; border-top: 1px solid var(--rule);
-                   max-width: 200px; margin: 38px auto 0; }
-  .guide { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-           gap: clamp(28px, 4.4vw, 64px); padding-top: clamp(28px, 3.4vw, 40px);
-           align-items: start; }
-  .guide h2 { font-weight: 400; font-size: clamp(21px, 2.2vw, 26px); margin: 0 0 12px; }
-  .guide h2 + p, .guide p { font-size: clamp(16px, 1.5vw, 17.5px); line-height: 1.72;
-                            color: #3A342D; margin: 0 0 16px; text-wrap: pretty; }
-  .guide section + section { margin-top: 34px; }
-  .cases { border: 1px solid var(--rule); padding: 26px 28px 28px; }
-  .case { display: flex; align-items: center; gap: 18px; padding: 18px 0;
-          border-bottom: 1px solid var(--hair); }
-  .case:last-child { border-bottom: 0; padding-bottom: 0; }
-  .case:first-of-type { padding-top: 22px; }
-  .case svg { flex: none; }
-  .case-name { font-size: 19px; }
-  .case-note { font-size: 14px; color: var(--muted); font-style: italic; }
-  .caveat { border-left: 3px solid var(--incloud); padding: 4px 0 4px 22px; margin-top: 30px; }
-  .caveat p { font-size: 16.5px; line-height: 1.68; color: #3A342D; margin: 10px 0 0; }
-  .glossary { padding-top: clamp(32px, 4vw, 48px); }
-  .glossary > h2 { border-top: 2px solid var(--ink); padding-top: 10px; margin: 0;
-                   font-weight: 400; font-size: clamp(16px, 1.8vw, 20px);
-                   letter-spacing: .15em; text-transform: uppercase; }
-  .terms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-           gap: 28px clamp(24px, 3.6vw, 48px); margin-top: 22px; }
-  .terms > div { border-bottom: 1px solid var(--hair); padding-bottom: 16px; }
-  .terms dt { font-size: 20px; }
-  .terms dd { margin: 5px 0 0; font-size: 15.5px; line-height: 1.62; color: #4A423A; }
-  @media (max-width: 900px) {
-    .guide { grid-template-columns: 1fr; }
-    .terms { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
-  @media (max-width: 620px) { .terms { grid-template-columns: 1fr; } }
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
+<link rel="stylesheet" href="style.css?v=ece76d86">
 </head>
 <body>
 
 <header class="masthead wrap">
-  <div class="masthead-top kicker" style="border-bottom:1px solid var(--ink);padding-bottom:14px;align-items:baseline">
-    <span style="font-size:clamp(22px,3vw,30px);letter-spacing:normal;text-transform:none">Hill Weather</span>
-    <span style="display:flex;gap:clamp(14px,3vw,26px);align-items:center">
-      <button id="theme" class="theme" type="button" aria-pressed="false" title="Switch theme">
-        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-          <circle cx="12" cy="12" r="4.2"/>
-          <path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" stroke-linecap="round"/>
-        </svg>
-        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-          <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z" stroke-linejoin="round"/>
-        </svg>
-        <span>Theme</span>
-      </button>
-      <a href="index.html" style="text-decoration:none">&larr; Back to the forecast</a>
-    </span>
+  <div class="masthead-top kicker">
+    <span><a href="index.html">Back to the forecast</a></span>
+    <span>Free &middot; No accounts &middot; No advertising</span>
   </div>
+  <div class="rule-2"></div>
+  <div class="masthead-main compact">
+    <h1>Hill Weather</h1>
+    <div class="tagline">How to read this</div>
+  </div>
+  <div class="rule-1"></div>
 </header>
 
 <main class="wrap">
 
-  <div class="guide-head">
-    <div class="kicker" style="color:var(--ochre)">A short guide</div>
-    <h1>How to read this</h1>
-    <p class="deck">Every weather app tells you it will be eight degrees and windy on the
-      summit. None of them tell you the thing you actually want to know, which is whether
-      you will be able to see anything when you get there.</p>
-    <hr>
-  </div>
+  <section class="guide-lede">
+    <h2>Cloud has a bottom.</h2>
+    <p>Every mainstream forecast tells you whether it will rain. In the hills the question is
+      a different one. On a typical day the cloud sits with its base at, say, 700&nbsp;metres:
+      below that line you can see for miles, and above it you are inside a grey nothing with
+      fifteen metres of visibility. Which side of the line a summit falls on decides whether
+      the day was worth the drive.</p>
+    <p class="soft">This site works out that line, the <em>cloud base</em>, twice a day for
+      all 282 Munros and all 214 Wainwrights, and tells you which side of it each summit
+      should be on. That is the whole product. Everything else on the page is in service of
+      that one number.</p>
+  </section>
 
-  <div class="guide">
+  <div class="rule-2 spaced"></div>
+
+  <section class="scenes">
     <div>
-      <section>
-        <h2>The one idea</h2>
-        <p>Cloud has a bottom. On a typical Lakeland day it might sit at 700&nbsp;metres:
-          below that line you can see for miles, above it you are inside a grey nothing with
-          fifteen metres of visibility. That line is called the <em>cloud base</em>, and
-          where your summit sits relative to it decides whether the day was worth the
-          drive.</p>
-        <p>This site works out the cloud base for every Munro and every Wainwright, twice a
-          day, and tells you which side of it each summit falls on. That is the whole
-          product. Everything else on the page is in service of that one number.</p>
-      </section>
-
-      <section>
-        <h2>Why other forecasts get summits wrong</h2>
-        <p>Weather models describe the ground as a smooth surface. Even a good one, at two
-          kilometres between grid points, cannot see a mountain properly: it shaves about
-          sixty metres off Ben&nbsp;Nevis and far more off anything sharp. So when an app
-          shows you conditions for a summit, it is usually describing a hill several hundred
-          metres shorter than the one you are standing on, which is why it reads too warm,
-          too calm and too clear.</p>
-        <p>This site ignores the model&rsquo;s own ground level. It takes the profile of the
-          atmosphere above each hill, level by level, and reads off the conditions at the
-          summit&rsquo;s <em>real</em> surveyed height. Same data, honest altitude.</p>
-      </section>
-
-      <section>
-        <h2>Why it is a chance and not a promise</h2>
-        <p>Cloud is rarely all or nothing. When cover is broken, a summit sits in and out of
-          it for an afternoon, and the honest answer is a chance rather than a verdict. So
-          the number is the odds of a view during walking hours, averaged across them rather
-          than taken from the single luckiest one.</p>
-        <p>Where the forecast is genuinely borderline the site says so instead of picking a
-          side. <em>Could go either way</em> is a real answer, and it is the one every other
-          weather app refuses to give.</p>
-      </section>
-
-      <section>
-        <h2>Why the hills are grouped by height</h2>
-        <p>On a poor day the small fells are clear and the big ones are not, so ranking every
-          hill together would simply list the shortest first. Grouping by height band tells
-          you the thing that actually matters: the tops are in cloud, but there is still a
-          walk worth doing lower down.</p>
-      </section>
+      <svg viewBox="0 0 320 150" role="img"
+           aria-label="A summit below the cloud base, with cloud overhead">
+        <rect x="0.5" y="0.5" width="319" height="149" fill="var(--glyph-bg)" stroke="var(--glyph-frame)"/>
+        <rect x="1" y="4" width="318" height="26" fill="var(--glyph-cloud)" opacity="var(--glyph-cloud-op)"/>
+        <line x1="2" y1="30" x2="318" y2="30" stroke="var(--faint)" stroke-width="0.9" stroke-dasharray="4 4"/>
+        <polygon points="40,132 160,58 280,132" fill="var(--glyph-hill)" stroke="var(--glyph-hill-line)" stroke-width="1.2"/>
+        <circle cx="160" cy="58" r="3" fill="var(--clear)"/>
+        <line x1="2" y1="132" x2="318" y2="132" stroke="var(--ink)" stroke-width="1"/>
+      </svg>
+      <div class="scene-name c-clear">Below the cloud</div>
+      <p>The summit is under the base. You see the valley, the ridge, the next hill over.
+        This is the view you drove for.</p>
     </div>
-
     <div>
-      <div class="cases">
-        <div class="kicker" style="color:var(--ochre)">Reading a hill</div>
-
-        <div class="case">
-          <svg viewBox="0 0 64 48" width="64" height="48" aria-hidden="true">
-            <path d="M2 46 L24 27 L38 34 L52 25 L62 46 Z" fill="var(--relief)" stroke="var(--relief-line)" stroke-width="1"></path>
-            <rect x="0" y="4" width="64" height="12" fill="var(--cloud)" opacity=".42"></rect>
-            <line x1="0" y1="4" x2="64" y2="4" stroke="#8C8175" stroke-width="1" stroke-dasharray="3 3"></line>
-          </svg>
-          <div>
-            <div class="case-name">Below the cloud</div>
-            <div class="case-note">Clear summit, cloud overhead. A good day.</div>
-          </div>
-        </div>
-
-        <div class="case">
-          <svg viewBox="0 0 64 48" width="64" height="48" aria-hidden="true">
-            <path d="M2 46 L24 14 L38 26 L52 10 L62 46 Z" fill="var(--relief)" stroke="var(--relief-line)" stroke-width="1"></path>
-            <rect x="0" y="8" width="64" height="20" fill="var(--cloud)" opacity=".42"></rect>
-            <line x1="0" y1="8" x2="64" y2="8" stroke="#8C8175" stroke-width="1" stroke-dasharray="3 3"></line>
-          </svg>
-          <div>
-            <div class="case-name">Inside it</div>
-            <div class="case-note">Grey all the way up. Save the petrol.</div>
-          </div>
-        </div>
-
-        <div class="case">
-          <svg viewBox="0 0 64 48" width="64" height="48" aria-hidden="true">
-            <path d="M2 46 L24 12 L38 24 L52 6 L62 46 Z" fill="var(--relief)" stroke="var(--relief-line)" stroke-width="1"></path>
-            <rect x="0" y="22" width="64" height="14" fill="var(--cloud)" opacity=".42"></rect>
-            <line x1="0" y1="22" x2="64" y2="22" stroke="#8C8175" stroke-width="1" stroke-dasharray="3 3"></line>
-          </svg>
-          <div>
-            <div class="case-name">Above it</div>
-            <div class="case-note">An inversion. A sea of cloud below you, and the best day of the year.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="caveat">
-        <div class="kicker" style="color:var(--incloud)">Please read this bit</div>
-        <p>This forecast has <strong>not yet been checked against what actually happened</strong>
-          on the hill. The method is sound, but until it has been scored against real
-          observations over a season, treat it as an interesting second opinion and nothing
-          more. It is not a mountain safety service, and it will never replace
-          <a href="https://www.mwis.org.uk">MWIS</a> or, in winter,
-          <a href="https://www.sais.gov.uk">SAIS</a>.</p>
-      </div>
+      <svg viewBox="0 0 320 150" role="img"
+           aria-label="A summit inside the cloud, with the cloud base below it">
+        <rect x="0.5" y="0.5" width="319" height="149" fill="var(--glyph-bg)" stroke="var(--glyph-frame)"/>
+        <polygon points="40,132 160,38 280,132" fill="var(--glyph-hill)" stroke="var(--glyph-hill-line)" stroke-width="1.2"/>
+        <rect x="1" y="4" width="318" height="66" fill="var(--glyph-cloud)" opacity="0.8"/>
+        <line x1="2" y1="70" x2="318" y2="70" stroke="var(--faint)" stroke-width="0.9" stroke-dasharray="4 4"/>
+        <line x1="2" y1="132" x2="318" y2="132" stroke="var(--ink)" stroke-width="1"/>
+      </svg>
+      <div class="scene-name c-incloud">Inside it</div>
+      <p>The summit is above the base. Fifteen metres of grey in every direction, and a
+        compass bearing to find the cairn.</p>
     </div>
-  </div>
+    <div>
+      <svg viewBox="0 0 320 150" role="img"
+           aria-label="A summit standing above a cloud filled valley, an inversion">
+        <rect x="0.5" y="0.5" width="319" height="149" fill="var(--glyph-bg)" stroke="var(--glyph-frame)"/>
+        <polygon points="40,132 160,30 280,132" fill="var(--glyph-hill)" stroke="var(--glyph-hill-line)" stroke-width="1.2"/>
+        <path d="M1,92 Q30,86 60,91 T120,89 T180,92 T240,88 T300,92 T319,90 L319,132 L1,132 Z"
+              fill="var(--glyph-cloud)" opacity="0.85"/>
+        <line x1="2" y1="90" x2="318" y2="90" stroke="var(--faint)" stroke-width="0.9" stroke-dasharray="4 4"/>
+        <circle cx="160" cy="30" r="3" fill="var(--ochre)"/>
+        <line x1="2" y1="132" x2="318" y2="132" stroke="var(--ink)" stroke-width="1"/>
+      </svg>
+      <div class="scene-name c-above">Above it, the inversion</div>
+      <p>Cloud fills the valleys and the top stands clear above a white sea. Perhaps twenty
+        mornings a year. Worth driving through the night for.</p>
+    </div>
+  </section>
+
+  <div class="rule-2 spaced"></div>
+
+  <section class="guide-cols">
+    <div>
+      <h3>A chance, not a promise</h3>
+      <p>The cloud base is estimated from atmospheric models, and it moves. A hill 20&nbsp;m
+        under the base is a coin toss; a hill 300&nbsp;m under it is a fairly safe bet. That
+        is why every hill gets a percentage rather than a verdict, and why the forecast says
+        <em>could go either way</em> where it genuinely could.</p>
+      <p>Cloud is rarely all or nothing either. When cover is broken a summit sits in and out
+        of it for an afternoon, so the number is the odds of a view during walking hours,
+        averaged across them rather than taken from the single luckiest one.</p>
+      <div class="caveat">This method has not yet been checked against real summit
+        observations. Until it has, treat every number here as an informed guess, honestly
+        made. It is not a mountain safety service and it will never replace
+        <a href="https://www.mwis.org.uk">MWIS</a> or, in winter,
+        <a href="https://www.sais.gov.uk">SAIS</a>.</div>
+    </div>
+    <div>
+      <h3>Why other forecasts get summits wrong</h3>
+      <p>A postcode forecast describes the valley floor, where the weather station is. The
+        summit 900&nbsp;m above it is usually in different air: colder, windier, and often
+        inside cloud the valley never sees. Sunny intervals in Fort William can mean zero
+        visibility on Ben&nbsp;Nevis, and on an inversion morning the reverse.</p>
+      <p>Weather models make it worse by describing the ground as a smooth surface. Even a
+        good one, at two kilometres between grid points, cannot see a mountain properly: it
+        shaves about sixty metres off Ben&nbsp;Nevis and far more off anything sharp. This
+        site ignores the model&rsquo;s own ground level, takes the profile of the atmosphere
+        above each hill level by level, and reads off the conditions at the summit&rsquo;s
+        real surveyed height. Same data, honest altitude.</p>
+
+      <h3 class="spaced">Why the hills are grouped by height</h3>
+      <p>On a poor day the small fells are clear and the big ones are not, so ranking every
+        hill together would simply list the shortest first. Grouping by height band tells you
+        the thing that actually matters: the tops are in cloud, but there is still a walk
+        worth doing lower down.</p>
+    </div>
+  </section>
 
   <section class="glossary">
-    <h2>What the words mean</h2>
+    <h3 class="section-head">Glossary</h3>
+    <div class="rule-2"></div>
     <dl class="terms">
-      <div>
-        <dt>Cloud base</dt>
-        <dd>The height of the bottom of the cloud, above sea level. Compare it against a
-          summit height to know which side of it you will be.</dd>
-      </div>
-      <div>
-        <dt>Cloud top</dt>
-        <dd>The height of the top of the same layer. If a summit is above it, you are looking
-          down on cloud rather than standing in it.</dd>
-      </div>
-      <div>
-        <dt>Inversion</dt>
-        <dd>Cold air trapped in the valleys with warmer air above, so cloud fills the glens
-          and the tops stand clear. Rare, and worth setting an alarm for.</dd>
-      </div>
-      <div>
-        <dt>Freezing level</dt>
-        <dd>The height at which the air reaches zero. Above it, rain becomes snow and wet
-          rock becomes ice.</dd>
-      </div>
-      <div>
-        <dt>Chance of a view</dt>
-        <dd>The odds the summit is out of cloud, averaged across the hours people are
-          actually up there rather than the single luckiest hour of the day.</dd>
-      </div>
-      <div>
-        <dt>Sun azimuth</dt>
-        <dd>The compass bearing the sun rises and sets on. For photographers, knowing where
-          the light comes from matters as much as when.</dd>
-      </div>
+      <div><dt>Cloud base</dt><dd>The height of the bottom of the cloud, above sea level.
+        Compare it against a summit height to know which side of it you will be.</dd></div>
+      <div><dt>Cloud top</dt><dd>The height of the top of the same layer. If a summit is
+        above it, you are looking down on cloud rather than standing in it.</dd></div>
+      <div><dt>Inversion</dt><dd>Cold air trapped in the valleys with warmer air above, so
+        cloud fills the glens and the tops stand clear. Rare, and worth setting an alarm
+        for.</dd></div>
+      <div><dt>Freezing level</dt><dd>The height at which the air reaches zero. Above it,
+        rain becomes snow and wet rock becomes ice.</dd></div>
+      <div><dt>Chance of a view</dt><dd>The odds the summit is out of cloud, averaged across
+        the hours people are actually up there rather than the single luckiest hour of the
+        day.</dd></div>
+      <div><dt>Could go either way</dt><dd>The summit is within the model&rsquo;s own margin
+        of error of the cloud top or base. The honest answer is that nobody knows, and the
+        site says so rather than picking a side.</dd></div>
+      <div><dt>Sun azimuth</dt><dd>The compass bearing the sun rises and sets on. For
+        photographers, knowing where the light comes from matters as much as when.</dd></div>
+      <div><dt>Prominence, or drop</dt><dd>How far you must descend from a summit before you
+        can climb anything higher. It is what separates a hill in its own right from a bump
+        on a ridge.</dd></div>
     </dl>
   </section>
 
