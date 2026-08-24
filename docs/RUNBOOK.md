@@ -470,6 +470,25 @@ rather than the absolute number.
 `sitemap.xml` and `robots.txt` are **generated**, by `scripts/sitemap.py`, and
 regenerated on every build. Editing either by hand loses the change at 05:15.
 
+`sitemap.xml` is **gitignored and not tracked**, because its `lastmod` changes
+with every build. It was tracked at first, which made the VPS working tree
+diverge from the repo within hours and blocked every deploy with:
+
+```
+error: Your local changes to the following files would be overwritten by merge:
+        web/sitemap.xml
+```
+
+If a deploy ever stops on a generated file, discarding it is safe, because the
+next build writes it again:
+
+```bash
+cd /opt/hillweather && git checkout -- web/sitemap.xml && git pull
+```
+
+`robots.txt` stays tracked on purpose: it is deterministic and only changes
+when the script does, so it never diverges.
+
 Page URLs come from each page's own `<link rel="canonical">`, so the sitemap
 cannot drift from what the pages claim about themselves. `lastmod` is the
 forecast build date for the two pages that render the forecast and the file's

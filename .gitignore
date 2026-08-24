@@ -21,3 +21,10 @@ deploy/.env
 # profiles, refetchable in minutes with `python scripts/validate.py --fetch`.
 # The findings belong in docs/PLAN.md; the raw pull does not belong in git.
 data/validation/
+
+# Generated on every build by scripts/sitemap.py, with a lastmod that changes
+# with the forecast. Committing it made the VPS working tree diverge from the
+# repo within hours and blocked every git pull with "local changes would be
+# overwritten". robots.txt stays tracked because it is deterministic: it only
+# changes when the script does.
+web/sitemap.xml
