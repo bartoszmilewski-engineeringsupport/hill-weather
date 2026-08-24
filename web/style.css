@@ -500,6 +500,25 @@ h3.spaced { margin-top: clamp(24px, 2.8vw, 32px); }
 .light-note { font-size: 13.5px; font-style: italic; color: var(--faint);
               margin-top: 10px; }
 
+.outlook { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: clamp(16px, 3vw, 44px); padding-top: 20px; }
+.outlook-when { font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase;
+                color: var(--faint); }
+.outlook-pct { font-size: clamp(30px, 4vw, 44px); line-height: 1.1; margin-top: 4px;
+               font-variant-numeric: tabular-nums; }
+.outlook-note { font-size: 14.5px; font-style: italic; color: var(--muted);
+                margin-top: 2px; }
+
+/* The per-hill pages reuse the entry's definition rows outside .detail. */
+.detail-facts { margin: 4px 0 0; }
+.detail-facts > div { display: flex; justify-content: space-between; gap: 16px;
+                      align-items: baseline; padding: 9px 0;
+                      border-top: 1px solid var(--hair); }
+.detail-facts > div:last-child { border-bottom: 1px solid var(--hair); }
+.detail-facts dt { color: var(--muted); flex: none; font-size: 15.5px; }
+.detail-facts dd { margin: 0; text-align: right; font-size: 16px; }
+.detail-facts dd small { font-size: 13.5px; color: var(--faint); }
+
 /* ---------------------------------------------------------------- footer -- */
 
 footer { padding-top: clamp(28px, 3.4vw, 44px); }

@@ -27,6 +27,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+import hillpages
 import omfetch                                  # noqa: E402
 import solar                                    # noqa: E402
 from physics import summit_conditions           # noqa: E402
@@ -297,6 +298,14 @@ def write_region(out, out_dir):
     summary = {"meta": out["meta"], "hills": summary_hills}
     text = json.dumps(summary, separators=(",", ":"))
     (region_dir / "summary.json").write_text(text, encoding="utf-8")
+
+    # One crawlable page per hill, written from the same data in the same pass
+    # so they cannot drift from the forecast. The site is otherwise invisible
+    # to search: everything about a hill lived behind client-side state.
+    # out_dir is web/data, and the pages belong a level up at web/hill.
+    for h, sh in zip(out["hills"], summary_hills):
+        h["slug"] = sh["slug"]
+    hillpages.write_pages(out, out_dir.parent)
 
     detail_bytes = sum(f.stat().st_size for f in hills_dir.glob("*.json"))
     return len(text), detail_bytes, len(summary_hills)

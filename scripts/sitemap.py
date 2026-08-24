@@ -94,6 +94,17 @@ def main():
         priority, freq = PRIORITY.get(page.name, ("0.5", "monthly"))
         entries.append((url, when, freq, priority))
 
+    # One entry per hill. These are the reason the sitemap exists: without
+    # them the site offers search engines four pages for 546 hills. They are
+    # rebuilt with every forecast, so their lastmod is the build date.
+    hill_pages = sorted((ROOT / "web" / "hill").rglob("*.html"))
+    for page in hill_pages:
+        url = canonical(page.read_text(encoding="utf-8"))
+        if url:
+            entries.append((url, built or git_date(page), "daily", "0.6"))
+    if hill_pages:
+        print(f"   plus {len(hill_pages)} hill pages")
+
     entries.sort(key=lambda e: (-float(e[3]), e[0]))
 
     lines = ['<?xml version="1.0" encoding="UTF-8"?>',
@@ -127,8 +138,10 @@ Sitemap: {SITE}/sitemap.xml
 
     print(f"sitemap.xml: {len(entries)} pages"
           + (f", forecast dated {built}" if built else ", no forecast data present"))
-    for url, when, freq, priority in entries:
+    for url, when, freq, priority in entries[:6]:
         print(f"   {priority}  {when}  {freq:8} {url}")
+    if len(entries) > 6:
+        print(f"   ... and {len(entries) - 6} more")
     if skipped:
         print(f"\n  SKIPPED, no <link rel=canonical>: {', '.join(skipped)}")
     print("robots.txt: written")

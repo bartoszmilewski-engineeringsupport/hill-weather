@@ -28,3 +28,13 @@ data/validation/
 # overwritten". robots.txt stays tracked because it is deterministic: it only
 # changes when the script does.
 web/sitemap.xml
+
+# Generated: one page per hill, rewritten by every build. About 7 MB of HTML
+# that is a pure function of the forecast and the hill data, so it belongs in
+# the build output rather than in git.
+web/hill/
+
+# Scratch from scripts/screenshots.py. Cleaned up on a successful run, but
+# left behind if a capture is interrupted.
+docs/screenshots/.chrome-profile/
+docs/screenshots/.frame.html
