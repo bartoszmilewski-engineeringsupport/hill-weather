@@ -133,8 +133,15 @@ poor in the band where Munro summits actually sit. That band is the work.
 calibration, not cloud base. When the site says a 0 to 20% chance of a view,
 the summit was actually clear **54%** of the time. Every band is
 underconfident, by 47 points at the low end. The verdict errors are lopsided in
-the same direction: 3,039 "said in cloud, was clear" against 306 the other way,
-with overall accuracy 72.8%.
+the same direction: 3,590 "said in cloud, was clear" against 490 the other way.
+
+**The plain accuracy number is worse than saying nothing.** 75.6% of summit
+hours are judged correctly, but 83.0% of them were clear, so a model that
+answered "clear" every single time and knew nothing at all would score higher.
+When the site says IN CLOUD it is right 39.6% of the time; when it says CLEAR
+it is right 95.5%. It catches 82.7% of genuinely clouded summits. That is a
+very sensitive, very imprecise detector: it almost never promises a view that
+is not there, and it talks people out of days they should have gone on.
 It cries wolf.
 
 **Negative skill so far.** Brier 0.202 against climatology's 0.157, so -29%:

@@ -506,7 +506,22 @@ def report(rows):
     print(f"   said clear,    was in cloud : {cm['said_clear_was_cloud']:>6}"
           f"   (the worse error: a promise broken)")
     print(f"   said clear,    was clear    : {cm['said_clear_was_clear']:>6}")
+    tp = cm["said_cloud_was_cloud"]; fp = cm["said_cloud_was_clear"]
+    fn = cm["said_clear_was_cloud"]; tn = cm["said_clear_was_clear"]
+    really_clear = fp + tn
     print(f"   accuracy {cm['accuracy']:.1f}% of {cm['n']:,} summit-hours")
+    # Accuracy alone flatters any forecast on an unbalanced problem. Most
+    # summit-hours are clear, so a model that says "clear" every single time
+    # scores well without knowing anything. That is the number to beat.
+    naive = 100 * really_clear / cm["n"] if cm["n"] else 0
+    verdict_line = "BEATEN by saying nothing" if naive > cm["accuracy"] else "beats it"
+    print(f"   always saying CLEAR would score {naive:.1f}%  <- {verdict_line}")
+    if tp + fp:
+        print(f"   when it says IN CLOUD it is right {100*tp/(tp+fp):.1f}% of the time")
+    if tn + fn:
+        print(f"   when it says CLEAR    it is right {100*tn/(tn+fn):.1f}% of the time")
+    if tp + fn:
+        print(f"   of summits really in cloud it catches {100*tp/(tp+fn):.1f}%")
 
     print("\n-- SKILL, held out ---------------------------------------------")
     print("   Brier score, lower is better. Beating these is the whole point.")
