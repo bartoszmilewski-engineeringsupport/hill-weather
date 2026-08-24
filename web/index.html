@@ -237,8 +237,8 @@ const GUST_NOTE = 30, GUST_HARD = 45, GUST_STOP = 60;
  * is not equally reliable in both directions and pretending otherwise would be
  * the dishonest part.
  *
- *   says the summit will be clear  -> right 93.7% of the time
- *   says the summit is in cloud    -> right 50.8% of the time
+ *   says the summit will be clear  -> right 92.4% of the time
+ *   says the summit is in cloud    -> right 56.6% of the time
  *
  * So a high number is close to trustworthy and a low one is barely better than
  * a shrug. Both used to be presented as though they were the same kind of
@@ -246,8 +246,8 @@ const GUST_NOTE = 30, GUST_HARD = 45, GUST_STOP = 60;
 const TRUST = {
   clear: 'Forecasts this confident have been right about nine times in ten.',
   edge: 'Around this figure the forecast is close to a coin toss.',
-  cloud: 'Forecasts this pessimistic have been right about half the time, so '
-       + 'read it as poor odds rather than a closed door.',
+  cloud: 'Forecasts this pessimistic have been right a bit more than half '
+       + 'the time, so read it as poor odds rather than a closed door.',
 };
 const trustNote = pct => pct >= 75 ? TRUST.clear
   : pct > 40 ? TRUST.edge : TRUST.cloud;

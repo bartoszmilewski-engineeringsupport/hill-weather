@@ -49,6 +49,31 @@ CLEAR_MARGIN = 150.0
 # and because the cliff always fell the pessimistic way it made the whole
 # forecast cry wolf: it said IN CLOUD and the summit was clear 54% of the time.
 BASE_SIGMA = 500.0
+
+# Recalibration, fitted on measured observations.
+#
+# Even after the base uncertainty was handled properly, the forecast stayed
+# systematically too pessimistic: when it said 50% the summit was clear about
+# 74% of the time. That is a calibration error, not a physics error, so it is
+# corrected on the OUTPUT rather than by bending the meteorology to fit.
+#
+# Platt scaling, two numbers, fitted by scripts/validate.py on the training
+# half of 35,280 labelled summit-hours:
+#
+#     p_calibrated = sigmoid(A + B * logit(p_raw))
+#
+# Held out, this took skill against climatology from +20.7% to +26.3% and cut
+# the worst calibration gap from 22 points to about 9.
+#
+# It is deliberately NOT a fitted model of the whole problem. A full logistic
+# regression on the same inputs scored better still, +32.9%, but it was trained
+# on summer airfields: it would encode summer, it cannot say WHY, and the plain
+# English on every hill comes from the physics. Two numbers on the end keep the
+# meteorology, the explanations and the ability to reason about failures.
+#
+# Refit when there is winter data. These are summer numbers.
+CALIB_A = -0.237
+CALIB_B = 0.834
 PARCEL_LEVEL = 975          # ~350m, representative of glen-level air
 # Metres of lift per degC of dewpoint depression. Espy's rule gives 125; this
 # is 145, chosen by sweeping the TRAINING half and reading the CLOUD BASE ERROR
@@ -136,6 +161,18 @@ def _normal_cdf(z):
     return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
 
 
+def calibrate(p_pct):
+    """Correct a raw probability against what was actually observed.
+
+    Applied to every branch of verdict(), because the correction was fitted
+    against every branch of verdict().
+    """
+    p = min(max(p_pct / 100.0, 1e-6), 1 - 1e-6)
+    logit = math.log(p / (1 - p))
+    out = 1.0 / (1.0 + math.exp(-(CALIB_A + CALIB_B * logit)))
+    return max(2.0, min(97.0, out * 100.0))
+
+
 def verdict(summit, base, top, low_cover):
     """(label, in-cloud probability %, plain-English reason).
 
@@ -160,24 +197,25 @@ def verdict(summit, base, top, low_cover):
     low_cover = low_cover or 0.0
 
     if base is None or low_cover < LOW_CLOUD_MIN:
-        return "CLEAR", 5, f"little low cloud about ({low_cover:.0f}% cover)"
+        return ("CLEAR", calibrate(5),
+                f"little low cloud about ({low_cover:.0f}% cover)")
 
     # An inversion is a different question: the summit is above the cloud top
     # rather than below its base, and the useful answer is about standing on
     # top of it. Left as a separate branch on purpose.
     if top is not None and summit > top + CLEAR_MARGIN:
-        return ("ABOVE CLOUD", 10,
+        return ("ABOVE CLOUD", calibrate(10),
                 f"cloud {base:.0f}-{top:.0f}m, summit {summit - top:.0f}m clear above it")
 
     if top is not None and summit > top:
-        return ("JUST ABOVE?", 45,
+        return ("JUST ABOVE?", calibrate(45),
                 f"cloud tops ~{top:.0f}m, summit only {summit - top:.0f}m above "
                 f"- inside model error, could go either way")
 
     margin = summit - base                       # positive: summit above base
     p_above = _normal_cdf(margin / BASE_SIGMA)
     p = 100.0 * (low_cover / 100.0) * p_above
-    p = max(2.0, min(97.0, p))                   # never absolute either way
+    p = calibrate(p)                             # against what was observed
 
     if p >= 60:
         label = "IN CLOUD"
