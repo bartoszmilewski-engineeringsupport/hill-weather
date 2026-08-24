@@ -321,6 +321,10 @@ into an hour of failures.
 This is also why adding regions is cheaper than it looks: the binding limit is
 requests per minute, not hills per build.
 
+The scheduler now waits `ARCHIVE_GAP` seconds, 75 by default, between the
+archive and the build for exactly this reason. Waiting a minute beats backing
+off for twenty. Set `ARCHIVE_GAP=0` in `deploy/.env` to disable it.
+
 **A new region does not appear until a build has run.** The code ships with
 `git pull`, but the site can only show regions that have data files, and
 `data/index.json` is the file listing which exist. It is cached for thirty

@@ -32,6 +32,9 @@ ROOT = Path(os.environ.get("ROOT", "/app"))
 RUN_TIMES = [t.strip() for t in
              os.environ.get("RUN_TIMES", "05:15,16:15").split(",") if t.strip()]
 RUN_ON_START = os.environ.get("RUN_ON_START", "1") not in ("0", "false", "no")
+
+# Seconds to wait between the archive and the build. See pipeline().
+ARCHIVE_GAP = int(os.environ.get("ARCHIVE_GAP", "75"))
 HEARTBEAT_URL = os.environ.get("HEARTBEAT_URL", "").strip()
 PYTHON = sys.executable
 
@@ -125,6 +128,21 @@ def pipeline():
         log("archive ok")
     else:
         log("ARCHIVE FAILED, validation data lost for this run")
+
+    # Let the API breathe before the build starts.
+    #
+    # The limit that bites is per minute, not per hour. The archive asks for
+    # all 75 variables, the heaviest requests this project makes, and the build
+    # used to start about seven seconds behind it and immediately fire 25-hill
+    # chunks a second apart. The result was a 429 on the very first request of
+    # a build, even two hours after the previous one, followed by a backoff of
+    # 60s, then 120s, then 240s.
+    #
+    # Waiting here costs a minute. Not waiting cost twenty.
+    if ARCHIVE_GAP:
+        log(f"  pausing {ARCHIVE_GAP}s so the build does not start on the "
+            f"archive's heels")
+        time.sleep(ARCHIVE_GAP)
 
     # Build into staging so a half-finished build is never served.
     if STAGING.exists():
