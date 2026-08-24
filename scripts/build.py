@@ -52,7 +52,7 @@ def from_live(region):
     hills = load_hills(region)
     responses = omfetch.fetch_hills(
         hills, forecast_days=FORECAST_DAYS,
-        variables=omfetch.all_variables(minimal=True), pause=3.0)
+        variables=omfetch.all_variables(minimal=True))
     meta = {
         "fetched_utc": datetime.now(timezone.utc).replace(
             microsecond=0).isoformat(),

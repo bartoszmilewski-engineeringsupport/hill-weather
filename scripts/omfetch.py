@@ -34,17 +34,45 @@ LEVEL_VARS = ["temperature", "relative_humidity", "cloud_cover",
               "wind_speed", "wind_direction", "geopotential_height",
               "vertical_velocity"]
 
-# Open-Meteo weights a request by variables x locations x days, so the full set
-# above times 496 hills trips the free-tier rate limit. The live build asks only
-# for what physics.py actually reads; the archive keeps everything, because it
-# is only ~40 hills and we cannot re-fetch the past if we later want a variable
-# we did not save.
+# Open-Meteo weights a request by variables x locations x days (see call_weight
+# below), so asking for all 75 variables across all 546 hills would cost about
+# 4100 calls a run against an hourly allowance of 5000. The live build asks only
+# for the 46 variables physics.py actually reads, which brings a run to ~2500.
+# The archive keeps all 75, because it is only 60 hills and we cannot re-fetch
+# the past if we later want a variable we did not save.
 BUILD_SURFACE_VARS = [
     "cloud_cover_low", "cloud_cover_mid", "cloud_cover_high",
     "precipitation", "freezing_level_height", "wind_gusts_10m",
 ]
 BUILD_LEVEL_VARS = ["temperature", "relative_humidity",
                     "wind_speed", "wind_direction", "geopotential_height"]
+
+# --------------------------------------------------------------- budget ---
+# Open-Meteo counts fractional "calls", not requests. From their own worked
+# example (45 variables, 3 days, 1 location = 4.5 calls):
+#
+#     calls = variables x forecast_days x locations / 30
+#
+# The free tier allows 600 calls a minute, 5000 an hour, 10000 a day. The
+# per-minute one is what we kept tripping, and not because we ask for too
+# much: one 25-hill chunk of the live build is 115 calls, so firing chunks
+# three seconds apart is roughly 1400 calls a minute, over twice the limit.
+# We were sprinting into a 429 in the first few seconds of every build and
+# then backing off for twenty minutes.
+#
+# So pace by weight instead of by a flat sleep. A full run is about 2960
+# calls, which is comfortable against the hourly 5000 as long as only one run
+# happens per hour. Two builds in the same hour will not fit; that is why the
+# scheduler runs twice a day and manual rebuilds should be occasional.
+TARGET_PER_MIN = 450          # of 600; headroom, we are a guest on a free tier
+
+_last_chunk_at = 0.0          # module-level so regions in one build queue up
+
+
+def call_weight(locations, variables, forecast_days):
+    """Open-Meteo's fractional call count for one request."""
+    return locations * variables * forecast_days / 30.0
+
 
 ATTRIBUTION = {
     "weather": "Open-Meteo, UK Met Office 2km model - https://open-meteo.com",
@@ -80,12 +108,12 @@ def _fetch_chunk(hills, variables, forecast_days, retries=6):
             last = e
             if e.code != 429 or attempt == retries - 1:
                 raise RuntimeError(f"fetch failed: HTTP {e.code} {e.reason}")
-            # Rate limited. The free tier caps calls per minute AND per hour,
-            # and one build of both regions already sits close to the hourly
-            # limit, so short backoffs are not enough: exhausting the hour
-            # means waiting a good part of it out. Nothing here is urgent, and
-            # a build that takes twenty minutes beats one that fails and leaves
-            # the site stale until the next slot.
+            # Rate limited. With weight-based pacing this should now be rare,
+            # so reaching here usually means something else ran recently and
+            # ate the hourly allowance. That cannot be waited out in seconds,
+            # hence the long backoff: nothing here is urgent, and a build that
+            # takes twenty minutes beats one that fails and leaves the site
+            # stale until the next slot.
             wait = min(600, 60 * (2 ** attempt))
             print(f"    rate limited, waiting {wait}s")
             time.sleep(wait)
@@ -96,14 +124,30 @@ def _fetch_chunk(hills, variables, forecast_days, retries=6):
     raise RuntimeError(f"fetch failed after {retries} attempts: {last}")
 
 
-def fetch_hills(hills, forecast_days=3, variables=None, pause=1.0):
-    """Fetch every hill, batched. Returns responses in the same order."""
+def fetch_hills(hills, forecast_days=3, variables=None):
+    """Fetch every hill, batched and paced to the free-tier call budget.
+
+    Returns responses in the same order as `hills`.
+    """
+    global _last_chunk_at
     variables = variables or all_variables()
+    per_chunk = call_weight(min(CHUNK, len(hills)), len(variables),
+                            forecast_days)
+    total = call_weight(len(hills), len(variables), forecast_days)
+    # Seconds each chunk has to occupy for the minute average to stay legal.
+    spacing = per_chunk / (TARGET_PER_MIN / 60.0)
+    print(f"    {len(hills)} hills x {len(variables)} vars x {forecast_days}d"
+          f" = ~{total:.0f} calls, one chunk every {spacing:.0f}s")
+
     out = []
     for i in range(0, len(hills), CHUNK):
+        # Wait out whatever the previous chunk did not already use up. The
+        # request's own latency counts, so a slow response costs no extra time.
+        due = _last_chunk_at + spacing - time.monotonic()
+        if due > 0:
+            time.sleep(due)
+        _last_chunk_at = time.monotonic()
         out.extend(_fetch_chunk(hills[i:i + CHUNK], variables, forecast_days))
-        if i + CHUNK < len(hills):
-            time.sleep(pause)          # be a good citizen on a free API
     if len(out) != len(hills):
         raise RuntimeError(f"got {len(out)} responses for {len(hills)} hills")
     return out

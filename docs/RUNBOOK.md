@@ -321,9 +321,34 @@ into an hour of failures.
 This is also why adding regions is cheaper than it looks: the binding limit is
 requests per minute, not hills per build.
 
-The scheduler now waits `ARCHIVE_GAP` seconds, 75 by default, between the
-archive and the build for exactly this reason. Waiting a minute beats backing
-off for twenty. Set `ARCHIVE_GAP=0` in `deploy/.env` to disable it.
+Open-Meteo confirmed the exact formula by email:
+
+    calls = variables x forecast_days x locations / 30
+
+Free tier: 600 calls a minute, 5000 an hour, 10000 a day. What that means here:
+
+| stage    | hills | vars | calls per run |
+|----------|-------|------|---------------|
+| archive  |    60 |   75 |           450 |
+| build    |   546 |   46 |          2512 |
+| **run**  |       |      |      **2962** |
+
+Two runs a day is 5923 of the 10000 daily allowance. The binding limit is the
+per-minute one, and `omfetch.fetch_hills` now paces to it: a 25-hill build
+chunk costs 115 calls, so chunks go out about 15 seconds apart to hold roughly
+450 calls a minute. A full build takes about six minutes and never sees a 429.
+
+Before this, chunks went out three seconds apart, which is around 1400 calls a
+minute, over twice the limit. Every build sprinted into a 429 in its first few
+seconds and then backed off for twenty minutes.
+
+The scheduler also waits `ARCHIVE_GAP` seconds, 75 by default, between the
+archive and the build, because pacing state does not survive across the two
+processes. Set `ARCHIVE_GAP=0` in `deploy/.env` to disable it.
+
+**One run per hour.** A run is 2962 calls against an hourly 5000, so a manual
+rebuild in the same hour as a scheduled one will not fit. Rebuild in a
+different hour, or wait for the next slot.
 
 **A new region does not appear until a build has run.** The code ships with
 `git pull`, but the site can only show regions that have data files, and
