@@ -37,7 +37,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
-<link rel="stylesheet" href="style.css?v=68650e64">
+<link rel="stylesheet" href="style.css?v=5a008d41">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite",
  "name":"Hill Weather","url":"https://hillweather.co.uk/",
@@ -105,7 +105,7 @@ try {
   <div class="noscript">
     <p><strong>This forecast needs JavaScript to draw itself.</strong> It reads a
     small data file in your browser rather than on a server, which is how the
-    site stays free and keeps no record of who visited.</p>
+    site stays free and stays fast.</p>
     <p>Hill Weather answers one question that mainstream forecasts do not:
     whether a summit will be <em>in</em> cloud, <em>above</em> it, or clear.
     It computes the cloud base twice a day for every Munro, every Wainwright
@@ -152,6 +152,8 @@ try {
       <h5>Get in touch</h5>
       Corrections, collaboration and observations all welcome.
       <a href="contact.html">Contact</a>.
+      <br><button type="button" class="foot-btn"
+        onclick="hillAnalyticsReset()">Change my analytics choice</button>
     </div>
     <div>
       <h5>Before you go</h5>
@@ -1016,5 +1018,6 @@ boot().catch(e => {
 </script>
 <script src="share.js?v=cb53beaf"></script>
 <script src="theme.js?v=59f3cbe2"></script>
+<script src="analytics.js?v=6f61cb72"></script>
 </body>
 </html>

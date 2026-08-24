@@ -449,6 +449,23 @@ h3.spaced { margin-top: clamp(24px, 2.8vw, 32px); }
              border-bottom: 1px solid var(--rule); font-size: 17px; line-height: 1.65; }
 .noscript p { margin: 0 0 12px; text-wrap: pretty; }
 
+.consent { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+            background: var(--paper-raised); border-top: 2px solid var(--ink);
+            padding: 16px var(--pad); display: flex; align-items: center;
+            gap: clamp(14px, 3vw, 40px); flex-wrap: wrap;
+            box-shadow: 0 -8px 28px rgba(42, 37, 33, .10); }
+.consent p { margin: 0; flex: 1 1 340px; font-size: 15.5px; line-height: 1.55;
+             color: var(--muted); text-wrap: pretty; max-width: 78ch; }
+.consent-buttons { display: flex; gap: 12px; flex: none; }
+.consent button { font-size: 13px; letter-spacing: .14em; text-transform: uppercase;
+                  border: 1px solid var(--muted); padding: 10px 18px;
+                  color: var(--ink); min-height: 44px; }
+.consent button:hover { border-color: var(--ink); background: var(--row-hover); }
+/* The two answers look the same on purpose. A refusal that is harder to click
+   than an acceptance is not consent, whatever the banner says. */
+.consent-yes { border-color: var(--ochre); color: var(--ochre); }
+.consent-yes:hover { border-color: var(--ochre); color: var(--ochre); }
+
 /* ---------------------------------------------------------------- footer -- */
 
 footer { padding-top: clamp(28px, 3.4vw, 44px); }

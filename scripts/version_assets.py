@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 WEB = ROOT / "web"
-ASSETS = ["style.css", "glyph.js", "theme.js", "share.js"]
+ASSETS = ["style.css", "glyph.js", "theme.js", "share.js", "analytics.js"]
 # Every HTML file in web/, found rather than listed: a page added later and
 # forgotten here would quietly lose its cache busting, which is the exact
 # failure that cost an afternoon when Cloudflare served a stale stylesheet.
