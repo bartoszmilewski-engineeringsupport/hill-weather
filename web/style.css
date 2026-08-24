@@ -311,6 +311,11 @@ td { padding: 8px 16px 8px 0; font-size: 16px; border-bottom: 1px solid var(--ha
 td.soft { color: var(--muted); }
 th:last-child, td:last-child { padding-right: 0; }
 
+.gust { color: var(--muted); }
+/* Only the genuinely difficult numbers get a colour. If every wind reading
+   were coloured, the colour would stop meaning anything. */
+.gust-hard { color: var(--incloud); }
+
 /* ------------------------------------------------------------------ hero -- */
 
 /* Board 2b. Present only on an inversion day, which is why it is allowed to be
@@ -466,6 +471,32 @@ h3.spaced { margin-top: clamp(24px, 2.8vw, 32px); }
 .consent-yes { border-color: var(--ochre); color: var(--ochre); }
 .consent-yes:hover { border-color: var(--ochre); color: var(--ochre); }
 
+.light { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+          margin-top: clamp(20px, 2.6vw, 30px); padding: 20px 0 22px; }
+.light-kicker { font-size: 13px; letter-spacing: .24em; text-transform: uppercase;
+                color: var(--ochre); font-weight: 600; }
+.light h3 { margin: 8px 0 0; font-weight: 500; line-height: 1.15;
+            font-size: clamp(24px, 2.8vw, 34px); }
+.light p { margin: 10px 0 0; max-width: 68ch; font-size: 16px; line-height: 1.6;
+           color: var(--muted); text-wrap: pretty; }
+.light-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+              gap: clamp(20px, 3.4vw, 56px); margin-top: 20px; }
+.light-head { font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase;
+              color: var(--faint); border-bottom: 1px solid var(--rule);
+              padding-bottom: 7px; }
+.light-hill { display: grid; grid-template-columns: minmax(0, 1fr) auto;
+              width: 100%; text-align: left; align-items: baseline; gap: 4px 14px;
+              padding: 10px 6px; margin: 0 -6px;
+              border-bottom: 1px solid var(--hair); min-height: 44px; }
+.light-hill:hover { background: var(--row-hover); }
+.light-name { font-size: 17px; }
+.light-meta { grid-column: 1; font-size: 13.5px; font-style: italic;
+              color: var(--faint); }
+.light-score { grid-row: 1 / span 2; align-self: center; font-size: 26px;
+               color: var(--ochre); font-variant-numeric: tabular-nums; }
+.light-note { font-size: 13.5px; font-style: italic; color: var(--faint);
+              margin-top: 10px; }
+
 /* ---------------------------------------------------------------- footer -- */
 
 footer { padding-top: clamp(28px, 3.4vw, 44px); }
@@ -547,6 +578,19 @@ footer { padding-top: clamp(28px, 3.4vw, 44px); }
      cloud top, so on a phone the hero keeps only what it alone says. That is
      roughly ninety pixels of duplication removed from above the first hill. */
   .hero-stats > div:nth-child(-n+2) { display: none; }
+
+  /* The light panel stacks to one column on a phone, so eight hills over two
+     columns became a thousand pixels of it before the first hill in the list.
+     Three each, and the height and area line goes: both are on the hill's own
+     entry, one tap away. The caveat stays, because it is the honest part. */
+  .light { padding: 16px 0 18px; }
+  .light-cols { gap: 18px; margin-top: 14px; }
+  /* Two each. On a phone the useful answer is where to go, not a shortlist to
+     compare, and the full ranking is one tap away in the region list. */
+  .light-hill:nth-of-type(n+3) { display: none; }
+  .light-note { display: none; }
+  .light-meta { display: none; }
+  .light-hill { padding: 9px 6px; }
   .hero-stats > div:nth-child(3) { border-left: 0; padding-left: 0; }
   .hero-stats > div:nth-child(4) { border-left: 1px solid var(--rule);
                                    padding-left: 20px; }

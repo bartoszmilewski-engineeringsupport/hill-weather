@@ -175,6 +175,24 @@ def build(meta, hill_defs, responses, source):
             # the day without pulling the hill's full hourly file.
             midday = by_hour.get(f"{date}T12:00") or day_hours[len(day_hours) // 2]
 
+            # Wind and rain over the same walking hours as the view figure.
+            #
+            # These are fetched and stored per hour but were never carried into
+            # the summary, so the ranked list could not show or sort by them and
+            # a walker had to open a hill to discover it was blowing. Gust is
+            # the max rather than the mean: what turns a party back is the worst
+            # gust on the ridge, not the average of a comfortable afternoon.
+            # Measured across ten Scottish summits on one day, peak gust ran
+            # from 17 to 36 mph, so this genuinely separates hills.
+            def over(field, hours):
+                vals = [hr.get(field) for hr in hours if hr.get(field) is not None]
+                return vals
+
+            wind_hours = walking or daylight
+            gusts = over("gust", wind_hours)
+            winds = over("wind", wind_hours)
+            rain = over("precip", wind_hours)
+
             daily[date] = {
                 "view_pct": round(sum(views) / len(views)) if views else 0,
                 "view_best": max(views, default=0),
@@ -189,6 +207,10 @@ def build(meta, hill_defs, responses, source):
                 "inversion_dawn": dawn["inversion"] if dawn else None,
                 "light_dawn": dawn["light"] if dawn else None,
                 "light_dusk": dusk["light"] if dusk else None,
+                "gust_max": max(gusts) if gusts else None,
+                "wind_avg": round(sum(winds) / len(winds)) if winds else None,
+                "wind_dir": midday.get("wind_dir"),
+                "precip_mm": round(sum(rain), 1) if rain else 0,
             }
         h["daily"] = daily
 

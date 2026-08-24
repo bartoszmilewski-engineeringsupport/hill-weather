@@ -37,7 +37,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
-<link rel="stylesheet" href="style.css?v=5a008d41">
+<link rel="stylesheet" href="style.css?v=4b79f47f">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite",
  "name":"Hill Weather","url":"https://hillweather.co.uk/",
@@ -134,6 +134,8 @@ try {
 
   <section class="hero" id="hero" hidden></section>
 
+  <section class="light" id="light" hidden></section>
+
   <div class="legend" id="legend">
     <span class="l-above"><span class="c-above">&#9679;</span>&nbsp;Above cloud,
       top clear of the deck</span>
@@ -215,6 +217,17 @@ const verdictColour = s => s.verdict === 'ABOVE CLOUD' ? 'above'
    gates on low cloud cover before it will call a summit above the deck, and the
    verdict label is the only thing in the summary that carries that gate. Both
    labels below mean the same geometry, the second with less confidence. */
+/* Gust bands, in mph, for a person on an exposed summit rather than a sailor.
+   Below 30 nobody needs telling. From 30 it is hard work and worth a mention,
+   from 45 it knocks you about and from 60 it is a turn-back number whatever the
+   cloud is doing: a 95% chance of a view is worth nothing if you cannot stand
+   up in it. Only ever shown when there is something to say. */
+const GUST_NOTE = 30, GUST_HARD = 45, GUST_STOP = 60;
+const gustWord = g => g == null ? null
+  : g >= GUST_STOP ? 'dangerous'
+  : g >= GUST_HARD ? 'hard going'
+  : g >= GUST_NOTE ? 'breezy' : null;
+
 const aboveDeck = (h, s) =>
   (s.verdict === 'ABOVE CLOUD' || s.verdict === 'JUST ABOVE?') && s.cloud_top != null;
 
@@ -392,6 +405,23 @@ function writeLede(hills, day, label) {
      a headline about being above the cloud rather than under it, and the hero
      panel below. On every other day none of it appears. That the site looks
      different on the rare good morning is the whole point of it. */
+  /* Light is independent of the inversion: a fine sunset happens on days with
+     no inversion at all, and an inversion can arrive under a flat grey sky. */
+  const lt = bestLight(rows, day);
+  const lightEl = document.getElementById('light');
+  lightEl.hidden = !lt;
+  lightEl.innerHTML = lt ? lightHTML(lt, day) : '';
+  if (lt) {
+    lightEl.querySelectorAll('.light-hill').forEach(b => {
+      b.onclick = () => {
+        state.pinned = b.dataset.slug;
+        state.open = null;
+        render();
+        openPinned();
+      };
+    });
+  }
+
   const showHero = !!(iv && iv.topsOut);
   const kicker = document.getElementById('kicker');
   const hero = document.getElementById('hero');
@@ -466,6 +496,24 @@ function writeLede(hills, day, label) {
       ${frac >= 0.5 ? 'The view should be there; it is the light that will decide the day.'
                     : 'Go low today and you will still get your view.'}`;
   }
+  /* A wind sentence, appended when it changes the answer. On a day when most
+     tops are clear but it is blowing 60, the cloud figure alone is misleading:
+     the page would be recommending hills nobody should be standing on. */
+  const gusts = rows.map(r => r.s.gust_max).filter(v => v != null);
+  if (gusts.length) {
+    const worst = Math.max(...gusts);
+    const calm = rows.filter(r => (r.s.gust_max || 0) < GUST_NOTE).length;
+    if (worst >= GUST_STOP)
+      standfirst += ` It is also blowing hard: gusts reach ${worst} mph on the
+        most exposed tops, which is a turn-back number whatever the cloud does.`;
+    else if (worst >= GUST_HARD)
+      standfirst += ` Wind will decide the day as much as the cloud, gusting to
+        ${worst} mph high up${calm ? `, though ${calm} of the lower tops stay
+        under ${GUST_NOTE}` : ''}.`;
+    else if (worst >= GUST_NOTE)
+      standfirst += ` Breezy on the tops, gusting to ${worst} mph.`;
+  }
+
   document.getElementById('headline').textContent = headline;
   document.getElementById('standfirst').textContent = standfirst.replace(/\s+/g, ' ').trim();
 
@@ -487,6 +535,65 @@ function writeLede(hills, day, label) {
         `<span class="c-clear">${clear.length}</span> <small>of ${rows.length}</small>`]];
   document.getElementById('glance').innerHTML =
     glance.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+}
+
+/* ----------------------------------------------------------------- light -- */
+
+/* The light panel, for the half of the audience that is here for photographs
+   rather than for the walk.
+ *
+ * physics.light_score is computed for every hill twice a day and, until now,
+ * was displayed in exactly one place on the rare inversion morning. It was
+ * effectively invisible, and the ranked list actively hid it: ordering by the
+ * chance of a view is the walker's question, and on one measured day the best
+ * light on the page's top ten scored 25 while 84 was available further down.
+ *
+ * This appears only when there is something worth getting up for. Across three
+ * measured days the number of hills scoring 50 or more was 0, 22 and 2 out of
+ * 282, so on most days the honest answer is "nowhere" and the panel stays
+ * away, exactly like the inversion hero. */
+const LIGHT_WORTH_IT = 50;
+
+function bestLight(rows, day) {
+  const pick = (field) => rows
+    .map(r => ({ h: r.h, s: r.s, score: r.s[field] || 0 }))
+    .filter(x => x.score >= LIGHT_WORTH_IT)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+  const dawn = pick('light_dawn'), dusk = pick('light_dusk');
+  if (!dawn.length && !dusk.length) return null;
+  return { dawn, dusk, day };
+}
+
+function lightHTML(lt, day) {
+  const col = (title, list, note) => {
+    if (!list.length) return '';
+    return `<div>
+      <div class="light-head">${title}</div>
+      ${list.map(x => `<button type="button" class="light-hill" data-slug="${x.h.slug}">
+          <span class="light-name">${x.h.name}</span>
+          <span class="light-meta">${metres(x.h.height)}${
+            x.h.area ? ' &middot; ' + x.h.area : ''}</span>
+          <span class="light-score">${x.score}</span>
+        </button>`).join('')}
+      <div class="light-note">${note}</div>
+    </div>`;
+  };
+
+  const sunrise = lt.dawn.length && lt.dawn[0].h.sunrise
+    ? hhmm(lt.dawn[0].h.sunrise[day]) : null;
+
+  return `<div class="light-inner">
+    <div class="light-kicker">Worth the alarm</div>
+    <h3>The light${sunrise ? `, from ${sunrise}` : ''}.</h3>
+    <p>Cloud in the right place catches colour; too much blocks the light and a
+      clear sky gives a bland sunrise. These score best on that balance. It is a
+      model, not a promise.</p>
+    <div class="light-cols">
+      ${col('Sunrise', lt.dawn, 'Be on top before the sun is.')}
+      ${col('Sunset', lt.dusk, 'Leave time to come down in the dark.')}
+    </div>
+  </div>`;
 }
 
 /* ----------------------------------------------------------------- chips -- */
@@ -524,10 +631,16 @@ function hillRow(h, s, scale, grid) {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'hill';
+  // Wind rides on the existing secondary line rather than adding a third, and
+  // only appears once it is worth knowing about.
+  const gust = s.gust_max;
+  const windy = gust != null && gust >= GUST_NOTE
+    ? ` &middot; <span class="${gust >= GUST_HARD ? 'gust-hard' : 'gust'}">gusting ${gust}</span>`
+    : '';
   btn.innerHTML =
     hillGlyph(h.name, h.height, s.cloud_base, scale, aboveDeck(h, s)) +
     `<span><span class="hill-name">${h.name}</span>` +
-    `<span class="hill-meta" style="display:block">${phrase(h, s)}</span></span>` +
+    `<span class="hill-meta" style="display:block">${phrase(h, s)}${windy}</span></span>` +
     `<span class="hill-pct c-${verdictColour(s)}">${s.view_pct}%</span>`;
 
   const holder = document.createElement('div');
@@ -822,6 +935,14 @@ function detailHTML(h) {
           <div><dt>Sunset</dt><dd>${hhmm(sun.sunset)} <small>${compass(sun.sunset_azimuth)}</small></dd></div>
           ${golden ? `<div><dt>Golden hour</dt><dd>${golden}</dd></div>` : ''}
           <div><dt>Daylight</dt><dd>${sun.daylight_hours ?? '-'} hours</dd></div>
+          ${s.light_dawn != null || s.light_dusk != null ? `<div><dt>Light</dt><dd>
+            <span class="${(s.light_dawn || 0) >= 50 ? 'c-above' : ''}">dawn ${s.light_dawn ?? '-'}</span>
+            &middot;
+            <span class="${(s.light_dusk || 0) >= 50 ? 'c-above' : ''}">dusk ${s.light_dusk ?? '-'}</span>
+            <small>of 100</small></dd></div>` : ''}
+          ${s.gust_max != null ? `<div><dt>Gusting to</dt><dd>
+            <span class="${s.gust_max >= GUST_HARD ? 'c-incloud' : ''}">${s.gust_max} mph</span>
+            ${s.wind_avg != null ? `<small>avg ${s.wind_avg}</small>` : ''}</dd></div>` : ''}
         </dl>
       </div>
       <div>
