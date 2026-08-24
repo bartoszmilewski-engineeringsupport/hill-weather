@@ -70,25 +70,103 @@ Four pages: the forecast, **The week ahead**, **How to read this** and
 location count, so 496 hills four times daily exceeds the free tier. Measured,
 not assumed.
 
-## Phase 2: Validation (the long pole, running now)
+## Phase 2: Validation (running, and it has started answering)
 
 Everything else is polish until this is answered.
 
+### The harness
+
+`scripts/validate.py` scores the forecast against real observations.
+
+```bash
+python scripts/validate.py --fetch      # collect, ~1 minute per station
+python scripts/validate.py --score      # the report
+python scripts/validate.py --tune       # search constants on training data only
+python scripts/validate.py --score --rh 75 --lcl 140   # test a candidate
+```
+
 - [x] Archive raw API responses, never derived answers, so any future tuning
       can be re-scored against every day collected.
-- [x] `build.py --file <archive>` rebuilds from any archived day. The backtest
-      harness and the production pipeline are the same code.
-- [ ] Webcam list: Nevis Range, Cairngorm, Glencoe.
-- [ ] Ingest Lake District Fell Top Assessor reports. A professional human
-      observation from Helvellyn most winter days, far better ground truth
-      than a webcam.
-- [ ] Daily capture of stills alongside the matching forecast.
-- [ ] Score sheet: predicted cloud base against observed, per hill per day.
-- [ ] Tune `RH_MOIST`, `LOW_CLOUD_MIN`, `CLEAR_MARGIN` in `scripts/physics.py`.
+- [x] `build.py --file <archive>` rebuilds from any archived day.
+- [x] **A validation set that did not need waiting for.** Open-Meteo's
+      previous-runs endpoint returns 60 days of history *with pressure
+      levels*, from the same model the site forecasts with, and Iowa State's
+      ASOS archive returns historical METAR going back decades. So paired
+      (profile, observed cloud base) records exist today rather than in March.
+      It also costs none of the daily forecast budget: different endpoint.
+- [x] Scoring: cloud base error by regime, calibration, verdict confusion,
+      Brier score against climatology and persistence baselines, on a
+      chronological held-out third that tuning never sees.
+- [ ] Summit observations: Cairngorm summit AWS, Fell Top Assessor, webcams.
+- [ ] Fix the calibration, which is the real problem.
 
-**Success criterion: cloud base right to within ~200 m on most days.** If it is
-not, no amount of app polish saves this. Better to know in week four than in
-month six.
+### Why airports
+
+Almost nobody measures cloud base over a summit. Airports measure it every half
+hour, for free, and report the two numbers the LCL formula takes as input,
+temperature and dewpoint, alongside the base it is trying to predict.
+
+This does **not** answer whether the method transfers to mountains: orographic
+lift raises cloud base over a summit and the model's terrain is smoothed. But
+if the physics is wrong over an airfield it cannot be right on Ben Nevis, so
+it is the first question and the only one answerable now.
+
+### First findings, ~7,000 paired hours, 5 stations, 60 days
+
+**Regime matters more than anything.** A first run showed skill of minus 110%
+against climatology, which was a flaw in the scoring rather than the forecast.
+The LCL predicts the base of cloud lifted from the surface, which is what hill
+fog and low stratus are, and says nothing useful about a deck at 3000 m. Those
+hours, where no British summit is anywhere near the cloud, were dominating a
+single average. Split by how low the cloud actually was:
+
+| observed ceiling | bias | mean abs error | within 200 m |
+|---|---|---|---|
+| 0 to 800 m, in among the hills | **+51 m** | **191 m** | **67.5%** |
+| 800 to 1400 m, around the summits | -399 m | 418 m | 19.6% |
+| above 1400 m, over everything | -1697 m | 1706 m | 3.7% |
+
+So the method is respectable exactly where it is asked the real question, and
+poor in the band where Munro summits actually sit. That band is the work.
+
+**The forecast is far too pessimistic.** This is the headline failure and it is
+calibration, not cloud base. When the site says a 0 to 20% chance of a view,
+the summit was actually clear **54%** of the time. Every band is
+underconfident, by 47 points at the low end. The verdict errors are lopsided in
+the same direction: 3,039 "said in cloud, was clear" against 306 the other way,
+with overall accuracy 72.8%.
+It cries wolf.
+
+**Negative skill so far.** Brier 0.202 against climatology's 0.157, so -29%:
+worse than always predicting the base rate. It does beat persistence (0.253). A forecast that cannot beat climatology has no value yet, and saying
+so plainly is the point of measuring.
+
+**Tuning helps a little and generalises.** A search on the training half picked
+`RH_MOIST=75, LCL_K=140` over the current `85, 125`, and it held up on the
+held-out third it had never seen: mean absolute error 330 to 306 m, median 284
+to 250, within-200 m 37.6% to 42.0%, Brier 0.2163 to 0.2099. Real, but small
+relative to the calibration problem, and **not yet applied to production.**
+
+### What the numbers say to do next
+
+1. **Fix calibration before anything else.** `verdict()` turns "the modelled
+   base is below the summit" into a near-certainty of cloud, when broken cover
+   at summit level means in and out. The probability should reflect cover
+   fraction and the margin between base and summit, not saturate.
+2. **Then the 800 to 1400 m band**, which is where the Munros are.
+3. **Then summit observations**, to find out how much of this transfers off
+   the airfield.
+
+### Success criteria
+
+- Cloud base within 200 m on most days, in the low regime. Currently 67.5%
+  there, but only 37% across the hill-relevant range: **partly met**.
+- Calibration within about 10 points across the range. Currently out by up to
+  46: **not met**.
+- Positive skill against climatology. Currently -29%: **not met**.
+
+Honest position: the method is not yet good enough to be trusted, the site says
+so on every page, and now there is a measurement instead of an opinion.
 
 ## Phase 3: Web app (designed and built)
 

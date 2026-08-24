@@ -16,3 +16,8 @@ venv/
 
 # Host configuration, differs per machine.
 deploy/.env
+
+# Validation working data: ~600 kB per station of raw METAR and model
+# profiles, refetchable in minutes with `python scripts/validate.py --fetch`.
+# The findings belong in docs/PLAN.md; the raw pull does not belong in git.
+data/validation/
