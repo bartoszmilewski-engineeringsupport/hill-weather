@@ -15,7 +15,7 @@
  * drop analytics instead.
  */
 (function () {
-  var ID = 'G-XXXXXXXXXX';          // Measurement ID, from the GA data stream
+  var ID = 'G-8J78948PTM';          // Measurement ID, from the GA data stream
   var KEY = 'hw.analytics';
 
   function stored() {
