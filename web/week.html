@@ -121,7 +121,8 @@ try {
  * front clearing west to east, because that needs the spatial work that is
  * waiting on validation. */
 const DATA = 'data/';
-const band = v => v >= 70 ? 'clear' : v >= 40 ? 'edge' : 'incloud';
+// Same boundaries as physics.verdict and the front page legend.
+const band = v => v >= 75 ? 'clear' : v > 40 ? 'edge' : 'incloud';
 const metres = m => m == null ? null : m.toLocaleString('en-GB') + ' m';
 const median = a => a.length ? a.slice().sort((x, y) => x - y)[Math.floor(a.length / 2)] : null;
 

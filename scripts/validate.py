@@ -591,6 +591,35 @@ def tune(rows):
     print("   held-out third. If it does not, it was noise.")
 
 
+
+def sweep(name, values):
+    """Try one constant across a range, on the TRAINING half only.
+
+    The held-out third is never touched here. Anything chosen has to be
+    confirmed against it afterwards with a plain --score, which is the only
+    number that means anything.
+    """
+    keep = getattr(physics, name)
+    print(f"\n-- SWEEPING {name} on the training half only ------------------")
+    print(f"   {'value':>8} {'brier':>9} {'base mae':>10}")
+    best = None
+    for v in values:
+        setattr(physics, name, v)
+        train, _ = split(load_all())
+        train = [r for r in train if r["observed_base"] is None
+                 or r["observed_base"] < HILL_RELEVANT]
+        b = brier(summit_cases(train))
+        e = base_error(train)
+        mark = "   <-- current" if v == keep else ""
+        mae = f"{e['mae']:.0f}" if e else "-"
+        print(f"   {v:>8.0f} {b:>9.4f} {mae:>10}{mark}")
+        if best is None or b < best[0]:
+            best = (b, v)
+    setattr(physics, name, keep)
+    print(f"\n   best on training: {name}={best[1]:.0f}  (brier {best[0]:.4f})")
+    print("   Confirm with --score before believing it.")
+
+
 # ------------------------------------------------------------------ main --
 
 def main():
@@ -605,6 +634,11 @@ def main():
     # Try a candidate without editing physics.py, so a proposal can be tested
     # against the held-out third before it goes anywhere near production.
     ap.add_argument("--rh", type=float, help="override RH_MOIST for this run")
+    ap.add_argument("--sigma", type=float,
+                    help="override BASE_SIGMA for this run")
+    ap.add_argument("--sweep", metavar="CONST",
+                    help="sweep one constant on training data: "
+                         "BASE_SIGMA, RH_MOIST or LCL_K")
     ap.add_argument("--lcl", type=float, help="override LCL_K for this run")
     args = ap.parse_args()
 
@@ -620,10 +654,24 @@ def main():
 
     if args.rh is not None:
         physics.RH_MOIST = args.rh
+    if args.sigma is not None:
+        physics.BASE_SIGMA = args.sigma
     if args.lcl is not None:
         physics.LCL_K = args.lcl
     if args.rh is not None or args.lcl is not None:
         print(f"overrides: RH_MOIST={physics.RH_MOIST} LCL_K={physics.LCL_K}")
+
+    if args.sweep:
+        ranges = {
+            "BASE_SIGMA": [150.0, 200.0, 250.0, 300.0, 400.0, 500.0, 650.0, 800.0],
+            "RH_MOIST": [70.0, 75.0, 80.0, 85.0, 90.0, 95.0],
+            "LCL_K": [130.0, 140.0, 150.0, 155.0, 160.0, 170.0, 185.0, 200.0],
+        }
+        if args.sweep not in ranges:
+            sys.exit(f"unknown constant {args.sweep!r}; "
+                     f"try one of {', '.join(ranges)}")
+        sweep(args.sweep, ranges[args.sweep])
+        return
 
     if args.fetch:
         do_fetch(args.days, set(args.station) if args.station else None)

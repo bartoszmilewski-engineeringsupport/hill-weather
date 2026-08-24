@@ -139,9 +139,9 @@ try {
   <div class="legend" id="legend">
     <span class="l-above"><span class="c-above">&#9679;</span>&nbsp;Above cloud,
       top clear of the deck</span>
-    <span class="l-clear"><span class="c-clear">&#9679;</span>&nbsp;Clear, 70% and up</span>
-    <span><span class="c-edge">&#9679;</span>&nbsp;On the edge, 40&ndash;69%</span>
-    <span><span class="c-incloud">&#9679;</span>&nbsp;In cloud, under 40%</span>
+    <span class="l-clear"><span class="c-clear">&#9679;</span>&nbsp;Clear, 75% and up</span>
+    <span><span class="c-edge">&#9679;</span>&nbsp;On the edge, 41&ndash;74%</span>
+    <span><span class="c-incloud">&#9679;</span>&nbsp;In cloud, 40% or less</span>
     <span class="tip">tap any hill for routes, sun times and the hour-by-hour</span>
   </div>
 
@@ -198,7 +198,10 @@ const DATA = 'data/';
 const SHOWN_PER_BAND = 9;
 const detailCache = {};
 
-const band = v => v >= 70 ? 'c-clear' : v >= 40 ? 'c-edge' : 'c-incloud';
+/* The same boundaries physics.verdict uses for its labels. When these drifted
+   apart a hill could read "on the edge" in its entry while showing green in
+   the list. */
+const band = v => v >= 75 ? 'c-clear' : v > 40 ? 'c-edge' : 'c-incloud';
 const hhmm = iso => iso ? iso.slice(11, 16) : '-';
 const compass = d => d == null ? '' :
   ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'][Math.round(d / 22.5) % 16];
@@ -206,7 +209,7 @@ const metres = m => m == null ? '-' : m.toLocaleString('en-GB') + ' m';
 const escapeXML = s => String(s).replace(/[&<>"]/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const verdictColour = s => s.verdict === 'ABOVE CLOUD' ? 'above'
-  : s.view_pct >= 70 ? 'clear' : s.view_pct >= 40 ? 'edge' : 'incloud';
+  : s.view_pct >= 75 ? 'clear' : s.view_pct > 40 ? 'edge' : 'incloud';
 
 /* True when the summit stands above the top of the cloud rather than under its
    base: an inversion, drawn the other way up.
@@ -393,7 +396,7 @@ function heroHTML(iv) {
 
 function writeLede(hills, day, label) {
   const rows = hills.map(h => ({ h, s: h.daily[day] })).filter(r => r.s);
-  const clear = rows.filter(r => r.s.view_pct >= 70);
+  const clear = rows.filter(r => r.s.view_pct >= 75);
   const bases = rows.map(r => r.s.cloud_base).filter(v => v != null).sort((a, b) => a - b);
   const mid = bases.length ? bases[Math.floor(bases.length / 2)] : null;
   const lo = bases.length ? bases[0] : null;
@@ -707,7 +710,7 @@ function render() {
       !bands.some(([f]) => f > floor && r.h.height >= f));
     if (!inBand.length) continue;
 
-    const clear = inBand.filter(r => r.s.view_pct >= 70);
+    const clear = inBand.filter(r => r.s.view_pct >= 75);
     const best = inBand[0];
     const section = document.createElement('section');
     section.className = 'band';

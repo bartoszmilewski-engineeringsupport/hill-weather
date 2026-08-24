@@ -111,69 +111,82 @@ lift raises cloud base over a summit and the model's terrain is smoothed. But
 if the physics is wrong over an airfield it cannot be right on Ben Nevis, so
 it is the first question and the only one answerable now.
 
-### First findings, ~7,000 paired hours, 5 stations, 60 days
+### What the measurement found, and what it fixed
 
-**Regime matters more than anything.** A first run showed skill of minus 110%
-against climatology, which was a flaw in the scoring rather than the forecast.
-The LCL predicts the base of cloud lifted from the surface, which is what hill
-fog and low stratus are, and says nothing useful about a deck at 3000 m. Those
-hours, where no British summit is anywhere near the cloud, were dominating a
-single average. Split by how low the cloud actually was:
+**The single bug behind almost all of it.** `verdict()` treated the modelled
+cloud base as exact. A hill 51 m below it got a 90% chance of a view; one 49 m
+below got 5%. A hundred-metre cliff, on an input whose mean absolute error is
+about 300 m. The forecast was far more confident than its own data justified,
+and because the cliff always fell the pessimistic way, it cried wolf.
+
+It is now probabilistic in the base as well as the cover:
+
+    P(in cloud) = P(cloud present) x P(summit above the true base)
+
+the second being a normal CDF over the margin, with `BASE_SIGMA` standing for
+how well the base is actually known. A summit exactly at the modelled base now
+reads 50%, which is the honest answer, instead of 5%.
+
+**Held out, and never used for tuning:**
+
+| | before | after |
+|---|---|---|
+| Brier score | 0.2019 | **0.1164** |
+| skill vs climatology | **-29%** | **+20.6%** |
+| accuracy | 75.6% | **83.4%** |
+| beaten by answering "clear" always? | yes, 83.0% | **no** |
+| when it says IN CLOUD, right | 39.6% | **50.8%** |
+| worst calibration gap | +47 pts | **+23 pts** |
+| cloud base mean abs error | 329 m | **290 m** |
+| cloud base within 200 m | 37.3% | **43.8%** |
+
+Every measure moved the same way, on data never used to choose anything.
+
+**Cloud base by regime, held out:**
 
 | observed ceiling | bias | mean abs error | within 200 m |
 |---|---|---|---|
-| 0 to 800 m, in among the hills | **+51 m** | **191 m** | **67.5%** |
-| 800 to 1400 m, around the summits | -399 m | 418 m | 19.6% |
-| above 1400 m, over everything | -1697 m | 1706 m | 3.7% |
+| 0 to 800 m, in among the hills | +117 m | **215 m** | **63.4%** |
+| 800 to 1400 m, around the summits | -316 m | 366 m | 28.6% |
+| above 1400 m, over everything | -1744 m | 1763 m | 6.8% |
 
-So the method is respectable exactly where it is asked the real question, and
-poor in the band where Munro summits actually sit. That band is the work.
+### Two methodological traps, both nearly fallen into
 
-**The forecast is far too pessimistic.** This is the headline failure and it is
-calibration, not cloud base. When the site says a 0 to 20% chance of a view,
-the summit was actually clear **54%** of the time. Every band is
-underconfident, by 47 points at the low end. The verdict errors are lopsided in
-the same direction: 3,590 "said in cloud, was clear" against 490 the other way.
+**Brier will walk a forecast into the majority class.** Sweeping `LCL_K`, the
+Brier score kept improving all the way to 200, but the cloud base error
+bottomed at 140 to 150 and then climbed to 300 m. Past the optimum a larger
+value simply makes every forecast more optimistic, which pays on a problem
+where 83% of summit-hours are clear without being any more accurate. `LCL_K` is
+therefore chosen on base error, the physical measure, not on Brier.
 
-**The plain accuracy number is worse than saying nothing.** 75.6% of summit
-hours are judged correctly, but 83.0% of them were clear, so a model that
-answered "clear" every single time and knew nothing at all would score higher.
-When the site says IN CLOUD it is right 39.6% of the time; when it says CLEAR
-it is right 95.5%. It catches 82.7% of genuinely clouded summits. That is a
-very sensitive, very imprecise detector: it almost never promises a view that
-is not there, and it talks people out of days they should have gone on.
-It cries wolf.
+**A holdout stops being a holdout the moment you choose with it.** Sweeping
+`BASE_SIGMA`, training preferred 500 and the held-out third kept improving past
+650. 500 was taken. The held-out number is only worth having because nothing
+was selected on it.
 
-**Negative skill so far.** Brier 0.202 against climatology's 0.157, so -29%:
-worse than always predicting the base rate. It does beat persistence (0.253). A forecast that cannot beat climatology has no value yet, and saying
-so plainly is the point of measuring.
+### Still wrong
 
-**Tuning helps a little and generalises.** A search on the training half picked
-`RH_MOIST=75, LCL_K=140` over the current `85, 125`, and it held up on the
-held-out third it had never seen: mean absolute error 330 to 306 m, median 284
-to 250, within-200 m 37.6% to 42.0%, Brier 0.2163 to 0.2099. Real, but small
-relative to the calibration problem, and **not yet applied to production.**
-
-### What the numbers say to do next
-
-1. **Fix calibration before anything else.** `verdict()` turns "the modelled
-   base is below the summit" into a near-certainty of cloud, when broken cover
-   at summit level means in and out. The probability should reflect cover
-   fraction and the margin between base and summit, not saturate.
-2. **Then the 800 to 1400 m band**, which is where the Munros are.
-3. **Then summit observations**, to find out how much of this transfers off
-   the airfield.
+- **Calibration is halved, not fixed.** The middle bands still run about 22
+  points underconfident: when the site says 50%, the summit is clear about 74%
+  of the time. Still too pessimistic, just far less so.
+- **The 800 to 1400 m band**, where the Munros are, remains the weakest, at
+  -316 m bias and 28.6% within 200 m.
+- **Summer only.** Every hour of this is June to August. Winter is a different
+  problem, with more low stratus and the inversions the site is built around.
+  The model side of the data is a rolling 60-day window, so a re-fetch in late
+  winter is needed to say anything about the season that matters most.
+- **Airfields, not mountains.** Orographic lift raises cloud base over a summit
+  and the model's terrain is smoothed. None of this proves the transfer.
 
 ### Success criteria
 
-- Cloud base within 200 m on most days, in the low regime. Currently 67.5%
-  there, but only 37% across the hill-relevant range: **partly met**.
-- Calibration within about 10 points across the range. Currently out by up to
-  46: **not met**.
-- Positive skill against climatology. Currently -29%: **not met**.
+- Cloud base within 200 m on most days: **63.4% in the low regime, 43.8%
+  overall. Not met, but close in the regime that matters.**
+- Calibration within about 10 points: **worst gap +23. Not met.**
+- Positive skill against climatology: **+20.6%. Met.**
 
-Honest position: the method is not yet good enough to be trusted, the site says
-so on every page, and now there is a measurement instead of an opinion.
+The site is worth using for the first time. It is still not validated on
+mountains, and every page still says so.
 
 ## Phase 3: Web app (designed and built)
 

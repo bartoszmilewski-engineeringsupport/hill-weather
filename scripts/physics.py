@@ -29,8 +29,36 @@ LOW_CLOUD_MIN = 15.0
 # Model levels are 215-466m apart, so a summit poking just above an estimated
 # cloud top is inside the error bars. Demand real clearance before calling it.
 CLEAR_MARGIN = 150.0
+
+# How well the modelled cloud base is actually known, in metres.
+#
+# Measured, not guessed: scripts/validate.py scores the modelled base against
+# observed ceilings and gives a mean absolute error near 300 m across the
+# hill-relevant range, and about 190 m when cloud is genuinely low. The value
+# used here is larger than that, at 500 m, because it absorbs more than the
+# base error alone: it also carries the fact that modelled cloud cover over a
+# grid box is not the same thing as cloud at one point on one summit. Chosen by
+# sweeping the TRAINING half only. The held-out third preferred an even larger
+# value, and that was deliberately not taken: choosing a constant because the
+# held-out data likes it is how a holdout stops being a holdout.
+#
+# This is the single most important number in the file. The verdict used to
+# treat the base as exact, with a hard cliff at 50 m either side, which made a
+# hill 51 m below the base a 90% chance of a view and one 49 m below a 5%
+# chance. On an input known to a few hundred metres that is false precision,
+# and because the cliff always fell the pessimistic way it made the whole
+# forecast cry wolf: it said IN CLOUD and the summit was clear 54% of the time.
+BASE_SIGMA = 500.0
 PARCEL_LEVEL = 975          # ~350m, representative of glen-level air
-LCL_K = 125.0               # metres of lift per degC of dewpoint depression
+# Metres of lift per degC of dewpoint depression. Espy's rule gives 125; this
+# is 145, chosen by sweeping the TRAINING half and reading the CLOUD BASE ERROR
+# rather than the Brier score. That distinction matters: Brier kept improving
+# all the way to 200, but base error bottomed at 140 to 150 and then climbed to
+# 300 m. Past the optimum, a larger value simply makes every forecast more
+# optimistic, which pays on a problem where 83% of summit-hours are clear
+# without being any more accurate. Brier alone will happily walk a forecast
+# into the majority class.
+LCL_K = 145.0
 GRID = 25                   # m, vertical resolution of the interpolated profile
 
 
@@ -103,17 +131,40 @@ def moist_layer(prof):
     return base, top
 
 
+def _normal_cdf(z):
+    """Probability a standard normal is below z."""
+    return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
+
+
 def verdict(summit, base, top, low_cover):
     """(label, in-cloud probability %, plain-English reason).
 
     Deliberately probabilistic. Broken cloud means the summit is in and out of
     it, and saying so is more useful than a confident icon that is wrong.
+
+    Two independent things have to be true for a summit to be in cloud: there
+    has to be cloud, and the summit has to be above its base. So:
+
+        P(in cloud) = P(cloud present) x P(summit above the true base)
+
+    The first is the modelled low cloud cover. The second is where the old
+    version went wrong, by treating the modelled base as exact. It is not: it
+    is known to about BASE_SIGMA, so the summit sitting a little below it is
+    only weakly reassuring, and a summit far below it is genuinely safe. A
+    normal CDF over the margin expresses exactly that, and it replaces a cliff
+    that flipped a hill from 90% to 5% over a hundred metres.
+
+    The practical effect is that the forecast stops claiming certainty it never
+    had, in the direction it was always wrong: too much cloud, too often.
     """
     low_cover = low_cover or 0.0
 
-    if low_cover < LOW_CLOUD_MIN or base is None:
+    if base is None or low_cover < LOW_CLOUD_MIN:
         return "CLEAR", 5, f"little low cloud about ({low_cover:.0f}% cover)"
 
+    # An inversion is a different question: the summit is above the cloud top
+    # rather than below its base, and the useful answer is about standing on
+    # top of it. Left as a separate branch on purpose.
     if top is not None and summit > top + CLEAR_MARGIN:
         return ("ABOVE CLOUD", 10,
                 f"cloud {base:.0f}-{top:.0f}m, summit {summit - top:.0f}m clear above it")
@@ -123,14 +174,25 @@ def verdict(summit, base, top, low_cover):
                 f"cloud tops ~{top:.0f}m, summit only {summit - top:.0f}m above "
                 f"- inside model error, could go either way")
 
-    if summit < base - 50:
-        return ("CLEAR", 10,
-                f"cloud base {base:.0f}m, sitting {base - summit:.0f}m above the summit")
+    margin = summit - base                       # positive: summit above base
+    p_above = _normal_cdf(margin / BASE_SIGMA)
+    p = 100.0 * (low_cover / 100.0) * p_above
+    p = max(2.0, min(97.0, p))                   # never absolute either way
 
-    p = max(20.0, min(95.0, low_cover))
+    if p >= 60:
+        label = "IN CLOUD"
+    elif p >= 25:
+        label = "ON THE EDGE"
+    else:
+        label = "CLEAR"
+
     top_s = f"{top:.0f}m" if top is not None else "well above"
-    label = "ON THE EDGE" if abs(summit - base) <= 100 else "IN CLOUD"
-    return label, p, f"cloud {base:.0f}m to {top_s}, {low_cover:.0f}% cover"
+    if margin >= 0:
+        where = f"summit {margin:.0f}m above the base"
+    else:
+        where = f"summit {-margin:.0f}m below the base"
+    return label, p, (f"cloud {base:.0f}m to {top_s}, {low_cover:.0f}% cover, "
+                      f"{where}")
 
 
 def inversion_score(summit, base, top, low_cover):
