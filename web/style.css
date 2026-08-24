@@ -295,6 +295,9 @@ nav .links { display: flex; gap: clamp(16px, 2.4vw, 30px); flex-wrap: wrap;
 
 /* The annotated section. Height is bounded because the drawing is an aside to
    the verdict, not the point of the page. */
+.trust { font-size: 14.5px; font-style: italic; color: var(--faint);
+          margin: 8px 0 0; text-wrap: pretty; }
+
 .section { display: block; width: 100%; max-width: 700px; height: auto;
            margin-top: 16px; }
 .section text { font-family: "Newsreader", Georgia, serif; }

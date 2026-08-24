@@ -37,7 +37,7 @@ try {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&display=swap">
-<link rel="stylesheet" href="style.css?v=4b79f47f">
+<link rel="stylesheet" href="style.css?v=71577bb0">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebSite",
  "name":"Hill Weather","url":"https://hillweather.co.uk/",
@@ -123,8 +123,9 @@ try {
       <div class="kicker-inv" id="kicker" hidden></div>
       <h2 id="headline">Loading the forecast&hellip;</h2>
       <p class="standfirst" id="standfirst"></p>
-      <p class="unverified">The method is unverified against real observations:
-        read every number as a chance, not a promise.</p>
+      <p class="unverified">Scored against measured cloud base, but not yet on
+        summits themselves: read every number as a chance, not a promise.
+        <a href="how-to-read.html#trust">How reliable is this?</a></p>
     </div>
     <div class="glance-wrap">
       <div class="glance-head">At a glance</div>
@@ -142,7 +143,9 @@ try {
     <span class="l-clear"><span class="c-clear">&#9679;</span>&nbsp;Clear, 75% and up</span>
     <span><span class="c-edge">&#9679;</span>&nbsp;On the edge, 41&ndash;74%</span>
     <span><span class="c-incloud">&#9679;</span>&nbsp;In cloud, 40% or less</span>
-    <span class="tip">tap any hill for routes, sun times and the hour-by-hour</span>
+    <span class="tip">a high number is close to reliable, a low one is
+      barely better than a shrug.
+      <a href="how-to-read.html#trust">Why</a></span>
   </div>
 
   <div id="bands"></div>
@@ -226,6 +229,28 @@ const verdictColour = s => s.verdict === 'ABOVE CLOUD' ? 'above'
    cloud is doing: a 95% chance of a view is worth nothing if you cannot stand
    up in it. Only ever shown when there is something to say. */
 const GUST_NOTE = 30, GUST_HARD = 45, GUST_STOP = 60;
+
+/* How much to trust the number you are looking at.
+ *
+ * From scripts/validate.py, held out and never used for tuning: 16,745
+ * summit-hours against observed cloud base, June to August 2026. The forecast
+ * is not equally reliable in both directions and pretending otherwise would be
+ * the dishonest part.
+ *
+ *   says the summit will be clear  -> right 93.7% of the time
+ *   says the summit is in cloud    -> right 50.8% of the time
+ *
+ * So a high number is close to trustworthy and a low one is barely better than
+ * a shrug. Both used to be presented as though they were the same kind of
+ * claim. Update these when the validation is re-run. */
+const TRUST = {
+  clear: 'Forecasts this confident have been right about nine times in ten.',
+  edge: 'Around this figure the forecast is close to a coin toss.',
+  cloud: 'Forecasts this pessimistic have been right about half the time, so '
+       + 'read it as poor odds rather than a closed door.',
+};
+const trustNote = pct => pct >= 75 ? TRUST.clear
+  : pct > 40 ? TRUST.edge : TRUST.cloud;
 const gustWord = g => g == null ? null
   : g >= GUST_STOP ? 'dangerous'
   : g >= GUST_HARD ? 'hard going'
@@ -951,6 +976,8 @@ function detailHTML(h) {
       <div>
         <p class="verdict"><span class="${cls}">${s.view_pct}%, ${said}</span>
           <em>${elaborate(h, s, hrs)}</em></p>
+        <p class="trust">${trustNote(s.view_pct)}
+          <a href="how-to-read.html#trust">How this was measured</a></p>
         ${sectionSVG(h, s, scale)}
         ${h.wikipedia ? `<p class="wiki">${h.wikipedia.extract}</p>
           <div class="wiki-credit">From <a href="${h.wikipedia.url}" target="_blank" rel="noopener">Wikipedia</a>,
