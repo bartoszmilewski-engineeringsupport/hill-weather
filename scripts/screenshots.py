@@ -19,6 +19,14 @@ Two things make this work where a naive --screenshot does not:
   the device by design and stores an override in localStorage, neither of
   which a command line can reach, but the Blink setting underneath both can
   be set directly.
+
+  The page is loaded inside an iframe of exactly the target width. This is
+  not decoration. --window-size does NOT set the layout viewport that
+  "width=device-width" resolves against, in either headless mode, so a phone
+  capture laid the page out wide and then cropped it: the first set of README
+  screenshots had the right-hand third of every line missing. An iframe has a
+  real layout viewport at its own width, so the page inside it reflows the way
+  a phone actually would.
 """
 
 import argparse
@@ -37,7 +45,10 @@ CANDIDATES = [
     "google-chrome", "chromium", "chromium-browser",
 ]
 
-LIGHT, DARK = 1, 2
+# Measured, not assumed: preferredColorScheme=0 reports prefers-color-scheme
+# dark, and 1 reports light. 2 silently behaves as light, which is why every
+# "dark" screenshot produced before this was quietly a light one.
+LIGHT, DARK = 1, 0
 
 #  file                 path              width height scheme
 SHOTS = [
@@ -45,8 +56,8 @@ SHOTS = [
     ("forecast-dark.png",  "/",                 1360, 1180, DARK),
     ("week-light.png",     "/week.html",        1360, 1000, LIGHT),
     ("guide-light.png",    "/how-to-read.html", 1360, 1150, LIGHT),
-    ("phone-light.png",    "/",                  390,  844, LIGHT),
-    ("phone-dark.png",     "/",                  390,  844, DARK),
+    ("phone-light.png",    "/",                  504,  920, LIGHT),
+    ("phone-dark.png",     "/",                  504,  920, DARK),
 ]
 
 
@@ -65,7 +76,10 @@ def main():
     ap.add_argument("--url", default="https://hillweather.co.uk",
                     help="site to capture (default: the live site)")
     ap.add_argument("--browser", default=None)
-    ap.add_argument("--wait", type=int, default=15000,
+    # 30s, not 15. The page inside the iframe has to fetch its data and draw
+    # before the shutter, and at 15s the capture caught "Loading the
+    # forecast..." every time.
+    ap.add_argument("--wait", type=int, default=30000,
                     help="virtual time budget in ms, for data fetch and paint")
     args = ap.parse_args()
 
@@ -80,6 +94,11 @@ def main():
     print(f"{browser}\n{base}\n")
     for name, path, w, h, scheme in SHOTS:
         dest = OUT / name
+        # Remove it first. Chrome leaves the previous file in place when a
+        # capture fails, and checking the size afterwards then reports a stale
+        # image as a success. That shipped two clipped, months-old screenshots
+        # to the README while claiming all six were written.
+        dest.unlink(missing_ok=True)
         cmd = [browser, "--headless=new", "--disable-gpu", "--hide-scrollbars",
                f"--user-data-dir={profile}",
                f"--window-size={w},{h}",
