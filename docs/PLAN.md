@@ -242,6 +242,17 @@ Each of these cost real time and each looks like something it is not.
    returned the whole site with HTTP 200 for every address that does not
    exist, which search engines read as unlimited duplicate pages. The site
    routes on the URL hash and never on the path, so it bought nothing.
+8. **`server_name _` is not a catch-all.** It is a name matching no real host.
+   A block gets unmatched traffic only because it is the FIRST block on that
+   port. Adding a server block above it steals the default and, in this case,
+   took the site down: the apex matched nothing, fell through to a www
+   redirect and bounced to itself. Fixed with an explicit `default_server`.
+9. **Cloudflare caches redirects for hours.** A `return 301` never reaches the
+   `location` blocks that set short cache headers, so it ships bare and
+   Cloudflare applies a multi-hour default. That outlived the fix. Purge after
+   any redirect mistake, not just after a rebuild.
+10. **Test the hostname you did not touch.** Adding the www redirect, www was
+   verified and passed while the apex was broken.
 
 When something looks wrong in the browser, check what is actually being served
 before trusting local rendering. One curl settles it.

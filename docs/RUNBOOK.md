@@ -352,6 +352,42 @@ startup and will refuse to start if one is missing:
 cd /opt/hillweather/deploy && docker compose ps web && docker compose logs --tail 15 web
 ```
 
+**Then curl every hostname, not just the one you changed.** A www redirect was
+added, verified on www, and shipped while the apex was redirecting to itself:
+
+```bash
+for h in hillweather.co.uk www.hillweather.co.uk hillweather.uk www.hillweather.uk; do
+  printf "%-26s " "$h"
+  curl -s -o /dev/null -L --max-time 20 \
+    -w "final %{http_code} after %{num_redirects} hop(s) -> %{url_effective}\n" "https://$h/"
+done
+```
+
+Every line should end at `https://hillweather.co.uk/` in at most one hop. Any
+line showing many hops is a redirect loop and the site is down.
+
+**Two nginx facts that caused that outage**, both worth knowing before editing
+the config:
+
+`server_name _` is NOT a catch-all. It is a name that matches no real host. A
+block receives unmatched traffic only because it is the first block on that
+port, which makes it the implicit default. Adding any server block above it
+silently takes that role. The main block now carries `listen 80 default_server`
+so file order cannot matter.
+
+A `return 301` never reaches the `location` blocks that set `max-age=300` on
+CSS and JS, so redirects ship with no cache headers and Cloudflare applies its
+own multi-hour default. A cached redirect outlives its own fix. **Purge
+Cloudflare after any redirect or config mistake**, then confirm with a
+cache-busting query, which is a different cache key and always reaches origin:
+
+```bash
+curl -sI "https://hillweather.co.uk/analytics.js"        | head -1   # cached
+curl -sI "https://hillweather.co.uk/analytics.js?cb=$RANDOM" | head -1   # origin
+```
+
+A mismatch between those two means Cloudflare is still serving something stale.
+
 How much history exists:
 
 ```bash
@@ -406,6 +442,26 @@ One caveat either way. Link scrapers cache the preview hard, and the URL stays
 Facebook or WhatsApp fetched the first time. Giving the file a versioned URL
 would fix that and break every previously shared link instead, which is the
 worse trade.
+
+---
+
+## Analytics
+
+Google Analytics 4, live since 2026-08-24. Account **Hill Weather**, property
+`hillweather.co.uk`, measurement ID `G-8J78948PTM`, set in `web/analytics.js`.
+
+It is consent-gated on purpose. Nothing from Google loads until a visitor
+clicks Allow, because analytics are not "strictly necessary" under UK PECR and
+the forecast works identically without them. The answer is kept in
+localStorage, not a cookie: recording a refusal in a cookie would mean setting
+a cookie to honour somebody declining cookies. Ad storage, ad user data and ad
+personalisation are denied permanently.
+
+**Realtime showing zero users is normal.** It only counts people who accepted.
+To test, load the site, click Allow, then look at Realtime.
+
+Expect undercounting. Everyone who declines is invisible, so read the trend
+rather than the absolute number.
 
 ---
 
